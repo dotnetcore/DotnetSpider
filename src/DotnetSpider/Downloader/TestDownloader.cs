@@ -1,5 +1,6 @@
 using System;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using DotnetSpider.Common;
 using Microsoft.Extensions.Logging;
@@ -28,22 +29,17 @@ namespace DotnetSpider.Downloader
 				Logger?.LogInformation($"任务 {request.OwnerId} 下载 {request.Url} 成功");
 				return new Response
 				{
-					RawText = content,
+					Content = Encoding.UTF8.GetBytes(content),
 					Request = request,
 					AgentId = AgentId,
-					Success = true
+					Success = true,
+					CharSet = "UTF-8"
 				};
 			}
 			catch (Exception e)
 			{
 				Logger?.LogInformation($"任务 {request.OwnerId} 下载 {request.Url} 失败: {e}");
-				return new Response
-				{
-					Request = request,
-					AgentId = AgentId,
-					Success = false,
-					Exception = e.ToString()
-				};
+				return new Response {Request = request, AgentId = AgentId, Success = false, Exception = e.ToString()};
 			}
 		}
 	}

@@ -37,7 +37,7 @@ namespace DotnetSpider.Portal
 			services.AddSingleton<SpiderOptions>();
 			services.AddSingleton<PortalOptions>();
 
-			services.AddKafkaEventBus();
+			services.AddKafka();
 			services.AddDownloadCenter(x => x.UseMySql());
 			services.AddStatisticsCenter(x => x.UseMySql());
 
@@ -160,7 +160,7 @@ namespace DotnetSpider.Portal
 					Schema = null,
 					Registry = null,
 					Repository = "dotnetspider/spiders.startup",
-					CreationTime = DateTime.Now,
+					CreationTime = DateTimeOffset.Now,
 					UserName = "",
 					Password = ""
 				};
@@ -173,7 +173,7 @@ namespace DotnetSpider.Portal
 					Repository = "dotnetspider/spiders.startup",
 					Type = "DotnetSpider.Spiders.CnblogsSpider",
 					Tag = "latest",
-					CreationTime = DateTime.Now
+					CreationTime = DateTimeOffset.Now
 				};
 				context.Spiders.Add(spider);
 				context.SaveChanges();

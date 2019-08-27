@@ -238,7 +238,7 @@ namespace DotnetSpider.DataFlow.Storage
 			var key = tableMetadata.TypeName;
 			if (tableMetadata.Schema.TablePostfix != TablePostfix.None)
 			{
-				key = $"{key}-{DateTime.Now:yyyyMMdd}";
+				key = $"{key}-{DateTimeOffset.Now:yyyyMMdd}";
 			}
 
 			lock (this)

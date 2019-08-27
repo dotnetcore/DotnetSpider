@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using Confluent.Kafka;
 using Confluent.Kafka.Admin;
 using DotnetSpider.Common;
-using DotnetSpider.EventBus;
+using DotnetSpider.MessageQueue;
+using MessagePack;
+using MessagePack.Resolvers;
 using Microsoft.Extensions.Logging;
 using Partitioner = Confluent.Kafka.Partitioner;
 
@@ -16,13 +18,13 @@ namespace DotnetSpider.Kafka
 	/// TODO: 确定 Kafka 这个客户端在网络断开、Kafka 崩溃情况下的表现，是否一直等待还是抛异常退出
 	/// TODO: 如果会退出，则需要重试
 	/// </summary>
-	public class KafkaEventBus : IEventBus
+	public class KafkaMq : IMq
 	{
-		private readonly ConcurrentDictionary<string, IConsumer<Null, Event>> _consumers =
-			new ConcurrentDictionary<string, IConsumer<Null, Event>>();
+		private readonly ConcurrentDictionary<string, IConsumer<Null, byte[]>> _consumers =
+			new ConcurrentDictionary<string, IConsumer<Null, byte[]>>();
 
 		private readonly ILogger _logger;
-		private readonly IProducer<Null, Event> _producer;
+		private readonly IProducer<Null, byte[]> _producer;
 		private readonly KafkaOptions _options;
 
 		/// <summary>
@@ -30,44 +32,50 @@ namespace DotnetSpider.Kafka
 		/// </summary>
 		/// <param name="options">爬虫选项</param>
 		/// <param name="logger">日志接口</param>
-		public KafkaEventBus(KafkaOptions options,
-			ILogger<KafkaEventBus> logger)
+		public KafkaMq(KafkaOptions options,
+			ILogger<KafkaMq> logger)
 		{
 			_logger = logger;
 			_options = options;
 			var productConfig = new ProducerConfig
 			{
-				Partitioner = Partitioner.ConsistentRandom,
-				CompressionType = CompressionType.Lz4
+				Partitioner = Partitioner.ConsistentRandom, CompressionType = CompressionType.Lz4
 			};
 			SetClientConfig(productConfig);
 			var builder =
-				new ProducerBuilder<Null, Event>(productConfig).SetValueSerializer(new ProtobufSerializer<Event>());
+				new ProducerBuilder<Null, byte[]>(productConfig);
 
 			_producer = builder.Build();
 		}
 
-		public async Task PublishAsync(string topic, Event message)
+		public async Task PublishAsync<TData>(string topic, MessageData<TData> message)
 		{
 			if (message == null)
 			{
 #if DEBUG
-				var stackTrace = new StackTrace();
+				var stackTrace = new System.Diagnostics.StackTrace();
 				_logger.LogDebug($"Publish empty message to topic {topic}: {stackTrace}");
 #endif
 				return;
 			}
 
-			message.Timestamp = (long) DateTimeHelper.GetCurrentUnixTimeNumber();
+
 			await _producer.ProduceAsync(topic,
-				new Message<Null, Event>
+				new Message<Null, byte[]>
 				{
-					Value = message
+					Value = LZ4MessagePackSerializer.Serialize(
+						new TransferMessage
+						{
+							Timestamp = (long)DateTimeHelper.GetCurrentUnixTimeNumber(),
+							Type = message.Type,
+							Data = LZ4MessagePackSerializer.Serialize(message.Data,
+								TypelessContractlessStandardResolver.Instance)
+						}, TypelessContractlessStandardResolver.Instance)
 				});
 		}
 
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		public void Subscribe(string topic, Action<Event> action)
+		public void Subscribe<TData>(string topic, Action<MessageData<TData>> action)
 		{
 			if (_consumers.ContainsKey(topic))
 			{
@@ -96,8 +104,7 @@ namespace DotnetSpider.Kafka
 				AutoOffsetReset = AutoOffsetReset.Earliest
 			};
 			SetClientConfig(config);
-			var consumer = new ConsumerBuilder<Null, Event>(config)
-				.SetValueDeserializer(new ProtobufDeserializer<Event>()).Build();
+			var consumer = new ConsumerBuilder<Null, byte[]>(config).Build();
 			consumer.Subscribe(topic);
 			_consumers.TryAdd(topic, consumer);
 			Task.Factory.StartNew(() =>
@@ -105,10 +112,16 @@ namespace DotnetSpider.Kafka
 				_logger.LogInformation("Subscribe: " + topic);
 				while (_consumers.ContainsKey(topic))
 				{
-					Event msg = null;
+					TransferMessage msg = null;
 					try
 					{
-						msg = consumer.Consume().Value;
+						var value = consumer.Consume().Value;
+						msg = LZ4MessagePackSerializer.Deserialize<TransferMessage>(value,
+							TypelessContractlessStandardResolver.Instance);
+					}
+					catch (ObjectDisposedException)
+					{
+						_logger?.LogDebug("Kafka handler is disposed");
 					}
 					catch (Exception e)
 					{
@@ -119,7 +132,13 @@ namespace DotnetSpider.Kafka
 					{
 						try
 						{
-							action(msg);
+							action?.Invoke(new MessageData<TData>
+							{
+								Timestamp = msg.Timestamp,
+								Type = msg.Type,
+								Data = LZ4MessagePackSerializer.Deserialize<TData>(msg.Data,
+									TypelessContractlessStandardResolver.Instance)
+							});
 						}
 						catch (Exception e)
 						{
@@ -156,7 +175,9 @@ namespace DotnetSpider.Kafka
 				adminClient.CreateTopicsAsync(new[]
 				{
 					new TopicSpecification
-						{NumPartitions = _options.TopicPartitionCount, Name = topic, ReplicationFactor = 1}
+					{
+						NumPartitions = _options.TopicPartitionCount, Name = topic, ReplicationFactor = 1
+					}
 				}).GetAwaiter().GetResult();
 			}
 			else
@@ -165,8 +186,7 @@ namespace DotnetSpider.Kafka
 				{
 					adminClient.CreatePartitionsAsync(new[]
 					{
-						new PartitionsSpecification
-							{Topic = topic, IncreaseTo = _options.TopicPartitionCount}
+						new PartitionsSpecification {Topic = topic, IncreaseTo = _options.TopicPartitionCount}
 					}).GetAwaiter().GetResult();
 				}
 			}

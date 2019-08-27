@@ -19,7 +19,7 @@ namespace DotnetSpider.Sample.samples
 				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
 				.ConfigureServices(services =>
 				{
-					services.AddKafkaEventBus();
+					services.AddKafka();
 					services.AddDownloadCenter(x => x.UseLocalDownloaderAgentStore());
 					services.AddDownloaderAgent(x =>
 					{

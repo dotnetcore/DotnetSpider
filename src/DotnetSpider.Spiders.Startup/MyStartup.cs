@@ -53,7 +53,7 @@ namespace DotnetSpider.Spiders.Startup
 			{
 				if (distributed)
 				{
-					services.AddLocalEventBus();
+					services.AddLocalMessageQueue();
 					services.AddLocalDownloadCenter();
 					services.AddDownloaderAgent(x =>
 					{
@@ -69,7 +69,7 @@ namespace DotnetSpider.Spiders.Startup
 				}
 				else
 				{
-					services.AddKafkaEventBus();
+					services.AddKafka();
 				}
 			});
 		}

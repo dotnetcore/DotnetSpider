@@ -3,7 +3,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Common;
 using DotnetSpider.DownloadAgentRegisterCenter.Entity;
-using DotnetSpider.EventBus;
+using DotnetSpider.MessageQueue;
+using MessagePack;
+using MessagePack.Resolvers;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -18,7 +20,7 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 		/// <summary>
 		/// 消息队列
 		/// </summary>
-		protected readonly IEventBus EventBus;
+		protected readonly IMq Mq;
 
 		/// <summary>
 		/// 系统选项
@@ -43,12 +45,12 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 		/// <param name="options">系统选项</param>
 		/// <param name="logger">日志接口</param>
 		protected DownloadAgentRegisterCenterBase(
-			IEventBus eventBus,
+			IMq eventBus,
 			IDownloaderAgentStore downloaderAgentStore,
 			SpiderOptions options,
 			ILogger logger)
 		{
-			EventBus = eventBus;
+			Mq = eventBus;
 			DownloaderAgentStore = downloaderAgentStore;
 			Logger = logger;
 			Options = options;
@@ -65,7 +67,7 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 				Logger.LogError($"Initialize register center database failed: {e}");
 			}
 
-			EventBus.Subscribe(Options.TopicDownloaderAgentRegisterCenter, async message =>
+			Mq.Subscribe<byte[]>(Options.TopicDownloaderAgentRegisterCenter, async message =>
 			{
 				if (message == null)
 				{
@@ -84,7 +86,7 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 					case Framework.RegisterCommand:
 					{
 						// 此处不考虑消息的超时，一是因为节点数量不会很多，二是因为超时的可以释放掉
-						var agent = JsonConvert.DeserializeObject<DownloaderAgent>(message.Data);
+						var agent = LZ4MessagePackSerializer.Deserialize<DownloaderAgent>(message.Data, TypelessContractlessStandardResolver.Instance);
 						if (agent != null)
 						{
 							await DownloaderAgentStore.RegisterAsync(agent);
@@ -100,10 +102,11 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 
 					case Framework.HeartbeatCommand:
 					{
-						var heartbeat = JsonConvert.DeserializeObject<DownloaderAgentHeartbeat>(message.Data);
+						var heartbeat = LZ4MessagePackSerializer.Deserialize<DownloaderAgentHeartbeat>(message.Data, TypelessContractlessStandardResolver.Instance);
 						if (heartbeat != null)
 						{
-							if ((DateTime.Now - heartbeat.CreationTime).TotalSeconds < Options.MessageExpiredTime)
+							var interval = (DateTimeOffset.Now - heartbeat.CreationTime).TotalSeconds;
+							if (interval < Options.MessageExpiredTime)
 							{
 								await DownloaderAgentStore.HeartbeatAsync(heartbeat);
 								Logger.LogDebug($"Agent {heartbeat.AgentId} refresh heartbeat success");
@@ -123,7 +126,7 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 
 		public override Task StopAsync(CancellationToken cancellationToken)
 		{
-			EventBus.Unsubscribe(Options.TopicDownloaderAgentRegisterCenter);
+			Mq.Unsubscribe(Options.TopicDownloaderAgentRegisterCenter);
 			Logger.LogInformation("Agent register center exited");
 			return base.StopAsync(cancellationToken);
 		}

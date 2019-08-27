@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using DotnetSpider.EventBus;
+using DotnetSpider.MessageQueue;
 using Xunit;
 
 namespace DotnetSpider.Tests.MessageQueue
@@ -11,11 +11,11 @@ namespace DotnetSpider.Tests.MessageQueue
 		public async Task PubAndSub()
 		{
 			int count = 0;
-			var mq = new LocalEventBus(CreateLogger<LocalEventBus>());
-			mq.Subscribe("topic", msg => { Interlocked.Increment(ref count); });
+			var mq = new LocalMessageQueue(CreateLogger<LocalMessageQueue>());
+			mq.Subscribe<string>("topic", msg => { Interlocked.Increment(ref count); });
 			for (int i = 0; i < 100; ++i)
 			{
-				await mq.PublishAsync("topic", new Event
+				await mq.PublishAsync("topic", new MessageData<string>
 				{
 					Data = "a"
 				});
@@ -35,12 +35,12 @@ namespace DotnetSpider.Tests.MessageQueue
 		public void ParallelPubAndSub()
 		{
 			int count = 0;
-			var mq = new LocalEventBus(CreateLogger<LocalEventBus>());
-			mq.Subscribe("topic", msg => { Interlocked.Increment(ref count); });
+			var mq = new LocalMessageQueue(CreateLogger<LocalMessageQueue>());
+			mq.Subscribe<string>("topic", msg => { Interlocked.Increment(ref count); });
 
 			Parallel.For(0, 100, async i =>
 			{
-				await mq.PublishAsync("topic", new Event
+				await mq.PublishAsync("topic", new MessageData<string>
 				{
 					Data = "a"
 				});
@@ -59,15 +59,15 @@ namespace DotnetSpider.Tests.MessageQueue
 		public async Task PubAndUnSub()
 		{
 			int count = 0;
-			var mq = new LocalEventBus(CreateLogger<LocalEventBus>());
-			mq.Subscribe("topic", msg => { Interlocked.Increment(ref count); });
+			var mq = new LocalMessageQueue(CreateLogger<LocalMessageQueue>());
+			mq.Subscribe<string>("topic", msg => { Interlocked.Increment(ref count); });
 
 			int i = 0;
 			Task.Factory.StartNew(async () =>
 			{
 				for (; i < 50; ++i)
 				{
-					await mq.PublishAsync("topic", new Event
+					await mq.PublishAsync("topic", new MessageData<string>
 					{
 						Data = "a"
 					});

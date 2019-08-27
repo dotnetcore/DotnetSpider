@@ -8,7 +8,6 @@ using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.DataFlow.Storage.Model;
-using DotnetSpider.DataFlow.Storage.MySql;
 using MySql.Data.MySqlClient;
 using Xunit;
 

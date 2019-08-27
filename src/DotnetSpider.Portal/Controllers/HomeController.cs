@@ -25,7 +25,7 @@ namespace DotnetSpider.Portal.Controllers
 			ViewData["Repository"] = await _dbContext.DockerRepositories.CountAsync();
 			ViewData["Spider"] = await _dbContext.Spiders.CountAsync();
 			ViewData["RunningSpider"] = await _dbContext.Set<SpiderStatistics>()
-				.CountAsync(x => (DateTime.Now - x.LastModificationTime).TotalSeconds < 60);
+				.CountAsync(x => (DateTimeOffset.Now - x.LastModificationTime).TotalSeconds < 60);
 			return View();
 		}
 

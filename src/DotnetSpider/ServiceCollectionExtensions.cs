@@ -4,7 +4,7 @@ using DotnetSpider.DataFlow;
 using DotnetSpider.DownloadAgent;
 using DotnetSpider.DownloadAgentRegisterCenter;
 using DotnetSpider.DownloadAgentRegisterCenter.Store;
-using DotnetSpider.EventBus;
+using DotnetSpider.MessageQueue;
 using DotnetSpider.Network;
 using DotnetSpider.Network.InternetDetector;
 using DotnetSpider.Statistics;
@@ -58,11 +58,11 @@ namespace DotnetSpider
 
 		#endregion
 
-		#region  EventBus
+		#region  MessageQueue
 
-		public static IServiceCollection AddLocalEventBus(this IServiceCollection services)
+		public static IServiceCollection AddLocalMessageQueue(this IServiceCollection services)
 		{
-			services.AddSingleton<IEventBus, LocalEventBus>();
+			services.AddSingleton<IMq, LocalMessageQueue>();
 			return services;
 		}
 

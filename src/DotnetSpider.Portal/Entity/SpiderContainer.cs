@@ -14,7 +14,7 @@ namespace DotnetSpider.Portal.Entity
 		public int Id { get; set; }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Column("spider_id")]
 		[Required]
@@ -33,13 +33,13 @@ namespace DotnetSpider.Portal.Entity
 		[Column("batch")]
 		[StringLength(100)]
 		public string Batch { get; set; }
-		
+
 		/// <summary>
 		/// 创建时间
 		/// </summary>
 		[Column("creation_time")]
 		[Required]
-		public DateTime CreationTime { get; set; }
+		public DateTimeOffset CreationTime { get; set; }
 
 		[Column("status")]
 		[StringLength(20)]

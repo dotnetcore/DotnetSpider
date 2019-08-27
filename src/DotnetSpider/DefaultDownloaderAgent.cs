@@ -1,6 +1,6 @@
 using DotnetSpider.Common;
 using DotnetSpider.DownloadAgent;
-using DotnetSpider.EventBus;
+using DotnetSpider.MessageQueue;
 using DotnetSpider.Network;
 using Microsoft.Extensions.Logging;
 
@@ -16,12 +16,12 @@ namespace DotnetSpider
 		/// </summary>
 		/// <param name="options">下载器代理选项</param>
 		/// <param name="spiderOptions"></param>
-		/// <param name="eventBus">消息队列</param>
+		/// <param name="mq">消息队列</param>
 		/// <param name="networkCenter">网络中心</param>
 		/// <param name="logger">日志接口</param>
 		public DefaultDownloaderAgent(DownloaderAgentOptions options,
-			SpiderOptions spiderOptions, IEventBus eventBus, NetworkCenter networkCenter,
-			ILogger<DefaultDownloaderAgent> logger) : base(options, spiderOptions, eventBus, networkCenter, logger)
+			SpiderOptions spiderOptions, IMq mq, NetworkCenter networkCenter,
+			ILogger<DefaultDownloaderAgent> logger) : base(options, spiderOptions, mq, networkCenter, logger)
 		{
 		}
 	}

@@ -41,7 +41,7 @@ namespace DotnetSpider.DownloaderAgentRegisterCenter
 					Log.Logger = configure.CreateLogger();
 
 					services.AddSingleton<SpiderOptions>();
-					services.AddKafkaEventBus();
+					services.AddKafka();
 					services.AddDownloadCenter(x => x.UseMySql());
 					services.AddStatisticsCenter(x => x.UseMySql());
 				})

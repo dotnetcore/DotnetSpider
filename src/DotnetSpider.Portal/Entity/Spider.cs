@@ -28,7 +28,7 @@ namespace DotnetSpider.Portal.Entity
 		[StringLength(400)]
 		[Column("type")]
 		public string Type { get; set; }
-		
+
 		/// <summary>
 		/// 定时表达式
 		/// </summary>
@@ -50,7 +50,7 @@ namespace DotnetSpider.Portal.Entity
 		[StringLength(255)]
 		[Column("registry")]
 		public string Registry { get; set; }
-		
+
 		/// <summary>
 		/// docker 镜像仓库名称
 		/// </summary>
@@ -66,18 +66,18 @@ namespace DotnetSpider.Portal.Entity
 		[Required]
 		[Column("tag")]
 		public string Tag { get; set; }
-		
+
 		/// <summary>
 		/// Creation time of this entity.
 		/// </summary>
 		[Required]
 		[Column("creation_time")]
-		public DateTime CreationTime { get; set; }
+		public DateTimeOffset CreationTime { get; set; }
 
 		/// <summary>
 		/// 上一次更新时间
 		/// </summary>
 		[Column("last_modification_time")]
-		public DateTime LastModificationTime { get; set; }
+		public DateTimeOffset LastModificationTime { get; set; }
 	}
 }

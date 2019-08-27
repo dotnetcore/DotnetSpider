@@ -28,8 +28,8 @@ namespace DotnetSpider.DownloadAgentRegisterCenter.Store
 		{
 			_agents.AddOrUpdate(agent.Id, x => agent, (s, a) =>
 			{
-				a.CreationTime = DateTime.Now;
-				a.LastModificationTime = DateTime.Now;
+				a.CreationTime = DateTimeOffset.Now;
+				a.LastModificationTime = DateTimeOffset.Now;
 				return a;
 			});
 			return Task.CompletedTask;
@@ -44,7 +44,7 @@ namespace DotnetSpider.DownloadAgentRegisterCenter.Store
 		{
 			if (_agents.TryGetValue(heartbeat.AgentId, out var agent))
 			{
-				agent.LastModificationTime = DateTime.Now;
+				agent.LastModificationTime = DateTimeOffset.Now;
 			}
 
 			return Task.CompletedTask;

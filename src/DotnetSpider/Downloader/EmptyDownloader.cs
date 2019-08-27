@@ -1,3 +1,4 @@
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,7 +12,8 @@ namespace DotnetSpider.Downloader
 			return Task.FromResult(new Response
 			{
 				Request = request,
-				RawText = "From empty downloader",
+				Content = Encoding.UTF8.GetBytes("From empty downloader"),
+				CharSet = "UTF-8",
 				Success = true,
 				TargetUrl = request.Url
 			});

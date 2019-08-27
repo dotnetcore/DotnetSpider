@@ -18,7 +18,7 @@ namespace DotnetSpider.Sample.samples
 				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
 				.ConfigureServices(services =>
 				{
-					services.AddKafkaEventBus();
+					services.AddKafka();
 				});
 			var provider = builder.Build();
 

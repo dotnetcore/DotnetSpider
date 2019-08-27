@@ -30,7 +30,7 @@ namespace DotnetSpider.Common
 
         public void Dispose()
         {
-            _stream?.WriteAllText(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            _stream?.WriteAllText(DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             _stream?.Dispose();
             _stream = null;
         }

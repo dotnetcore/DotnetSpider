@@ -2,9 +2,6 @@
 using System.Threading.Tasks;
 using DotnetSpider.Common;
 using DotnetSpider.DataFlow.Storage;
-using DotnetSpider.DataFlow.Storage.Mongo;
-using DotnetSpider.DataFlow.Storage.MySql;
-using DotnetSpider.DataFlow.Storage.PostgreSql;
 using DotnetSpider.Downloader;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Statistics.Store;
@@ -264,7 +261,7 @@ namespace DotnetSpider.Tests
 				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
 				.ConfigureServices(services =>
 				{
-					services.AddLocalEventBus();
+					services.AddLocalMessageQueue();
 					services.AddLocalDownloadCenter();
 					services.AddDownloaderAgent(x =>
 					{
@@ -313,7 +310,7 @@ namespace DotnetSpider.Tests
 				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
 				.ConfigureServices(services =>
 				{
-					services.AddLocalEventBus();
+					services.AddLocalMessageQueue();
 					services.AddLocalDownloadCenter();
 					services.AddDownloaderAgent(x =>
 					{

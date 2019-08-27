@@ -8,11 +8,12 @@ using System.Threading.Tasks;
 using DotnetSpider.Common;
 using DotnetSpider.DownloadAgentRegisterCenter.Entity;
 using DotnetSpider.Downloader;
-using DotnetSpider.EventBus;
+using DotnetSpider.MessageQueue;
 using DotnetSpider.Network;
+using MessagePack;
+using MessagePack.Resolvers;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace DotnetSpider.DownloadAgent
 {
@@ -21,7 +22,7 @@ namespace DotnetSpider.DownloadAgent
 	/// </summary>
 	public abstract class DownloaderAgentBase : BackgroundService, IDownloaderAgent
 	{
-		private readonly IEventBus _eventBus;
+		private readonly IMq _mq;
 		private readonly DownloaderAgentOptions _options;
 		private readonly SpiderOptions _spiderOptions;
 		private bool _exit;
@@ -45,36 +46,37 @@ namespace DotnetSpider.DownloadAgent
 		protected DownloaderAgentBase(
 			DownloaderAgentOptions options,
 			SpiderOptions spiderOptions,
-			IEventBus eventBus,
+			IMq eventBus,
 			NetworkCenter networkCenter,
 			ILogger logger)
 		{
 			_spiderOptions = spiderOptions;
-			_eventBus = eventBus;
+			_mq = eventBus;
 			_options = options;
 			Framework.NetworkCenter = networkCenter;
 
-			Logger = _eventBus is LocalEventBus ? null : logger;
+			Logger = _mq is LocalMessageQueue ? null : logger;
 		}
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			await _eventBus.PublishAsync(_spiderOptions.TopicDownloaderAgentRegisterCenter, new Event
-			{
-				Type = Framework.RegisterCommand,
-				Data = JsonConvert.SerializeObject(new DownloaderAgent
+			await _mq.PublishAsync(_spiderOptions.TopicDownloaderAgentRegisterCenter,
+				new MessageData<byte[]>
 				{
-					Id = _options.AgentId,
-					Name = _options.Name,
-					ProcessorCount = Environment.ProcessorCount,
-					TotalMemory = Framework.TotalMemory,
-					CreationTime = DateTime.Now,
-					LastModificationTime = DateTime.Now
-				})
-			});
-
+					Type = Framework.RegisterCommand,
+					Data = LZ4MessagePackSerializer.Serialize(new DownloaderAgent
+					{
+						Id = _options.AgentId,
+						Name = _options.Name,
+						ProcessorCount = Environment.ProcessorCount,
+						TotalMemory = Framework.TotalMemory,
+						CreationTime = DateTimeOffset.Now,
+						LastModificationTime = DateTimeOffset.Now
+					}, TypelessContractlessStandardResolver.Instance)
+				});
+			Logger?.LogInformation($"Agent {_options.AgentId} register success");
 			// 订阅节点
-			SubscribeMessage();
+			Subscribe();
 
 			await SendHeartbeatAsync();
 
@@ -89,9 +91,9 @@ namespace DotnetSpider.DownloadAgent
 		public override Task StopAsync(CancellationToken cancellationToken)
 		{
 			_exit = true;
-			_eventBus.Unsubscribe(_options.AgentId);
-			_eventBus.Unsubscribe("DownloadQueue");
-			_eventBus.Unsubscribe("AdslDownloadQueue");
+			_mq.Unsubscribe(_options.AgentId);
+			_mq.Unsubscribe("DownloadQueue");
+			_mq.Unsubscribe("AdslDownloadQueue");
 
 
 			// 一小时
@@ -109,20 +111,22 @@ namespace DotnetSpider.DownloadAgent
 		/// <summary>
 		/// 订阅消息
 		/// </summary>
-		private void SubscribeMessage()
+		private void Subscribe()
 		{
 			while (true)
 			{
 				try
 				{
-					_eventBus.Subscribe(_options.AgentId, HandleMessage);
+					_mq.Subscribe<string>(_options.AgentId, HandleCommand);
 
-					_eventBus.Subscribe("DownloadQueue", HandleMessage);
+					_mq.Subscribe<Request[]>("DownloadQueue", HandleRequest);
 
 					if (_options.SupportAdsl)
 					{
-						_eventBus.Subscribe("AdslDownloadQueue", HandleMessage);
+						_mq.Subscribe<Request[]>("AdslDownloadQueue", HandleRequest);
 					}
+
+					_mq.Subscribe<Request[]>($"{_options.AgentId}-DownloadQueue", HandleRequest);
 
 					return;
 				}
@@ -155,21 +159,18 @@ namespace DotnetSpider.DownloadAgent
 
 		private async Task SendHeartbeatAsync()
 		{
-			var json = JsonConvert.SerializeObject(new DownloaderAgentHeartbeat
+			var bytes = LZ4MessagePackSerializer.Serialize(new DownloaderAgentHeartbeat
 			{
 				AgentId = _options.AgentId,
 				AgentName = _options.Name,
-				FreeMemory = (int) Framework.GetFreeMemory(),
+				FreeMemory = (int)Framework.GetFreeMemory(),
 				DownloaderCount = _cache.Count,
-				CreationTime = DateTime.Now
-			});
+				CreationTime = DateTimeOffset.Now
+			}, TypelessContractlessStandardResolver.Instance);
 
-			await _eventBus.PublishAsync(_spiderOptions.TopicDownloaderAgentRegisterCenter,
-				new Event
-				{
-					Type = Framework.HeartbeatCommand,
-					Data = json
-				});
+			await _mq.PublishAsync(_spiderOptions.TopicDownloaderAgentRegisterCenter,
+				new MessageData<byte[]> {Type = Framework.HeartbeatCommand, Data = bytes});
+
 			Logger?.LogDebug($"Agent {_options.AgentId} send heartbeat success");
 		}
 
@@ -183,7 +184,7 @@ namespace DotnetSpider.DownloadAgent
 
 					try
 					{
-						var now = DateTime.Now;
+						var now = DateTimeOffset.Now;
 						var expires = new List<string>();
 						foreach (var kv in _cache)
 						{
@@ -217,9 +218,56 @@ namespace DotnetSpider.DownloadAgent
 			}, stoppingToken);
 		}
 
-		private void HandleMessage(Event message)
+		private void HandleCommand(MessageData<string> message)
 		{
-			if (message == null)
+			if (message?.Data == null || message.Data.Length == 0)
+			{
+				Logger?.LogWarning($"Agent {_options.AgentId} receive empty command");
+				return;
+			}
+#if DEBUG
+			Logger?.LogDebug($"Agent {_options.AgentId} receive command: {message}");
+#endif
+
+			try
+			{
+				if (message.IsTimeout(60))
+				{
+					return;
+				}
+
+				switch (message.Type)
+				{
+					case Framework.ExitCommand:
+					{
+						if (message.Data == _options.AgentId)
+						{
+							StopAsync(default).ConfigureAwait(true).GetAwaiter();
+						}
+						else
+						{
+							Logger?.LogWarning($"Agent {_options.AgentId} receive wrong command: {message}");
+						}
+
+						break;
+					}
+
+					default:
+					{
+						Logger?.LogError($"Agent {_options.AgentId} can't handle command: {message}");
+						break;
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				Logger?.LogError($"Agent {_options.AgentId} handle command: {message} failed: {e}");
+			}
+		}
+
+		private void HandleRequest(MessageData<Request[]> message)
+		{
+			if (message?.Data == null || message.Data.Length == 0)
 			{
 				Logger?.LogWarning($"Agent {_options.AgentId} receive empty message");
 				return;
@@ -230,35 +278,16 @@ namespace DotnetSpider.DownloadAgent
 
 			try
 			{
+				if (message.IsTimeout(60))
+				{
+					return;
+				}
+
 				switch (message.Type)
 				{
 					case Framework.DownloadCommand:
 					{
-						if (message.IsTimeout(60))
-						{
-							break;
-						}
-
 						DownloadAsync(message.Data).ConfigureAwait(false).GetAwaiter();
-						break;
-					}
-
-					case Framework.ExitCommand:
-					{
-						if (message.IsTimeout(6))
-						{
-							break;
-						}
-
-						if (message.Data == _options.AgentId)
-						{
-							StopAsync(default).ConfigureAwait(true).GetAwaiter();
-						}
-						else
-						{
-							Logger?.LogWarning($"Agent {_options.AgentId} receive wrong message: {message}");
-						}
-
 						break;
 					}
 
@@ -275,14 +304,12 @@ namespace DotnetSpider.DownloadAgent
 			}
 		}
 
-		private async Task DownloadAsync(string message)
+		private async Task DownloadAsync(Request[] requests)
 		{
-			var requests = JsonConvert.DeserializeObject<Request[]>(message);
-
 			if (requests.Length > 0)
 			{
-				// 超时 60 秒的不再下载 
-				requests = requests.Where(x => (DateTime.Now - x.CreationTime).TotalSeconds < 60).ToArray();
+				// 超时 60 秒的不再下载
+				requests = requests.Where(x => (DateTimeOffset.Now - x.CreationTime).TotalSeconds < 60).ToArray();
 
 				var downloader = GetDownloader(requests[0]);
 				if (downloader == null)
@@ -308,11 +335,8 @@ namespace DotnetSpider.DownloadAgent
 						response = await downloader.DownloadAsync(request);
 					}
 
-					await _eventBus.PublishAsync($"{_spiderOptions.TopicResponseHandler}{request.OwnerId}",
-						new Event
-						{
-							Data = JsonConvert.SerializeObject(new[] {response})
-						});
+					await _mq.PublishAsync($"{_spiderOptions.TopicResponseHandler}{request.OwnerId}",
+						new MessageData<Response[]> {Data = new[] {response}});
 				}
 			}
 			else
@@ -335,31 +359,19 @@ namespace DotnetSpider.DownloadAgent
 				{
 					case DownloaderType.Empty:
 					{
-						downloader = new EmptyDownloader
-						{
-							AgentId = _options.AgentId,
-							Logger = Logger
-						};
+						downloader = new EmptyDownloader {AgentId = _options.AgentId, Logger = Logger};
 						break;
 					}
 
 					case DownloaderType.Test:
 					{
-						downloader = new TestDownloader
-						{
-							AgentId = _options.AgentId,
-							Logger = Logger
-						};
+						downloader = new TestDownloader {AgentId = _options.AgentId, Logger = Logger};
 						break;
 					}
 
 					case DownloaderType.Exception:
 					{
-						downloader = new ExceptionDownloader
-						{
-							AgentId = _options.AgentId,
-							Logger = Logger
-						};
+						downloader = new ExceptionDownloader {AgentId = _options.AgentId, Logger = Logger};
 						break;
 					}
 
@@ -377,7 +389,6 @@ namespace DotnetSpider.DownloadAgent
 							UseProxy = request.UseProxy,
 							AllowAutoRedirect = request.AllowAutoRedirect,
 							Timeout = request.Timeout,
-							DecodeHtml = request.DecodeHtml,
 							UseCookies = request.UseCookies,
 							HttpProxyPool = string.IsNullOrWhiteSpace(_options.ProxySupplyUrl)
 								? null

@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using DotnetSpider.Downloader;
 
 namespace DotnetSpider.DataFlow.Parser
 {
@@ -12,7 +13,7 @@ namespace DotnetSpider.DataFlow.Parser
 			if (context.Response != null)
 			{
 				context.AddData("URL", context.Response.Request.Url);
-				context.AddData("Content", context.Response.RawText);
+				context.AddData("Content", context.Response.GetRawtext());
 				context.AddData("TargetUrl", context.Response.TargetUrl);
 				context.AddData("Success", context.Response.Success);
 				context.AddData("ElapsedMilliseconds", context.Response.ElapsedMilliseconds);

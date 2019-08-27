@@ -4,7 +4,6 @@ using DotnetSpider.Common;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Storage;
-using DotnetSpider.DataFlow.Storage.Mongo;
 using DotnetSpider.Downloader;
 using Microsoft.Extensions.Configuration;
 using Serilog;
@@ -20,7 +19,7 @@ namespace DotnetSpider.Sample.samples
 				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
 				.ConfigureServices(services =>
 				{
-					services.AddLocalEventBus();
+					services.AddLocalMessageQueue();
 					services.AddLocalDownloadCenter();
 					services.AddDownloaderAgent(x =>
 					{
@@ -56,7 +55,7 @@ namespace DotnetSpider.Sample.samples
 				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
 				.ConfigureServices(services =>
 				{
-					services.AddLocalEventBus();
+					services.AddLocalMessageQueue();
 					services.AddLocalDownloadCenter();
 					services.AddDownloaderAgent(x =>
 					{

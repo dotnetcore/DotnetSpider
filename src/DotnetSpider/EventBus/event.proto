@@ -1,9 +1,0 @@
-syntax = "proto3";
-
-package dotnetSpider.eventBus;
-
-message Event {
-    string Type = 1;
-    int64 Timestamp = 2;
-    string Data = 3;
-}

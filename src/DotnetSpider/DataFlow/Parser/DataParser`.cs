@@ -151,14 +151,14 @@ namespace DotnetSpider.DataFlow.Parser
 						case "DATE":
 						case "TODAY":
 						{
-							value = DateTime.Now.Date.ToString("yyyy-MM-dd");
+							value = DateTimeOffset.Now.Date.ToString("yyyy-MM-dd");
 							break;
 						}
 
 						case "DATETIME":
 						case "NOW":
 						{
-							value = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+							value = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss");
 							break;
 						}
 

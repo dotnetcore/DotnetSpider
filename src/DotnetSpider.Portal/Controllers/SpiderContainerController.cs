@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using DotnetSpider.Common;
-using DotnetSpider.EventBus;
+using DotnetSpider.MessageQueue;
 using DotnetSpider.Portal.Models.SpiderContainer;
 using DotnetSpider.Statistics.Entity;
 using Microsoft.AspNetCore.Mvc;
@@ -18,15 +18,15 @@ namespace DotnetSpider.Portal.Controllers
 	{
 		private readonly ILogger _logger;
 		private readonly PortalDbContext _dbContext;
-		private readonly IEventBus _eventBus;
+		private readonly IMq _mq;
 
 		public SpiderContainerController(PortalDbContext dbContext,
-			IEventBus eventBus,
+			IMq eventBus,
 			ILogger<SpiderController> logger)
 		{
 			_logger = logger;
 			_dbContext = dbContext;
-			_eventBus = eventBus;
+			_mq = eventBus;
 		}
 
 		[HttpGet("spider/{id}/containers")]
@@ -74,7 +74,7 @@ namespace DotnetSpider.Portal.Controllers
 		{
 			try
 			{
-				await _eventBus.PublishAsync(batch, new Event
+				await _mq.PublishAsync(batch,  new MessageData<string>
 				{
 					Type = Framework.ExitCommand,
 					Data = batch

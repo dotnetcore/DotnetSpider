@@ -224,7 +224,7 @@ namespace DotnetSpider.Common
 					$"<td>{ExpectedValue}</td>" +
 					$"<td>{result}</td>" +
 					$"<td style=\"color:{color}\"><strong>{verifyResultStr}</strong></td>" +
-					$"<td>{DateTime.Now:yyyy-MM-dd HH:mm:ss}</td>" +
+					$"<td>{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss}</td>" +
 					"</tr>";
 
 				return new VerificationMessage
@@ -347,7 +347,7 @@ namespace DotnetSpider.Common
 					$"<td>{ExpectedValue}</td>" +
 					$"<td>{Acutal}</td>" +
 					$"<td style=\"color:{color}\"><strong>{verifyResultStr}</strong></td>" +
-					$"<td>{DateTime.Now:yyyy-MM-dd HH:mm:ss}</td>" +
+					$"<td>{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss}</td>" +
 					"</tr>";
 
 				return Task.FromResult(new VerificationMessage
@@ -487,13 +487,13 @@ namespace DotnetSpider.Common
 					"<meta charset=\"utf-8\">" +
 					"<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">" +
 					"<meta name=\"viewport\" content=\"width=device-width initial-scale=1.0\">" +
-					$"<title>{Subject}: {DateTime.Now}</title>" +
+					$"<title>{Subject}: {DateTimeOffset.Now}</title>" +
 					"<style>" +
 					"table {border-collapse: collapse;border-spacing: 0;border-left: 1px solid #888;border-top: 1px solid #888;background: #efefef;}th, td {border-right: 1px solid #888;border-bottom: 1px solid #888;padding: 5px 15px;}th {font-weight: bold;background: #ccc;}" +
 					"</style>" +
 					"</head>" +
 					"<body style=\"background-color:#FAF7EC\">" +
-					$"<h2>{Subject}: {DateTime.Now}</h2>" +
+					$"<h2>{Subject}: {DateTimeOffset.Now}</h2>" +
 					$"&nbsp;&nbsp;&nbsp;<strong>Description: </strong>{Description}" +
 					"<br/><br/>" +
 					"<table>" +
@@ -556,7 +556,7 @@ namespace DotnetSpider.Common
 				if (success && !string.IsNullOrWhiteSpace(ExportDataSql) &&
 				    !string.IsNullOrWhiteSpace(ExportDataFile))
 				{
-					var path = conn.Export(ExportDataSql, $"{ExportDataFile}_{DateTime.Now:yyyyMMddhhmmss}",
+					var path = conn.Export(ExportDataSql, $"{ExportDataFile}_{DateTimeOffset.Now:yyyyMMddhhmmss}",
 						true);
 					var attachment = new MimePart("excel", "xlsx")
 					{

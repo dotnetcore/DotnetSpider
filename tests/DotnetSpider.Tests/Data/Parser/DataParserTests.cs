@@ -19,7 +19,9 @@ namespace DotnetSpider.Tests.Data.Parser
 				new DataFlowContext(
 					new Response
 					{
-						Request = new Request("http://cnblogs.com"), RawText = File.ReadAllText("cnblogs.html")
+						Request = new Request("http://cnblogs.com"),
+						Content = File.ReadAllBytes("cnblogs.html"),
+						CharSet = "UTF-8"
 					}, services);
 			if (dataContext.Selectable == null)
 			{

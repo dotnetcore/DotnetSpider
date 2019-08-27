@@ -77,7 +77,7 @@ namespace DotnetSpider.Portal
 						Batch = batch,
 						SpiderId = spider.Id,
 						Status = "Created",
-						CreationTime = DateTime.Now
+						CreationTime = DateTimeOffset.Now
 					};
 
 					dbContext.SpiderContainers.Add(spiderContainer);

@@ -88,22 +88,22 @@ namespace DotnetSpider.Selector
 			{
 				case "now":
 				{
-					return DateTime.Now.ToString("yyyy/MM/dd hh:mm:ss");
+					return DateTimeOffset.Now.ToString("yyyy/MM/dd hh:mm:ss");
 				}
 				case "monday":
 				{
-					var now = DateTime.Now;
+					var now = DateTimeOffset.Now;
 					int i = now.DayOfWeek - DayOfWeek.Monday == -1 ? 6 : -1;
 					TimeSpan ts = new TimeSpan(i, 0, 0, 0);
 					return now.Subtract(ts).Date.ToString("yyyy/MM/dd hh:mm:ss");
 				}
 				case "today":
 				{
-					return DateTime.Now.Date.ToString("yyyy/MM/dd hh:mm:ss");
+					return DateTimeOffset.Now.Date.ToString("yyyy/MM/dd hh:mm:ss");
 				}
 				case "monthly":
 				{
-					var now = DateTime.Now;
+					var now = DateTimeOffset.Now;
 					return now.AddDays(now.Day * -1 + 1).ToString("yyyy/MM/dd hh:mm:ss");
 				}
 				default:

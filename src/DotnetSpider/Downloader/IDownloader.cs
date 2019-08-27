@@ -23,7 +23,7 @@ namespace DotnetSpider.Downloader
 	    /// <summary>
 	    /// 最后一次使用时间
 	    /// </summary>
-        DateTime LastUsedTime { get; set; }
+	    DateTimeOffset LastUsedTime { get; set; }
 
 	    /// <summary>
 	    /// 添加 Cookie

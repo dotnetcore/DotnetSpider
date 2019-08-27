@@ -14,6 +14,16 @@ namespace DotnetSpider.DownloaderAgent
 {
 	class Program
 	{
+		public class MyClass
+		{
+			public string Name { get; set; }
+		}
+
+		public class MyClass2
+		{
+			public byte[] Data { get; set; }
+		}
+
 		static void Main(string[] args)
 		{
 			var host = new HostBuilder().ConfigureAppConfiguration(x =>
@@ -33,7 +43,7 @@ namespace DotnetSpider.DownloaderAgent
 					var logPath = $"/logs/{options.Name}.log";
 					var configure = new LoggerConfiguration()
 #if DEBUG
-						.MinimumLevel.Verbose()
+						.MinimumLevel.Debug()
 #else
 						.MinimumLevel.Information()
 #endif
@@ -44,9 +54,9 @@ namespace DotnetSpider.DownloaderAgent
 					Log.Logger = configure.CreateLogger();
 
 					PrintEnvironment(hostContext.Configuration);
-					
+
 					services.AddSingleton<SpiderOptions>();
-					services.AddKafkaEventBus();
+					services.AddKafka();
 					services.AddDownloaderAgent(x =>
 					{
 						x.UseFileLocker();
@@ -59,7 +69,7 @@ namespace DotnetSpider.DownloaderAgent
 				.Build();
 			host.Run();
 		}
-		
+
 		private static void PrintEnvironment(IConfiguration configuration)
 		{
 			Framework.PrintInfo();

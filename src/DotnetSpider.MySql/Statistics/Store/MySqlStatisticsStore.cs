@@ -85,7 +85,7 @@ namespace DotnetSpider.Statistics.Store
 					new
 					{
 						OwnerId = ownerId,
-						Start = DateTime.Now
+						Start = DateTimeOffset.Now
 					});
 			}
 		}
@@ -100,7 +100,7 @@ namespace DotnetSpider.Statistics.Store
 					new
 					{
 						OwnerId = ownerId,
-						Exit = DateTime.Now
+						Exit = DateTimeOffset.Now
 					});
 			}
 		}

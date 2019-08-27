@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Dapper;
 using DotnetSpider.Common;
 using DotnetSpider.DownloadAgentRegisterCenter.Entity;
-using DotnetSpider.EventBus;
+using DotnetSpider.MessageQueue;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -16,14 +16,14 @@ namespace DotnetSpider.Portal.Controllers
 	{
 		private readonly ILogger _logger;
 		private readonly PortalDbContext _dbContext;
-		private readonly IEventBus _eventBus;
+		private readonly IMq _mq;
 
-		public DownloaderAgentController(PortalDbContext dbContext, IEventBus eventBus,
+		public DownloaderAgentController(PortalDbContext dbContext, IMq eventBus,
 			ILogger<DownloaderAgentController> logger)
 		{
 			_logger = logger;
 			_dbContext = dbContext;
-			_eventBus = eventBus;
+			_mq = eventBus;
 		}
 
 		[HttpGet("downloader-agent")]
@@ -80,11 +80,7 @@ namespace DotnetSpider.Portal.Controllers
 				return NotFound();
 			}
 
-			await _eventBus.PublishAsync(id, new Event
-			{
-				Type = Framework.ExitCommand,
-				Data = id
-			});
+			await _mq.PublishAsync(id, new MessageData<string> {Type = Framework.ExitCommand, Data = id});
 
 			using (var conn = _dbContext.Database.GetDbConnection())
 			{
@@ -104,11 +100,7 @@ namespace DotnetSpider.Portal.Controllers
 				return NotFound();
 			}
 
-			await _eventBus.PublishAsync(id, new Event
-			{
-				Type = Framework.ExitCommand,
-				Data = id
-			});
+			await _mq.PublishAsync(id, new MessageData<string> {Type = Framework.ExitCommand, Data = id});
 			return Ok();
 		}
 	}

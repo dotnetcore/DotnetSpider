@@ -88,10 +88,10 @@ namespace DotnetSpider.Statistics.Store
 		{
 			_spiderStatisticsDict.AddOrUpdate(ownerId, s => new SpiderStatistics
 			{
-				Start = DateTime.Now
+				Start = DateTimeOffset.Now
 			}, (s, statistics) =>
 			{
-				statistics.Start = DateTime.Now;
+				statistics.Start = DateTimeOffset.Now;
 				return statistics;
 			});
 			return Task.CompletedTask;
@@ -106,10 +106,10 @@ namespace DotnetSpider.Statistics.Store
 		{
 			_spiderStatisticsDict.AddOrUpdate(ownerId, s => new SpiderStatistics
 			{
-				Exit = DateTime.Now
+				Exit = DateTimeOffset.Now
 			}, (s, statistics) =>
 			{
-				statistics.Exit = DateTime.Now;
+				statistics.Exit = DateTimeOffset.Now;
 				return statistics;
 			});
 			return Task.CompletedTask;

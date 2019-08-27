@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using DotnetSpider.Common;
-using DotnetSpider.DataFlow;
-using DotnetSpider.DataFlow.Storage;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 
-namespace DotnetSpider.HBase
+// ReSharper disable once CheckNamespace
+namespace DotnetSpider.DataFlow.Storage
 {
 	public class HBaseResponseStorage : EntityStorageBase
 	{

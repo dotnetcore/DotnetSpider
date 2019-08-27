@@ -3,11 +3,11 @@ using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Dapper;
 using DotnetSpider.Common;
-using DotnetSpider.DataFlow;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 
-namespace DotnetSpider.MySql
+// ReSharper disable once CheckNamespace
+namespace DotnetSpider.DataFlow.Storage
 {
 	public class MySqlRequestIndexStorage : DataFlowBase
 	{

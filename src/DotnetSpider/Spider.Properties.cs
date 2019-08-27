@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using DotnetSpider.Common;
 using DotnetSpider.DataFlow;
 using DotnetSpider.Downloader;
-using DotnetSpider.EventBus;
+using DotnetSpider.MessageQueue;
 using DotnetSpider.RequestSupplier;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Statistics;
@@ -15,8 +15,8 @@ namespace DotnetSpider
 	{
 		private readonly List<Request> _requests = new List<Request>();
 		private readonly List<IDataFlow> _dataFlows = new List<IDataFlow>();
-		private readonly IEventBus _eventBus;
-	
+		private readonly IMq _mq;
+
 		private readonly IStatisticsService _statisticsService;
 		private readonly List<IRequestSupplier> _requestSupplies = new List<IRequestSupplier>();
 		private readonly List<Action<Request>> _configureRequestDelegates = new List<Action<Request>>();
@@ -26,7 +26,7 @@ namespace DotnetSpider
 		private readonly ConcurrentDictionary<string, Request> _enqueuedRequestDict =
 			new ConcurrentDictionary<string, Request>();
 
-		private DateTime _lastRequestedTime;
+		private DateTimeOffset _lastRequestedTime;
 		private IScheduler _scheduler;
 		private int _emptySleepTime = 30;
 		private int _statisticsInterval = 5;
@@ -37,7 +37,7 @@ namespace DotnetSpider
 		private string _id;
 		private bool _retryWhenResultIsEmpty;
 		private bool _mmfSignal;
-		
+
 		/// <summary>
 		/// 遍历深度
 		/// </summary>

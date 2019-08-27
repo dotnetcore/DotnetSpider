@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Common;
-using DotnetSpider.EventBus;
+using DotnetSpider.MessageQueue;
 using DotnetSpider.Statistics.Store;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -13,7 +13,7 @@ namespace DotnetSpider.Statistics
 	/// </summary>
 	public class StatisticsCenter : BackgroundService, IStatisticsCenter
 	{
-		private readonly IEventBus _eventBus;
+		private readonly IMq _mq;
 		private readonly ILogger _logger;
 		private readonly IStatisticsStore _statisticsStore;
 		private readonly SpiderOptions _options;
@@ -25,11 +25,11 @@ namespace DotnetSpider.Statistics
 		/// <param name="options"></param>
 		/// <param name="statisticsStore">统计存储接口</param>
 		/// <param name="logger">日志接口</param>
-		public StatisticsCenter(IEventBus eventBus, SpiderOptions options, IStatisticsStore statisticsStore,
+		public StatisticsCenter(IMq eventBus, SpiderOptions options, IStatisticsStore statisticsStore,
 			ILogger<StatisticsCenter> logger)
 		{
 			_options = options;
-			_eventBus = eventBus;
+			_mq = eventBus;
 			_statisticsStore = statisticsStore;
 			_logger = logger;
 		}
@@ -38,7 +38,7 @@ namespace DotnetSpider.Statistics
 		{
 			await _statisticsStore.EnsureDatabaseAndTableCreatedAsync();
 			_logger.LogInformation("Initialize statistics center database success");
-			_eventBus.Subscribe(_options.TopicStatisticsService,
+			_mq.Subscribe<string>(_options.TopicStatisticsService,
 				async message => await HandleStatisticsMessageAsync(message));
 			_logger.LogInformation("Statistics center started");
 		}
@@ -50,14 +50,14 @@ namespace DotnetSpider.Statistics
 		/// <returns></returns>
 		public override Task StopAsync(CancellationToken cancellationToken)
 		{
-			_eventBus.Unsubscribe(_options.TopicStatisticsService);
+			_mq.Unsubscribe(_options.TopicStatisticsService);
 			_logger.LogInformation("Statistics center exited");
 			return base.StopAsync(cancellationToken);
 		}
 
-		private async Task HandleStatisticsMessageAsync(Event message)
+		private async Task HandleStatisticsMessageAsync(MessageData<string> message)
 		{
-			if (string.IsNullOrWhiteSpace(message.Data))
+			if (message == null)
 			{
 				_logger.LogWarning("Statistics center receive empty message");
 				return;

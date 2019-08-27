@@ -14,7 +14,7 @@ namespace DotnetSpider.Portal.Entity
 		public int Id { get; set; }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[StringLength(255)]
 		[Required]
@@ -27,7 +27,7 @@ namespace DotnetSpider.Portal.Entity
 		[Column("schema")]
 		[StringLength(10)]
 		public string Schema { get; set; }
-		
+
 		/// <summary>
 		/// registry.cn-shanghai.aliyuncs.com/ 允许为空，表示本地镜像
 		/// </summary>
@@ -56,6 +56,6 @@ namespace DotnetSpider.Portal.Entity
 		/// </summary>
 		[Required]
 		[Column("creation_time")]
-		public DateTime CreationTime { get; set; }
+		public DateTimeOffset CreationTime { get; set; }
 	}
 }

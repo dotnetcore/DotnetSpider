@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 
 // ReSharper disable once CheckNamespace
-namespace DotnetSpider.DataFlow.Storage.MySql
+namespace DotnetSpider.DataFlow.Storage
 {
 	/// <summary>
 	/// MySql 保存解析(实体)结果

@@ -26,13 +26,13 @@ namespace DotnetSpider.Statistics.Entity
 		/// 爬虫启动时间
 		/// </summary>
 		[Column("start")]
-		public DateTime? Start { get; set; }
+		public DateTimeOffset? Start { get; set; }
 
 		/// <summary>
 		/// 爬虫结束时间
 		/// </summary>
 		[Column("exit")]
-		public DateTime? Exit { get; set; }
+		public DateTimeOffset? Exit { get; set; }
 
 		/// <summary>
 		/// 总的请求数
@@ -76,8 +76,8 @@ namespace DotnetSpider.Statistics.Entity
 		/// 上一次更新时间
 		/// </summary>
 		[Column("last_modification_time")]
-		public DateTime LastModificationTime { get; set; }
-		
+		public DateTimeOffset LastModificationTime { get; set; }
+
 		/// <summary>
 		/// 添加指定的失败次数
 		/// </summary>

@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using Npgsql;
 
 // ReSharper disable once CheckNamespace
-namespace DotnetSpider.DataFlow.Storage.PostgreSql
+namespace DotnetSpider.DataFlow.Storage
 {
 	/// <summary>
 	/// PostgreSql 保存解析(实体)结果
@@ -21,7 +21,7 @@ namespace DotnetSpider.DataFlow.Storage.PostgreSql
 		/// </summary>
 		/// <param name="options">配置</param>
 		/// <returns></returns>
-		public new static PostgreSqlEntityStorage CreateFromOptions(SpiderOptions options)
+		public static PostgreSqlEntityStorage CreateFromOptions(SpiderOptions options)
 		{
 			return new PostgreSqlEntityStorage(options.StorageType, options.StorageConnectionString)
 			{

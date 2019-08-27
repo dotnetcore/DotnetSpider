@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using DotnetSpider.Common;
-using MsgPack.Serialization;
+using MessagePack;
 
 namespace DotnetSpider.Downloader
 {
@@ -36,11 +36,6 @@ namespace DotnetSpider.Downloader
 		/// 下载器类别
 		/// </summary>
 		public DownloaderType DownloaderType { get; set; } = DownloaderType.HttpClient;
-
-		/// <summary>
-		/// 下载内容是否需要解码
-		/// </summary>
-		public bool DecodeHtml { get; set; }
 
 		/// <summary>
 		/// 请求链接
@@ -147,11 +142,6 @@ namespace DotnetSpider.Downloader
 		public Compression Compression { get; set; }
 
 		/// <summary>
-		/// 创建时间
-		/// </summary>
-		public DateTime CreationTime { get; set; }
-
-		/// <summary>
 		/// 下载策略
 		/// </summary>
 		public DownloadPolicy DownloadPolicy { get; set; } = DownloadPolicy.Random;
@@ -160,6 +150,11 @@ namespace DotnetSpider.Downloader
 		/// 设置 Cookie 的 domain
 		/// </summary>
 		public string Domain { get; set; }
+
+		/// <summary>
+		/// 创建时间
+		/// </summary>
+		public DateTimeOffset CreationTime { get; set; }
 
 		/// <summary>
 		/// 构造方法
@@ -266,9 +261,32 @@ namespace DotnetSpider.Downloader
 		/// </summary>
 		public virtual void ComputeHash()
 		{
-			var serializer = MessagePackSerializer.Get<Request>();
-			var bytes =
-				serializer.PackSingleObject(this);
+			var bytes = MessagePackSerializer.Serialize(new
+			{
+				Properties,
+				OwnerId,
+				AgentId,
+				Depth,
+				DownloaderType,
+				Url,
+				ChangeIpPattern,
+				UserAgent,
+				Referer,
+				Origin,
+				Accept,
+				ContentType,
+				UseProxy,
+				UseCookies,
+				AllowAutoRedirect,
+				Cookie,
+				UseAdsl,
+				Headers,
+				Body,
+				Method,
+				Compression,
+				DownloadPolicy,
+				Domain
+			});
 			Hash = bytes.ToMd5();
 		}
 	}

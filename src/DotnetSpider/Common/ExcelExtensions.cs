@@ -106,7 +106,7 @@ namespace DotnetSpider.Common
 		/// <param name="displayName">邮件发送服务的显示名称</param>
 		public static void EmailTo(this IDbConnection conn, string sql, string fileName, string subject, IEnumerable<string> emailTo, string emailHost, int port, string account, string password, string displayName = "DotnetSpider Alert")
 		{
-			var path = Export(conn, sql, $"{fileName}_{DateTime.Now:yyyyMMddhhmmss}", true);
+			var path = Export(conn, sql, $"{fileName}_{DateTimeOffset.Now:yyyyMMddhhmmss}", true);
 			EmailTo(path, subject, emailTo, emailHost, port, account, password, displayName);
 		}
 

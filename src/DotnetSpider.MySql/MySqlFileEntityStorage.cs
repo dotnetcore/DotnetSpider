@@ -8,7 +8,8 @@ using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Storage.Model;
 using MySql.Data.MySqlClient;
 
-namespace DotnetSpider.DataFlow.Storage.MySql
+// ReSharper disable once CheckNamespace
+namespace DotnetSpider.DataFlow.Storage
 {
 	/// <summary>
 	/// 文件类型

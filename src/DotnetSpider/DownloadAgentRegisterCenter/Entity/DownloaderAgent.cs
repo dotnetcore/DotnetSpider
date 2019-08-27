@@ -15,7 +15,7 @@ namespace DotnetSpider.DownloadAgentRegisterCenter.Entity
 		/// 标识
 		/// </summary>
 		[Column("id")]
-		[Key]
+		[System.ComponentModel.DataAnnotations.Key]
 		[StringLength(40)]
 		public string Id { get; set; }
 
@@ -42,20 +42,20 @@ namespace DotnetSpider.DownloadAgentRegisterCenter.Entity
 		/// 上一次更新时间
 		/// </summary>
 		[Column("last_modification_time")]
-		public DateTime LastModificationTime { get; set; }
+		public DateTimeOffset LastModificationTime { get; set; }
 
 		/// <summary>
 		/// 是否已经标记删除
 		/// </summary>
 		[Column("is_deleted")]
 		public bool IsDeleted { get; set; }
-		
+
 		/// <summary>
 		/// 创建时间
 		/// </summary>
 		[Column("creation_time")]
 		[Required]
-		public DateTime CreationTime { get; set; }
+		public DateTimeOffset CreationTime { get; set; }
 
 		/// <summary>
 		/// 刷新上一次更新时间
@@ -63,12 +63,12 @@ namespace DotnetSpider.DownloadAgentRegisterCenter.Entity
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public void RefreshLastModificationTime()
 		{
-			LastModificationTime = DateTime.Now;
+			LastModificationTime = DateTimeOffset.Now;
 		}
 
 		public bool IsActive()
 		{
-			return (DateTime.Now - LastModificationTime).TotalSeconds <= 30;
+			return (DateTimeOffset.Now - LastModificationTime).TotalSeconds <= 30;
 		}
 	}
 }

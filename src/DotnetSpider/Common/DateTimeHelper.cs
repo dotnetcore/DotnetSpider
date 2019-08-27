@@ -13,7 +13,7 @@ namespace DotnetSpider.Common
 		/// <summary>
 		/// 当天的RunId: 2017-12-20
 		/// </summary>
-		public static string TodayString => DateTime.Now.ToString("yyyy-MM-dd");
+		public static string TodayString => DateTimeOffset.Now.ToString("yyyy-MM-dd");
 
 		/// <summary>
 		/// 当月的RunId: 2017-12-01
@@ -33,7 +33,7 @@ namespace DotnetSpider.Common
 		{
 			get
 			{
-				var now = DateTime.Now.Date;
+				var now = DateTimeOffset.Now.Date;
 				return now.AddDays(now.Day * -1 + 1);
 			}
 		}
@@ -57,7 +57,7 @@ namespace DotnetSpider.Common
 		/// <summary>
 		/// 星期一
 		/// </summary>
-		public static DateTime Today => DateTime.Now.Date;
+		public static DateTime Today => DateTimeOffset.Now.Date;
 
 		/// <summary>
 		/// 星期一
@@ -66,7 +66,7 @@ namespace DotnetSpider.Common
 		{
 			get
 			{
-				var now = DateTime.Now;
+				var now = DateTimeOffset.Now;
 				var i = now.DayOfWeek - DayOfWeek.Monday == -1 ? 6 : -1;
 				var ts = new TimeSpan(i, 0, 0, 0);
 

@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using DotnetSpider.Common;
-using DotnetSpider.EventBus;
+using DotnetSpider.MessageQueue;
 
 namespace DotnetSpider.Statistics
 {
@@ -9,7 +9,7 @@ namespace DotnetSpider.Statistics
 	/// </summary>
 	public class StatisticsService : IStatisticsService
 	{
-		private readonly IEventBus _eventBus;
+		private readonly IMq _mq;
 		private readonly SpiderOptions _options;
 
 		/// <summary>
@@ -17,9 +17,9 @@ namespace DotnetSpider.Statistics
 		/// </summary>
 		/// <param name="eventBus">消息队列接口</param>
 		/// <param name="options"></param>
-		public StatisticsService(IEventBus eventBus, SpiderOptions options)
+		public StatisticsService(IMq eventBus, SpiderOptions options)
 		{
-			_eventBus = eventBus;
+			_mq = eventBus;
 			_options = options;
 		}
 
@@ -30,11 +30,8 @@ namespace DotnetSpider.Statistics
 		/// <returns></returns>
 		public async Task IncrementSuccessAsync(string ownerId)
 		{
-			await _eventBus.PublishAsync(_options.TopicStatisticsService, new Event
-			{
-				Type = "Success",
-				Data = ownerId
-			});
+			await _mq.PublishAsync(_options.TopicStatisticsService,
+				new MessageData<string> {Type = "Success", Data = ownerId});
 		}
 
 		/// <summary>
@@ -45,11 +42,8 @@ namespace DotnetSpider.Statistics
 		/// <returns></returns>
 		public async Task IncrementFailedAsync(string ownerId, int count = 1)
 		{
-			await _eventBus.PublishAsync(_options.TopicStatisticsService, new Event
-			{
-				Type = "Failed",
-				Data = $"{ownerId},{count}"
-			});
+			await _mq.PublishAsync(_options.TopicStatisticsService,
+				new MessageData<string> {Type = "Failed", Data = $"{ownerId},{count}"});
 		}
 
 		/// <summary>
@@ -59,11 +53,8 @@ namespace DotnetSpider.Statistics
 		/// <returns></returns>
 		public async Task StartAsync(string ownerId)
 		{
-			await _eventBus.PublishAsync(_options.TopicStatisticsService, new Event
-			{
-				Type = "Start",
-				Data = ownerId
-			});
+			await _mq.PublishAsync(_options.TopicStatisticsService,
+				new MessageData<string> {Type = "Start", Data = ownerId});
 		}
 
 		/// <summary>
@@ -73,11 +64,8 @@ namespace DotnetSpider.Statistics
 		/// <returns></returns>
 		public async Task ExitAsync(string ownerId)
 		{
-			await _eventBus.PublishAsync(_options.TopicStatisticsService, new Event
-			{
-				Type = "Exit",
-				Data = ownerId
-			});
+			await _mq.PublishAsync(_options.TopicStatisticsService,
+				new MessageData<string> {Type = "Exit", Data = ownerId});
 		}
 
 		/// <summary>
@@ -89,11 +77,8 @@ namespace DotnetSpider.Statistics
 		/// <returns></returns>
 		public async Task IncrementDownloadSuccessAsync(string agentId, int count, long elapsedMilliseconds)
 		{
-			await _eventBus.PublishAsync(_options.TopicStatisticsService, new Event
-			{
-				Type = "DownloadSuccess",
-				Data = $"{agentId},{count},{elapsedMilliseconds}"
-			});
+			await _mq.PublishAsync(_options.TopicStatisticsService,
+				new MessageData<string> {Type = "DownloadSuccess", Data = $"{agentId},{count},{elapsedMilliseconds}"});
 		}
 
 		/// <summary>
@@ -105,11 +90,8 @@ namespace DotnetSpider.Statistics
 		/// <returns></returns>
 		public async Task IncrementDownloadFailedAsync(string agentId, int count, long elapsedMilliseconds)
 		{
-			await _eventBus.PublishAsync(_options.TopicStatisticsService, new Event
-			{
-				Type = "DownloadFailed",
-				Data = $"{agentId},{count},{elapsedMilliseconds}"
-			});
+			await _mq.PublishAsync(_options.TopicStatisticsService,
+				new MessageData<string> {Type = "DownloadFailed", Data = $"{agentId},{count},{elapsedMilliseconds}"});
 		}
 
 		/// <summary>
@@ -119,11 +101,8 @@ namespace DotnetSpider.Statistics
 		/// <returns></returns>
 		public async Task PrintStatisticsAsync(string ownerId)
 		{
-			await _eventBus.PublishAsync(_options.TopicStatisticsService, new Event
-			{
-				Type = "Print",
-				Data = ownerId
-			});
+			await _mq.PublishAsync(_options.TopicStatisticsService,
+				new MessageData<string> {Type = "Print", Data = ownerId});
 		}
 
 		/// <summary>
@@ -134,11 +113,8 @@ namespace DotnetSpider.Statistics
 		/// <returns></returns>
 		public async Task IncrementTotalAsync(string ownerId, int count)
 		{
-			await _eventBus.PublishAsync(_options.TopicStatisticsService, new Event
-			{
-				Type = "Total",
-				Data = $"{ownerId},{count}"
-			});
+			await _mq.PublishAsync(_options.TopicStatisticsService,
+				new MessageData<string> {Type = "Total", Data = $"{ownerId},{count}"});
 		}
 	}
 }

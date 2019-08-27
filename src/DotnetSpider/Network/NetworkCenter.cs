@@ -71,9 +71,9 @@ namespace DotnetSpider.Network
 				locker = _lockerFactory.GetLocker(RedialLocker);
 
 				var interval = double.MaxValue;
-				if (DateTime.TryParse(locker.Information, out DateTime latestRedialTime))
+				if (DateTimeOffset.TryParse(locker.Information, out DateTimeOffset latestRedialTime))
 				{
-					interval = (DateTime.Now - latestRedialTime).TotalSeconds;
+					interval = (DateTimeOffset.Now - latestRedialTime).TotalSeconds;
 				}
 
 				if (interval < _options.RedialIntervalLimit * 60)

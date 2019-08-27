@@ -114,7 +114,7 @@ namespace DotnetSpider.Portal.Controllers
 						spider.Repository = viewModel.Repository;
 						spider.Environment = viewModel.Environment;
 						spider.Tag = viewModel.Tag;
-						spider.LastModificationTime = DateTime.Now;
+						spider.LastModificationTime = DateTimeOffset.Now;
 
 						await _dbContext.SaveChangesAsync();
 
@@ -229,7 +229,7 @@ namespace DotnetSpider.Portal.Controllers
 							Repository = viewModel.Repository,
 							Environment = viewModel.Environment,
 							Tag = viewModel.Tag,
-							CreationTime = DateTime.Now
+							CreationTime = DateTimeOffset.Now
 						};
 						await _dbContext.Spiders.AddAsync(spider);
 						await _dbContext.SaveChangesAsync();

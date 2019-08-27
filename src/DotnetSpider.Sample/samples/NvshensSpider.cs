@@ -20,7 +20,7 @@ namespace DotnetSpider.Sample.samples
 	            .ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
 	            .ConfigureServices(services =>
 	            {
-		            services.AddLocalEventBus();
+		            services.AddLocalMessageQueue();
 		            services.AddLocalDownloadCenter();
 		            services.AddDownloaderAgent(x =>
 		            {

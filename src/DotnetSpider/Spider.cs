@@ -10,13 +10,12 @@ using DotnetSpider.Common;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Downloader;
-using DotnetSpider.EventBus;
+using DotnetSpider.MessageQueue;
 using DotnetSpider.RequestSupplier;
 using DotnetSpider.Scheduler;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 [assembly: InternalsVisibleTo("DotnetSpider.Tests")]
 
@@ -58,7 +57,7 @@ namespace DotnetSpider
 
 			Services = spiderParameters.ServiceProvider;
 			_statisticsService = spiderParameters.StatisticsService;
-			_eventBus = spiderParameters.EventBus;
+			_mq = spiderParameters.Mq;
 			Options = spiderParameters.SpiderOptions;
 			Logger = spiderParameters.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger(GetType());
 			Console.CancelKeyPress += ConsoleCancelKeyPress;
@@ -198,11 +197,11 @@ namespace DotnetSpider
 				await _statisticsService.StartAsync(Id);
 
 				// 订阅数据流
-				_eventBus.Subscribe($"{Options.TopicResponseHandler}{Id}",
-					async message => await HandleMessageAsync(message));
+				_mq.Subscribe<Response[]>($"{Options.TopicResponseHandler}{Id}",
+					async message => await HandleResponseAsync(message));
 
 				// 订阅命令
-				_eventBus.Subscribe($"{Id}",
+				_mq.Subscribe<string>($"{Id}",
 					async message => await HandleCommandAsync(message));
 
 				// 初始化各数据流处理器
@@ -229,7 +228,7 @@ namespace DotnetSpider
 				// 启动速度控制器
 				StartSpeedControllerAsync().ConfigureAwait(false).GetAwaiter();
 
-				_lastRequestedTime = DateTime.Now;
+				_lastRequestedTime = DateTimeOffset.Now;
 
 				// 等待退出信号
 				await WaitForExiting();
@@ -305,7 +304,7 @@ namespace DotnetSpider
 			Logger.LogInformation($"{Id} exiting...");
 			Status = Status.Exiting;
 			// 直接取消订阅即可: 1. 如果是本地应用,
-			_eventBus.Unsubscribe($"{Options.TopicResponseHandler}{Id}");
+			_mq.Unsubscribe($"{Options.TopicResponseHandler}{Id}");
 			return this;
 		}
 
@@ -465,7 +464,7 @@ namespace DotnetSpider
 
 										// 重试超时的下载请求
 										var timeoutRequests = new List<Request>();
-										var now = DateTime.Now;
+										var now = DateTimeOffset.Now;
 										foreach (var kv in _enqueuedRequestDict)
 										{
 											if (!((now - kv.Value.CreationTime).TotalSeconds > RespondedTimeout))
@@ -546,9 +545,15 @@ namespace DotnetSpider
 			});
 		}
 
-		private Task HandleCommandAsync(Event message)
+		private Task HandleCommandAsync(MessageData<string> command)
 		{
-			switch (message.Type)
+			if (command == null)
+			{
+				Logger.LogWarning($"{Id} receive empty message");
+				return Task.CompletedTask;
+			}
+
+			switch (command.Type)
 			{
 				case Framework.ExitCommand:
 				{
@@ -560,27 +565,17 @@ namespace DotnetSpider
 			return Task.CompletedTask;
 		}
 
-		private async Task HandleMessageAsync(Event message)
+		private async Task HandleResponseAsync(MessageData<Response[]> message)
 		{
-			if (string.IsNullOrWhiteSpace(message.Data))
+			if (message?.Data == null || message.Data.Length == 0)
 			{
 				Logger.LogWarning($"{Id} receive empty message");
 				return;
 			}
 
-			_lastRequestedTime = DateTime.Now;
+			_lastRequestedTime = DateTimeOffset.Now;
 
-			Response[] responses;
-
-			try
-			{
-				responses = JsonConvert.DeserializeObject<Response[]>(message.Data);
-			}
-			catch
-			{
-				Logger.LogError($"{Id} receive wrong message: {message}");
-				return;
-			}
+			Response[] responses = message.Data;
 
 			try
 			{
@@ -774,7 +769,7 @@ namespace DotnetSpider
 			int waited = 0;
 			while (Status != Status.Exiting)
 			{
-				if ((DateTime.Now - _lastRequestedTime).Seconds > EmptySleepTime)
+				if ((DateTimeOffset.Now - _lastRequestedTime).Seconds > EmptySleepTime)
 				{
 					break;
 				}
@@ -835,7 +830,7 @@ namespace DotnetSpider
 				foreach (var request in requests)
 				{
 					string topic;
-					request.CreationTime = DateTime.Now;
+					request.CreationTime = DateTimeOffset.Now;
 					// 初始请求通过是否使用 ADSL 分配不同的下载队列
 					if (string.IsNullOrWhiteSpace(request.AgentId))
 					{
@@ -848,7 +843,7 @@ namespace DotnetSpider
 							// 非初始请求如果是链式模式则使用旧的下载器
 							case DownloadPolicy.Chained:
 							{
-								topic = request.AgentId;
+								topic = $"{request.AgentId}-DownloadQueue";
 								break;
 							}
 
@@ -863,11 +858,8 @@ namespace DotnetSpider
 					}
 
 					_enqueuedRequestDict.TryAdd(request.Hash, request);
-					await _eventBus.PublishAsync(topic,
-						new Event
-						{
-							Type = Framework.DownloadCommand, Data = JsonConvert.SerializeObject(new[] {request})
-						});
+					await _mq.PublishAsync(topic,
+						new MessageData<Request[]> {Type = Framework.DownloadCommand, Data = new[] {request}});
 				}
 
 

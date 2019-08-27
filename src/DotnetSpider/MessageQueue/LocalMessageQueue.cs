@@ -5,16 +5,16 @@ using System.Threading.Tasks;
 using DotnetSpider.Common;
 using Microsoft.Extensions.Logging;
 
-namespace DotnetSpider.EventBus
+namespace DotnetSpider.MessageQueue
 {
 	/// <summary>
 	/// 1. 发布会把消息推送到所有订阅了对应 topic 的消费者
 	/// 2. 只能对 topic 做取消订阅，会导致所有订阅都取消。
 	/// </summary>
-	public class LocalEventBus : IEventBus
+	public class LocalMessageQueue : IMq
 	{
-		private readonly ConcurrentDictionary<string, Action<Event>> _consumers =
-			new ConcurrentDictionary<string, Action<Event>>();
+		private readonly ConcurrentDictionary<string, dynamic> _consumers =
+			new ConcurrentDictionary<string, dynamic>();
 
 		private readonly ILogger _logger;
 
@@ -22,7 +22,7 @@ namespace DotnetSpider.EventBus
 		/// 构造方法
 		/// </summary>
 		/// <param name="logger">日志接口</param>
-		public LocalEventBus(ILogger<LocalEventBus> logger)
+		public LocalMessageQueue(ILogger<LocalMessageQueue> logger)
 		{
 			_logger = logger;
 		}
@@ -30,28 +30,27 @@ namespace DotnetSpider.EventBus
 		/// <summary>
 		/// 推送消息到指定 topic
 		/// </summary>
-		/// <param name="topic">topic</param>
+		/// <param name="topic"></param>
 		/// <param name="message">消息</param>
 		/// <returns></returns>
-		public Task PublishAsync(string topic, Event message)
+		public Task PublishAsync<TData>(string topic, MessageData<TData> message)
 		{
 			return Task.Factory.StartNew(() => { Publish(topic, message); });
 		}
 
-		private void Publish(string topic, Event message)
+		private void Publish<TData>(string topic, MessageData<TData> message)
 		{
 			if (message == null)
 			{
 #if DEBUG
-				var stackTrace = new StackTrace();
-				_logger.LogDebug($"Publish empty message to topic {topic}: {stackTrace}");
+				var stackTrace = new System.Diagnostics.StackTrace();
+				_logger.LogDebug($"Publish empty event: {stackTrace}");
 #endif
 				return;
 			}
 
 			message.Timestamp = (long) DateTimeHelper.GetCurrentUnixTimeNumber();
-
-			if (_consumers.TryGetValue(topic, out Action<Event> consumer))
+			if (_consumers.TryGetValue(topic, out dynamic consumer))
 			{
 				try
 				{
@@ -59,28 +58,28 @@ namespace DotnetSpider.EventBus
 				}
 				catch (Exception e)
 				{
-					_logger.LogError($"Consume message {message} on topic {topic} failed: {e}");
+					_logger.LogError($"Consume message {message} on event {topic} failed: {e}");
 				}
 			}
 			else
 			{
 #if DEBUG
-				var stackTrace = new StackTrace();
-				_logger.LogDebug($"Topic {topic} is not subscribed: {stackTrace}");
+				var stackTrace = new System.Diagnostics.StackTrace();
+				_logger.LogDebug($"Event {topic} is not subscribed: {stackTrace}");
 #endif
 			}
 		}
 
 		/// <summary>
-		/// 订阅 topic
+		/// 订阅事件
 		/// </summary>
-		/// <param name="topic">topic</param>
+		/// <param name="topic"></param>
 		/// <param name="action">消息消费的方法</param>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		public void Subscribe(string topic, Action<Event> action)
+		public void Subscribe<TData>(string topic, Action<MessageData<TData>> action)
 		{
 			_consumers.AddOrUpdate(topic, x => action, (t, a) => action);
-			_logger.LogInformation("Subscribe: " + topic);
+			_logger.LogInformation($"Subscribe: {topic}");
 		}
 
 		/// <summary>

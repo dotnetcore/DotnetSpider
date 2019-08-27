@@ -1,13 +1,13 @@
 using System;
 using DotnetSpider.Common;
-using DotnetSpider.EventBus;
+using DotnetSpider.MessageQueue;
 using DotnetSpider.Statistics;
 
 namespace DotnetSpider
 {
 	public class SpiderParameters
 	{
-		internal IEventBus EventBus { get; }
+		internal IMq Mq { get; }
 
 		internal IStatisticsService StatisticsService { get; }
 
@@ -15,12 +15,12 @@ namespace DotnetSpider
 
 		internal IServiceProvider ServiceProvider { get; }
 
-		public SpiderParameters(IEventBus eventBus,
+		public SpiderParameters(IMq mq,
 			IStatisticsService statisticsService,
 			SpiderOptions options,
 			IServiceProvider services)
 		{
-			EventBus = eventBus;
+			Mq = mq;
 			StatisticsService = statisticsService;
 			SpiderOptions = options;
 			ServiceProvider = services;

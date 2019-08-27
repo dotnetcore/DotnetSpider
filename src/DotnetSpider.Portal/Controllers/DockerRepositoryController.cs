@@ -70,7 +70,7 @@ namespace DotnetSpider.Portal.Controllers
 				Repository = dto.Repository,
 				UserName = dto.UserName,
 				Password = dto.Password,
-				CreationTime = DateTime.Now
+				CreationTime = DateTimeOffset.Now
 			};
 			_dbContext.DockerRepositories.Add(repository);
 			await _dbContext.SaveChangesAsync();

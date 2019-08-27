@@ -32,7 +32,7 @@ namespace DotnetSpider.Tests
 				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
 				.ConfigureServices(services =>
 				{
-					services.AddLocalEventBus();
+					services.AddLocalMessageQueue();
 					services.AddLocalDownloadCenter();
 					services.AddDownloaderAgent(x =>
 					{
@@ -52,7 +52,7 @@ namespace DotnetSpider.Tests
 				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
 				.ConfigureServices(services =>
 				{
-					services.AddKafkaEventBus();
+					services.AddKafka();
 					services.AddLocalDownloadCenter();
 					services.AddDownloaderAgent(x =>
 					{

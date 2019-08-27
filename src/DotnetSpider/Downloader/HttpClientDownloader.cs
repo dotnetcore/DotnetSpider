@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -37,8 +36,6 @@ namespace DotnetSpider.Downloader
 
 		public bool UseCookies { get; set; } = true;
 
-		public bool DecodeHtml { get; set; }
-
 		public int Timeout { get; set; } = 8000;
 
 		public override void AddCookies(params Cookie[] cookies)
@@ -54,10 +51,7 @@ namespace DotnetSpider.Downloader
 
 		protected override async Task<Response> ImplDownloadAsync(Request request)
 		{
-			var response = new Response
-			{
-				Request = request
-			};
+			var response = new Response {Request = request};
 
 			for (int i = 0; i < RetryTime; ++i)
 			{
@@ -101,62 +95,69 @@ namespace DotnetSpider.Downloader
 
 					httpResponseMessage.EnsureSuccessStatusCode();
 					response.TargetUrl = httpResponseMessage.RequestMessage.RequestUri.AbsoluteUri;
-					var bytes = httpResponseMessage.Content.ReadAsByteArrayAsync().Result;
-					if (!ExcludeMediaTypes.Any(t =>
-						httpResponseMessage.Content.Headers.ContentType.MediaType.Contains(t)))
-					{
-						if (!DownloadFile)
-						{
-							StorageFile(request, bytes);
-						}
-					}
-					else
-					{
-						var content = ReadContent(request, bytes,
-							httpResponseMessage.Content.Headers.ContentType.CharSet);
+					response.MediaType = httpResponseMessage.Content.Headers.ContentType.MediaType;
+					response.CharSet = httpResponseMessage.Content.Headers.ContentType.CharSet;
+					response.Content = await httpResponseMessage.Content.ReadAsByteArrayAsync();
 
-						if (DecodeHtml)
-						{
-#if NETFRAMEWORK
-                            content = System.Web.HttpUtility.UrlDecode(
-                                System.Web.HttpUtility.HtmlDecode(content),
-                                string.IsNullOrEmpty(request.Encoding)
-                                    ? Encoding.UTF8
-                                    : Encoding.GetEncoding(request.Encoding));
-#else
-							content = WebUtility.UrlDecode(WebUtility.HtmlDecode(content));
-#endif
-						}
+//					if (!ExcludeMediaTypes.Any(t =>
+//						httpResponseMessage.Content.Headers.ContentType.MediaType.Contains(t)))
+//					{
+//						if (!DownloadFile)
+//						{
+//							StorageFile(request, bytes);
+//						}
+//					}
+//					else
+//					{
+//						var content = ReadContent(request, bytes,
+//							httpResponseMessage.Content.Headers.ContentType.CharSet);
+//
+//						if (DecodeHtml)
+//						{
+//#if NETFRAMEWORK
+//                            content = System.Web.HttpUtility.UrlDecode(
+//                                System.Web.HttpUtility.HtmlDecode(content),
+//                                string.IsNullOrEmpty(request.Encoding)
+//                                    ? Encoding.UTF8
+//                                    : Encoding.GetEncoding(request.Encoding));
+//#else
+//							content = WebUtility.UrlDecode(WebUtility.HtmlDecode(content));
+//#endif
+//						}
+//
+//						response.RawText = content;
+//					}
 
-						response.RawText = content;
-					}
-
-					if (!string.IsNullOrWhiteSpace(request.ChangeIpPattern) &&
-					    Regex.IsMatch(response.RawText, request.ChangeIpPattern))
+					if (!string.IsNullOrWhiteSpace(request.ChangeIpPattern))
 					{
-						if (UseProxy)
+						var rawtext = ResponseExtensions.ReadContent(request, response.Content, response.CharSet);
+
+						if (Regex.IsMatch(rawtext, request.ChangeIpPattern))
 						{
-							response.TargetUrl = null;
-							response.RawText = null;
-							response.Success = false;
-							// 把代理设置为空，影响 final 代码块里不作归还操作，等于删除此代理
-							proxy = null;
-						}
-						else
-						{
-							// 不支持切换 IP
-							if (Framework.NetworkCenter == null ||
-							    !Framework.NetworkCenter.SupportAdsl)
+							if (UseProxy)
 							{
+								response.TargetUrl = null;
+								response.Content = null;
 								response.Success = false;
-								response.Exception = "IP Banded";
-								Logger?.LogError(
-									$"{request.OwnerId} download {request.Url} failed [{i}]: {response.Exception}");
-								return response;
+								// 把代理设置为空，影响 final 代码块里不作归还操作，等于删除此代理
+								proxy = null;
 							}
 							else
 							{
-								Framework.NetworkCenter.Redial();
+								// 不支持切换 IP
+								if (Framework.NetworkCenter == null ||
+								    !Framework.NetworkCenter.SupportAdsl)
+								{
+									response.Success = false;
+									response.Exception = "IP Banded";
+									Logger?.LogError(
+										$"{request.OwnerId} download {request.Url} failed [{i}]: {response.Exception}");
+									return response;
+								}
+								else
+								{
+									Framework.NetworkCenter.Redial();
+								}
 							}
 						}
 					}
@@ -198,17 +199,6 @@ namespace DotnetSpider.Downloader
 			}
 
 			return response;
-		}
-
-		protected virtual string ReadContent(Request request, byte[] contentBytes, string characterSet)
-		{
-			if (string.IsNullOrEmpty(request.Encoding))
-			{
-				Encoding htmlCharset = EncodingHelper.GetEncoding(characterSet, contentBytes);
-				return htmlCharset.GetString(contentBytes, 0, contentBytes.Length);
-			}
-
-			return Encoding.GetEncoding(request.Encoding).GetString(contentBytes, 0, contentBytes.Length);
 		}
 
 		protected virtual byte[] CompressContent(Request request)
@@ -362,7 +352,7 @@ namespace DotnetSpider.Downloader
 
 			if (_httpClients.ContainsKey(hash))
 			{
-				_httpClients[hash].LastUseTime = DateTime.Now;
+				_httpClients[hash].LastUseTime = DateTimeOffset.Now;
 				return _httpClients[hash];
 			}
 
@@ -375,7 +365,7 @@ namespace DotnetSpider.Downloader
 				Proxy = proxy,
 				CookieContainer = _cookieContainer
 			};
-			var item = new HttpClientEntry(handler, AllowAutoRedirect) {LastUseTime = DateTime.Now};
+			var item = new HttpClientEntry(handler, AllowAutoRedirect) {LastUseTime = DateTimeOffset.Now};
 			item.HttpClient.Timeout = new TimeSpan(0, 0, 0, Timeout);
 			_httpClients.TryAdd(hash, item);
 			return item;
@@ -384,7 +374,7 @@ namespace DotnetSpider.Downloader
 		private void CleanupPool()
 		{
 			List<string> needRemoveEntries = new List<string>();
-			var now = DateTime.Now;
+			var now = DateTimeOffset.Now;
 			foreach (var pair in _httpClients)
 			{
 				if ((now - pair.Value.LastUseTime).TotalSeconds > 240)
@@ -405,7 +395,7 @@ namespace DotnetSpider.Downloader
 
 		private class HttpClientEntry : IDisposable
 		{
-			public DateTime LastUseTime { get; set; }
+			public DateTimeOffset LastUseTime { get; set; }
 
 			public HttpClient HttpClient { get; }
 
