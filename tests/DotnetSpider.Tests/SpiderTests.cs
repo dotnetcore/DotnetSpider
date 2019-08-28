@@ -31,7 +31,7 @@ namespace DotnetSpider.Tests
 		public class MySqlStorageOptions : SpiderOptions
 		{
 			public override string StorageConnectionString => "ConnectionString";
-			public override string Storage => "DotnetSpider.DataFlow.Storage.MySql.MySqlEntityStorage,DotnetSpider.MySql";
+			public override string Storage => "DotnetSpider.DataFlow.Storage.MySqlEntityStorage,DotnetSpider.MySql";
 			public override StorageType StorageType => StorageType.InsertAndUpdate;
 
 			public override bool StorageIgnoreCase => false;
@@ -46,7 +46,7 @@ namespace DotnetSpider.Tests
 		public class MySqlFileStorageOptions : SpiderOptions
 		{
 			public override string StorageConnectionString => "ConnectionString";
-			public override string Storage => "DotnetSpider.DataFlow.Storage.MySql.MySqlFileEntityStorage,DotnetSpider.MySql";
+			public override string Storage => "DotnetSpider.DataFlow.Storage.MySqlFileEntityStorage,DotnetSpider.MySql";
 			public override StorageType StorageType => StorageType.InsertAndUpdate;
 
 			public override bool StorageIgnoreCase => false;
@@ -65,7 +65,7 @@ namespace DotnetSpider.Tests
 			public override string StorageConnectionString => "ConnectionString";
 
 			public override string Storage =>
-				"DotnetSpider.DataFlow.Storage.PostgreSql.PostgreSqlEntityStorage,DotnetSpider.PostgreSql";
+				"DotnetSpider.DataFlow.Storage.PostgreSqlEntityStorage,DotnetSpider.PostgreSql";
 
 			public override StorageType StorageType => StorageType.InsertAndUpdate;
 
@@ -85,7 +85,7 @@ namespace DotnetSpider.Tests
 			public override string StorageConnectionString => "mongodb://mongodb0.example.com:27017/admin";
 
 			public override string Storage =>
-				"DotnetSpider.DataFlow.Storage.Mongo.MongoEntityStorage,DotnetSpider.Mongo";
+				"DotnetSpider.DataFlow.Storage.MongoEntityStorage,DotnetSpider.Mongo";
 
 			public override StorageType StorageType => StorageType.InsertAndUpdate;
 
