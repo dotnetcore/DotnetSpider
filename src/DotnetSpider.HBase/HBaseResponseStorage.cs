@@ -10,10 +10,11 @@ using Newtonsoft.Json;
 // ReSharper disable once CheckNamespace
 namespace DotnetSpider.DataFlow.Storage
 {
-	public class HBaseResponseStorage : EntityStorageBase
+	public class HBaseResponseStorage : DataFlowBase
 	{
 		private readonly HttpClient _httpClient;
 		private readonly string _url;
+		private readonly string _createTableUrl;
 
 		/// <summary>
 		/// 根据配置返回存储器
@@ -28,11 +29,13 @@ namespace DotnetSpider.DataFlow.Storage
 
 		public HBaseResponseStorage(string restServer)
 		{
-			_url = $"{new Uri(restServer)}spider_response/row";
+			var uri = new Uri(restServer);
+			_url = $"{uri}dotnetspider:spider_response/row";
+			_createTableUrl = $"{uri}dotnetspider:spider_response/schema";
 			_httpClient = new HttpClient();
 		}
 
-		protected override async Task<DataFlowResult> Store(DataFlowContext context)
+		public override async Task<DataFlowResult> HandleAsync(DataFlowContext context)
 		{
 			var hash = context.Response.Request.Hash;
 			var response = JsonConvert.SerializeObject(context.Response).ToBase64String();
@@ -57,7 +60,6 @@ namespace DotnetSpider.DataFlow.Storage
 				{
 					var httpRequestMessage = new HttpRequestMessage(HttpMethod.Put, _url);
 					httpRequestMessage.Headers.TryAddWithoutValidation("Accept", "application/json");
-					httpRequestMessage.Headers.TryAddWithoutValidation("Accept", "application/json");
 
 					var content = new StringContent(body);
 					content.Headers.ContentType.MediaType = "application/json";
@@ -74,6 +76,22 @@ namespace DotnetSpider.DataFlow.Storage
 			}
 
 			return DataFlowResult.Failed;
+		}
+
+		public override async Task InitAsync()
+		{
+			string body =
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?><TableSchema name=\"dotnetspider:spider_response\"><ColumnSchema name=\"response\"/></TableSchema>";
+			var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, _createTableUrl);
+			httpRequestMessage.Headers.TryAddWithoutValidation("Accept", "text/xml");
+
+			var content = new StringContent(body);
+			content.Headers.ContentType.MediaType = "text/xml";
+			httpRequestMessage.Content = content;
+
+			var res = await _httpClient.SendAsync(httpRequestMessage);
+			res.EnsureSuccessStatusCode();
+			await base.InitAsync();
 		}
 
 		class Row

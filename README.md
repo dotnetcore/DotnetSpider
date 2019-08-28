@@ -44,7 +44,11 @@ DotnetSpider, a .NET Standard web crawling library. It is lightweight, efficient
         
 11. Docker remote api for mac
 
-        docker run -d  --restart always --name socat -v /var/run/docker.sock:/var/run/docker.sock -p 2376:2375 bobrik/socat TCP4-LISTEN:2375,fork,reuseaddr UNIX-CONNECT:/var/run/docker.sock                   
+        docker run -d  --restart always --name socat -v /var/run/docker.sock:/var/run/docker.sock -p 2376:2375 bobrik/socat TCP4-LISTEN:2375,fork,reuseaddr UNIX-CONNECT:/var/run/docker.sock
+
+12. HBase
+
+        docker run -d --restart always --name hbase -p 20550:8080 -p 8085:8085 -p 9090:9090 -p 9095:9095 -p 16010:16010 dajobe/hbase                           
                         
 ### MORE DOCUMENTS
 

@@ -39,6 +39,13 @@ namespace DotnetSpider
 		private bool _mmfSignal;
 
 		/// <summary>
+		/// 配置选项
+		/// </summary>
+		public SpiderOptions Options { get; }
+
+		public IServiceProvider Services { get; }
+
+		/// <summary>
 		/// 遍历深度
 		/// </summary>
 		/// <exception cref="ArgumentException"></exception>

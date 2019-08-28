@@ -28,16 +28,9 @@ namespace DotnetSpider
 	public partial class Spider
 	{
 		/// <summary>
-		/// 配置选项
-		/// </summary>
-		protected SpiderOptions Options { get; }
-
-		/// <summary>
 		/// 日志接口
 		/// </summary>
 		protected ILogger Logger { get; }
-
-		protected IServiceProvider Services { get; }
 
 		/// <summary>
 		/// 结束前的处理工作

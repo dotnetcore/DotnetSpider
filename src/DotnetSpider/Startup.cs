@@ -179,6 +179,7 @@ namespace DotnetSpider
 				{
 					instance.Name = name;
 					instance.Id = id;
+					ConfigureSpider(instance);
 					instance.RunAsync(arguments).ConfigureAwait(true).GetAwaiter().GetResult();
 				}
 				else
@@ -190,6 +191,10 @@ namespace DotnetSpider
 			{
 				Log.Logger.Error($"Execute spider failed: {e}");
 			}
+		}
+
+		protected virtual void ConfigureSpider(Spider spider)
+		{
 		}
 
 		protected virtual void ConfigureSerialLog(string file)
@@ -240,10 +245,7 @@ namespace DotnetSpider
 					throw new SpiderException("EntryAssembly not found");
 				}
 
-				asmNames = new List<string>
-				{
-					entryAsm.GetName(false).Name
-				};
+				asmNames = new List<string> {entryAsm.GetName(false).Name};
 				var types = entryAsm.GetTypes();
 
 				foreach (var type in types)
