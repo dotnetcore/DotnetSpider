@@ -19,7 +19,7 @@ namespace DotnetSpider.Sample.samples
 				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
 				.ConfigureServices(services =>
 				{
-					services.AddLocalMessageQueue();
+					services.AddThroughMessageQueue();
 					services.AddLocalDownloadCenter();
 					services.AddDownloaderAgent(x =>
 					{
@@ -55,7 +55,7 @@ namespace DotnetSpider.Sample.samples
 				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
 				.ConfigureServices(services =>
 				{
-					services.AddLocalMessageQueue();
+					services.AddThroughMessageQueue();
 					services.AddLocalDownloadCenter();
 					services.AddDownloaderAgent(x =>
 					{

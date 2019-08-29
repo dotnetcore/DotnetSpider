@@ -53,7 +53,7 @@ namespace DotnetSpider.Spiders.Startup
 			{
 				if (distributed)
 				{
-					services.AddLocalMessageQueue();
+					services.AddThroughMessageQueue();
 					services.AddLocalDownloadCenter();
 					services.AddDownloaderAgent(x =>
 					{

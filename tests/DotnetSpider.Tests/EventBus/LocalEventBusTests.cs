@@ -11,7 +11,7 @@ namespace DotnetSpider.Tests.MessageQueue
 		public async Task PubAndSub()
 		{
 			int count = 0;
-			var mq = new LocalMessageQueue(CreateLogger<LocalMessageQueue>());
+			var mq = new ThroughMessageQueue(CreateLogger<ThroughMessageQueue>());
 			mq.Subscribe<string>("topic", msg => { Interlocked.Increment(ref count); });
 			for (int i = 0; i < 100; ++i)
 			{
@@ -35,7 +35,7 @@ namespace DotnetSpider.Tests.MessageQueue
 		public void ParallelPubAndSub()
 		{
 			int count = 0;
-			var mq = new LocalMessageQueue(CreateLogger<LocalMessageQueue>());
+			var mq = new ThroughMessageQueue(CreateLogger<ThroughMessageQueue>());
 			mq.Subscribe<string>("topic", msg => { Interlocked.Increment(ref count); });
 
 			Parallel.For(0, 100, async i =>
@@ -59,7 +59,7 @@ namespace DotnetSpider.Tests.MessageQueue
 		public async Task PubAndUnSub()
 		{
 			int count = 0;
-			var mq = new LocalMessageQueue(CreateLogger<LocalMessageQueue>());
+			var mq = new ThroughMessageQueue(CreateLogger<ThroughMessageQueue>());
 			mq.Subscribe<string>("topic", msg => { Interlocked.Increment(ref count); });
 
 			int i = 0;

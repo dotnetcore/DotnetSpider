@@ -11,7 +11,7 @@ namespace DotnetSpider.MessageQueue
 	/// 1. 发布会把消息推送到所有订阅了对应 topic 的消费者
 	/// 2. 只能对 topic 做取消订阅，会导致所有订阅都取消。
 	/// </summary>
-	public class LocalMessageQueue : IMq
+	public class ThroughMessageQueue : IMq
 	{
 		private readonly ConcurrentDictionary<string, dynamic> _consumers =
 			new ConcurrentDictionary<string, dynamic>();
@@ -22,7 +22,7 @@ namespace DotnetSpider.MessageQueue
 		/// 构造方法
 		/// </summary>
 		/// <param name="logger">日志接口</param>
-		public LocalMessageQueue(ILogger<LocalMessageQueue> logger)
+		public ThroughMessageQueue(ILogger<ThroughMessageQueue> logger)
 		{
 			_logger = logger;
 		}

@@ -83,7 +83,7 @@ namespace DotnetSpider
 
 			builder.ConfigureServices(services =>
 			{
-				services.AddLocalMessageQueue();
+				services.AddThroughMessageQueue();
 				services.AddLocalDownloadCenter();
 				services.AddDownloaderAgent(x =>
 				{

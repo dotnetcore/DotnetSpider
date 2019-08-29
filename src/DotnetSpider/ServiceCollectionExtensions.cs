@@ -60,9 +60,9 @@ namespace DotnetSpider
 
 		#region  MessageQueue
 
-		public static IServiceCollection AddLocalMessageQueue(this IServiceCollection services)
+		public static IServiceCollection AddThroughMessageQueue(this IServiceCollection services)
 		{
-			services.AddSingleton<IMq, LocalMessageQueue>();
+			services.AddSingleton<IMq, ThroughMessageQueue>();
 			return services;
 		}
 

@@ -55,7 +55,7 @@ namespace DotnetSpider.DownloadAgent
 			_options = options;
 			Framework.NetworkCenter = networkCenter;
 
-			Logger = _mq is LocalMessageQueue ? null : logger;
+			Logger = _mq is ThroughMessageQueue ? null : logger;
 		}
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
