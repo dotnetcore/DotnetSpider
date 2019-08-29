@@ -80,17 +80,26 @@ namespace DotnetSpider.DataFlow.Storage
 
 		public override async Task InitAsync()
 		{
-			string body =
-				"<?xml version=\"1.0\" encoding=\"UTF-8\"?><TableSchema name=\"dotnetspider:spider_response\"><ColumnSchema name=\"response\"/></TableSchema>";
-			var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, _createTableUrl);
-			httpRequestMessage.Headers.TryAddWithoutValidation("Accept", "text/xml");
+			try
+			{
+				var body =
+					"<?xml version=\"1.0\" encoding=\"UTF-8\"?><TableSchema name=\"dotnetspider:spider_response\"><ColumnSchema name=\"response\"/></TableSchema>";
+				Logger.LogInformation($"Try create table: {_createTableUrl}");
+				var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, _createTableUrl);
+				httpRequestMessage.Headers.TryAddWithoutValidation("Accept", "text/xml");
 
-			var content = new StringContent(body);
-			content.Headers.ContentType.MediaType = "text/xml";
-			httpRequestMessage.Content = content;
+				var content = new StringContent(body);
+				content.Headers.ContentType.MediaType = "text/xml";
+				httpRequestMessage.Content = content;
 
-			var res = await _httpClient.SendAsync(httpRequestMessage);
-			res.EnsureSuccessStatusCode();
+				var res = await _httpClient.SendAsync(httpRequestMessage);
+				res.EnsureSuccessStatusCode();
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"Create table failed: {e}");
+			}
+
 			await base.InitAsync();
 		}
 
