@@ -22,7 +22,7 @@ namespace DotnetSpider.DataFlow.Parser.Formatter
 		/// <returns>被格式化后的数值</returns>
 		protected override string FormatValue(string value)
 		{
-			string tmp = value;
+			var tmp = value;
 #if !NETSTANDARD
 			return HttpUtility.HtmlDecode(tmp);
 #else

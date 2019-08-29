@@ -412,7 +412,7 @@ namespace DotnetSpider
 		{
 			return Task.Factory.StartNew(async () =>
 			{
-				bool @break = false;
+				var @break = false;
 
 				var mmf = MmfSignal
 					? MemoryMappedFile.CreateFromFile(Path.Combine("mmf-signal", Id), FileMode.OpenOrCreate, null, 4,
@@ -568,7 +568,7 @@ namespace DotnetSpider
 
 			_lastRequestedTime = DateTimeOffset.Now;
 
-			Response[] responses = message.Data;
+			var responses = message.Data;
 
 			try
 			{
@@ -759,7 +759,7 @@ namespace DotnetSpider
 		/// <returns></returns>
 		private async Task WaitForExiting()
 		{
-			int waited = 0;
+			var waited = 0;
 			while (Status != Status.Exiting)
 			{
 				if ((DateTimeOffset.Now - _lastRequestedTime).Seconds > EmptySleepTime)

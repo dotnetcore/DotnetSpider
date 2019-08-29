@@ -50,7 +50,7 @@ namespace DotnetSpider.Selector
 			}
 
 			var type = (Type)text.GetType();
-			StringBuilder builder = new StringBuilder();
+			var builder = new StringBuilder();
 			if (typeof(IEnumerable).IsAssignableFrom(type))
 			{
 				foreach (var l in (IEnumerable)text)
@@ -63,7 +63,7 @@ namespace DotnetSpider.Selector
 				builder.Append(GetElementContent(text));
 			}
 
-			Match match = _regex.Match(builder.ToString());
+			var match = _regex.Match(builder.ToString());
 			if (match.Success)
 			{
 				return match.Groups.Count > _group ? match.Groups[_group].Value : null;
@@ -85,7 +85,7 @@ namespace DotnetSpider.Selector
 
 			var type = (Type)text.GetType();
 
-			StringBuilder builder = new StringBuilder();
+			var builder = new StringBuilder();
 
 			if (typeof(IEnumerable).IsAssignableFrom(type))
 			{
@@ -101,7 +101,7 @@ namespace DotnetSpider.Selector
 
 			var matches = _regex.Matches(builder.ToString());
 
-			List<dynamic> results = new List<dynamic>();
+			var results = new List<dynamic>();
 			foreach (Match match in matches)
 			{
 				if (match.Groups.Count > _group)

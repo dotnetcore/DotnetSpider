@@ -65,7 +65,7 @@ namespace DotnetSpider.Common
                 return;
             }
 
-            int count = 0;
+            var count = 0;
             try
             {
                 var logs = new List<dynamic>();
@@ -89,7 +89,7 @@ namespace DotnetSpider.Common
                     logs.Add(logInfo);
                 }
 
-                HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, _api);
+                var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, _api);
                 httpRequestMessage.Headers.Add("DotnetSpiderToken", _token);
                 var json = JsonConvert.SerializeObject(logs);
                 httpRequestMessage.Content = new StringContent(json, Encoding.UTF8, "application/json");

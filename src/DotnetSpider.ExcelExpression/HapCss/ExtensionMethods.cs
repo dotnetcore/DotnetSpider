@@ -47,7 +47,7 @@ namespace DotnetSpider.ExcelExpression.HapCss
 
             var selectors = CssSelector.Parse(cssSelector);
 
-            bool allowTraverse = true;
+            var allowTraverse = true;
 
             foreach (var selector in selectors)
             {

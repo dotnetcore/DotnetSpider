@@ -173,7 +173,7 @@ namespace DotnetSpider.DataFlow.Storage.Model
 
 				case ExpressionType.Convert:
 				{
-					UnaryExpression body = (UnaryExpression) indexExpression.Body;
+					var body = (UnaryExpression) indexExpression.Body;
 					var memberExpression = (MemberExpression) body.Operand;
 					columns.Add(memberExpression.Member.Name);
 					break;

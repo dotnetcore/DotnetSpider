@@ -21,7 +21,7 @@ namespace DotnetSpider.Selector
 		{
 			_xpath = xpath;
 
-			Match match = AttributeXPathRegex.Match(_xpath);
+			var match = AttributeXPathRegex.Match(_xpath);
 			if (!string.IsNullOrWhiteSpace(match.Value) && _xpath.EndsWith(match.Value))
 			{
 				_attrName = match.Value.Replace("@", "");
@@ -61,7 +61,7 @@ namespace DotnetSpider.Selector
 		/// <returns>查询结果</returns>
 		public override IEnumerable<dynamic> SelectList(HtmlNode element)
 		{
-			List<dynamic> result = new List<dynamic>();
+			var result = new List<dynamic>();
 			var nodes = element.SelectNodes(_xpath);
 			if (nodes != null)
 			{

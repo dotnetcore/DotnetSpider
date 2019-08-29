@@ -33,7 +33,7 @@ namespace DotnetSpider.Portal
 						return;
 					}
 
-					DockerClient client = new DockerClientConfiguration(
+					var client = new DockerClientConfiguration(
 							new Uri(options.Docker))
 						.CreateClient();
 					var batch = Guid.NewGuid().ToString("N");

@@ -67,7 +67,7 @@ namespace DotnetSpider.Selector
 				return els;
 			}
 
-			List<string> result = new List<string>();
+			var result = new List<string>();
 			foreach (var el in els)
 			{
 				var attr = el.Attributes[_attrName];

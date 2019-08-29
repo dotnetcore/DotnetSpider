@@ -53,7 +53,7 @@ namespace DotnetSpider.Scheduler
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public int Enqueue(IEnumerable<Request> requests)
 		{
-			int count = 0;
+			var count = 0;
 			foreach (var request in requests)
 			{
 				request.ComputeHash();

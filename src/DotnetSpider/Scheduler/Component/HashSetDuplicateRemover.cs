@@ -21,7 +21,7 @@ namespace DotnetSpider.Scheduler.Component
 		{
 			Check.NotNull(request.OwnerId, nameof(request.OwnerId));
 			var hash = request.Hash;
-			bool isDuplicate = _hashes.ContainsKey(hash);
+			var isDuplicate = _hashes.ContainsKey(hash);
 			if (!isDuplicate)
 			{
 				_hashes.TryAdd(hash, request);

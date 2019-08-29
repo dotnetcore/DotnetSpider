@@ -10,10 +10,10 @@ namespace DotnetSpider.Tests.MessageQueue
 		[Fact(DisplayName = "PubAndSub")]
 		public async Task PubAndSub()
 		{
-			int count = 0;
+			var count = 0;
 			var mq = new ThroughMessageQueue(CreateLogger<ThroughMessageQueue>());
 			mq.Subscribe<string>("topic", msg => { Interlocked.Increment(ref count); });
-			for (int i = 0; i < 100; ++i)
+			for (var i = 0; i < 100; ++i)
 			{
 				await mq.PublishAsync("topic", new MessageData<string>
 				{
@@ -21,7 +21,7 @@ namespace DotnetSpider.Tests.MessageQueue
 				});
 			}
 
-			int j = 0;
+			var j = 0;
 			while (count < 100 && j < 150)
 			{
 				Thread.Sleep(500);
@@ -34,7 +34,7 @@ namespace DotnetSpider.Tests.MessageQueue
 		[Fact(DisplayName = "ParallelPubAndSub")]
 		public void ParallelPubAndSub()
 		{
-			int count = 0;
+			var count = 0;
 			var mq = new ThroughMessageQueue(CreateLogger<ThroughMessageQueue>());
 			mq.Subscribe<string>("topic", msg => { Interlocked.Increment(ref count); });
 
@@ -45,7 +45,7 @@ namespace DotnetSpider.Tests.MessageQueue
 					Data = "a"
 				});
 			});
-			int j = 0;
+			var j = 0;
 			while (count < 100 && j < 150)
 			{
 				Thread.Sleep(500);
@@ -58,11 +58,11 @@ namespace DotnetSpider.Tests.MessageQueue
 		[Fact(DisplayName = "PubAndUnSub")]
 		public async Task PubAndUnSub()
 		{
-			int count = 0;
+			var count = 0;
 			var mq = new ThroughMessageQueue(CreateLogger<ThroughMessageQueue>());
 			mq.Subscribe<string>("topic", msg => { Interlocked.Increment(ref count); });
 
-			int i = 0;
+			var i = 0;
 			Task.Factory.StartNew(async () =>
 			{
 				for (; i < 50; ++i)

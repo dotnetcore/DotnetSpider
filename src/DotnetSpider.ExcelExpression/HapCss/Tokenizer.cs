@@ -11,12 +11,12 @@ namespace DotnetSpider.ExcelExpression.HapCss
             var reader = new StringReader(cssFilter);
             while (true)
             {
-                int v = reader.Read();
+                var v = reader.Read();
 
                 if (v < 0)
                     yield break;
 
-                char c = (char)v;
+                var c = (char)v;
 
                 if (c == '>')
                 {
@@ -27,22 +27,22 @@ namespace DotnetSpider.ExcelExpression.HapCss
                 if (c == ' ' || c == '\t')
                     continue;
 
-                string word = c + ReadWord(reader);
+                var word = c + ReadWord(reader);
                 yield return new Token(word);
             }
         }
 
         private static string ReadWord(StringReader reader)
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             while (true)
             {
-                int v = reader.Read();
+                var v = reader.Read();
 
                 if (v < 0)
                     break;
 
-                char c = (char)v;
+                var c = (char)v;
 
                 if (c == ' ' || c == '\t')
                     break;

@@ -27,7 +27,7 @@ namespace DotnetSpider.DataFlow.Storage
 			foreach (var item in context.GetParseData())
 			{
 				var tableMetadata = (TableMetadata) context[item.Key];
-				StreamWriter writer = CreateOrOpen(context, tableMetadata, "json");
+				var writer = CreateOrOpen(context, tableMetadata, "json");
 				await writer.WriteLineAsync(JsonConvert.SerializeObject(item.Value));
 			}
 

@@ -98,7 +98,7 @@ namespace DotnetSpider.DownloadAgent
 
 			// 一小时
 			var times = 12 * 60;
-			for (int i = 0; i < times && !cancellationToken.IsCancellationRequested; ++i)
+			for (var i = 0; i < times && !cancellationToken.IsCancellationRequested; ++i)
 			{
 				Thread.Sleep(5000);
 				Logger?.LogInformation($"Agent {_options.AgentId} is exiting, please exit agent after safe time");

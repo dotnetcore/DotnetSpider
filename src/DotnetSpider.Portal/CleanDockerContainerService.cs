@@ -27,7 +27,7 @@ namespace DotnetSpider.Portal
 			{
 				while (!stoppingToken.IsCancellationRequested)
 				{
-					DockerClient client = new DockerClientConfiguration(
+					var client = new DockerClientConfiguration(
 							new Uri(_options.Docker))
 						.CreateClient();
 

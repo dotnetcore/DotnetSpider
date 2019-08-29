@@ -18,7 +18,7 @@ namespace DotnetSpider.Tests
 				return;
 			}
 
-			ConcurrentDictionary<int, int> dict = new ConcurrentDictionary<int, int>();
+			var dict = new ConcurrentDictionary<int, int>();
 
 			Task.Factory.StartNew(() =>
 				{

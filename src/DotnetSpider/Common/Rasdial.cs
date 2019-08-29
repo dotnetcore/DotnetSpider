@@ -30,7 +30,7 @@ namespace DotnetSpider.Common
         /// <returns>返回拨号进程的返回值</returns>
         public int Connect()
         {
-            Process process = new Process
+            var process = new Process
             {
                 StartInfo =
                 {
@@ -51,7 +51,7 @@ namespace DotnetSpider.Common
         /// </summary>
         public void Disconnect()
         {
-            Process process = new Process
+            var process = new Process
             {
                 StartInfo =
                 {

@@ -41,7 +41,7 @@ namespace DotnetSpider.Downloader
 		/// <returns>代理</returns>
 		public WebProxy GetProxy()
 		{
-			for (int i = 0; i < 3600; ++i)
+			for (var i = 0; i < 3600; ++i)
 			{
 				lock (_proxyQueueLocker)
 				{
@@ -78,7 +78,7 @@ namespace DotnetSpider.Downloader
 				return;
 			}
 
-			Proxy p = _proxies[key];
+			var p = _proxies[key];
 			switch (statusCode)
 			{
 				case HttpStatusCode.OK:
@@ -145,7 +145,7 @@ namespace DotnetSpider.Downloader
 				return;
 			}
 
-			LimitedConcurrencyThreadPool threadCommonPool = new LimitedConcurrencyThreadPool(4);
+			var threadCommonPool = new LimitedConcurrencyThreadPool(4);
 			while (!_isDispose)
 			{
 				if (_proxyQueue.Count < 50)

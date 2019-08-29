@@ -50,7 +50,7 @@ namespace DotnetSpider.Sample.samples
 
                 HttpClient.DefaultRequestHeaders.Referrer = new Uri(request.Properties["referer"]);
                 var content = await HttpClient.GetByteArrayAsync(request.Url);
-                FileStream fs = new FileStream(savePath, FileMode.CreateNew);
+                var fs = new FileStream(savePath, FileMode.CreateNew);
                 fs.Write(content, 0, content.Length);
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("图片下载成功！");
@@ -77,24 +77,24 @@ namespace DotnetSpider.Sample.samples
 
         private string GetImagePath(string tag, string subject, string imageUrl)
         {
-            string fileName = imageUrl.Substring(imageUrl.LastIndexOf('/') + 1, imageUrl.Length - imageUrl.LastIndexOf('/') - 1);
-            string tagPath = Environment.CurrentDirectory + "\\Pictures" + "\\" + tag;
+            var fileName = imageUrl.Substring(imageUrl.LastIndexOf('/') + 1, imageUrl.Length - imageUrl.LastIndexOf('/') - 1);
+            var tagPath = Environment.CurrentDirectory + "\\Pictures" + "\\" + tag;
 
             CreateDirByPath(tagPath);
 
-            string subjectPath = tagPath + "\\" + subject;
+            var subjectPath = tagPath + "\\" + subject;
             CreateDirByPath(subjectPath);
 
-            string filePath = subjectPath + "\\" + fileName;
+            var filePath = subjectPath + "\\" + fileName;
             return filePath;
         }
 
         private async Task<Boolean> DownloadImage(Request request)
         {
-            string tag = request.Properties["tag"];
-            string subject = request.Properties["subject"];
-            string fileUrl = request.Url;
-            string filePath = GetImagePath(tag, subject, fileUrl);
+            var tag = request.Properties["tag"];
+            var subject = request.Properties["subject"];
+            var fileUrl = request.Url;
+            var filePath = GetImagePath(tag, subject, fileUrl);
             await DownloadAsync(request, filePath);
             return true;
         }

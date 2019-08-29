@@ -50,7 +50,7 @@ namespace DotnetSpider.MessageQueue
 			}
 
 			message.Timestamp = (long) DateTimeHelper.GetCurrentUnixTimeNumber();
-			if (_consumers.TryGetValue(topic, out dynamic consumer))
+			if (_consumers.TryGetValue(topic, out var consumer))
 			{
 				try
 				{

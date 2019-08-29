@@ -184,8 +184,8 @@ namespace DotnetSpider.Common
 				// ignore
 			}
 
-			StringBuilder builder = new StringBuilder();
-			for (int i = 0; i < width; ++i)
+			var builder = new StringBuilder();
+			for (var i = 0; i < width; ++i)
 			{
 				builder.Append(word);
 			}

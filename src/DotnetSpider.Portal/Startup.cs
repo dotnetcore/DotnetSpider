@@ -97,7 +97,7 @@ namespace DotnetSpider.Portal
 					template: "{controller=Home}/{action=Index}/{id?}");
 			});
 
-			using (IServiceScope scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
+			using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
 				.CreateScope())
 			{
 				var context = scope.ServiceProvider.GetRequiredService<PortalDbContext>();

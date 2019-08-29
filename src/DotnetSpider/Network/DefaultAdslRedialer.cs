@@ -31,7 +31,7 @@ namespace DotnetSpider.Network
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 			{
 				KillPppoeProcesses();
-				Process process = Process.Start("/sbin/ifdown", "ppp0");
+				var process = Process.Start("/sbin/ifdown", "ppp0");
 				if (process == null)
 				{
 					return false;
@@ -59,7 +59,7 @@ namespace DotnetSpider.Network
 
 		private bool RedialOnWindows()
 		{
-			Rasdial adsl =
+			var adsl =
 				new Rasdial(Options.AdslInterface, Options.AdslAccount, Options.AdslPassword);
 			adsl.Disconnect();
 			while (adsl.Connect() != 0)

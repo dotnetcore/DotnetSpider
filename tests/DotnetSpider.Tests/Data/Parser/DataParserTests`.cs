@@ -72,7 +72,7 @@ namespace DotnetSpider.Tests.Data.Parser
 				CharSet = "UTF-8"
 			}, service);
 
-			DataParser<Product> extractor = new DataParser<Product>();
+			var extractor = new DataParser<Product>();
 
 
 			extractor.HandleAsync(dataContext).GetAwaiter().GetResult();

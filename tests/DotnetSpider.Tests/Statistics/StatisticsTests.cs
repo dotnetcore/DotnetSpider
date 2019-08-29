@@ -11,7 +11,7 @@ namespace DotnetSpider.Tests.Statistics
 		[Fact(DisplayName = "SpiderStatistics")]
 		public async Task SpiderStatistics()
 		{
-			SpiderTests s = new SpiderTests();
+			var s = new SpiderTests();
 			await s.RetryDownloadTimes();
 			s.RetryWhenResultIsEmpty();
 		}

@@ -33,8 +33,8 @@ namespace DotnetSpider.Common
 				return GetEncoding(characterSet);
 			}
 
-			Match meta = Regex.Match(Encoding.UTF8.GetString(bytes), "<meta[^<]*charset=([^<]*)[\"']", RegexOptions.IgnoreCase);
-			string c = string.Empty;
+			var meta = Regex.Match(Encoding.UTF8.GetString(bytes), "<meta[^<]*charset=([^<]*)[\"']", RegexOptions.IgnoreCase);
+			var c = string.Empty;
 			if (meta.Groups.Count > 0)
 			{
 				c = meta.Groups[1].Value.ToLower().Trim();
@@ -88,14 +88,14 @@ namespace DotnetSpider.Common
 
 		private static Encoding DetectEncoding(ArraySegment<byte> buffer)
 		{
-			byte[] data = buffer.Array;
-			int offset = buffer.Offset;
-			int dataLength = buffer.Count;
+			var data = buffer.Array;
+			var offset = buffer.Offset;
+			var dataLength = buffer.Count;
 
 
 			if (dataLength >= 2 && data != null)
 			{
-				int first2Bytes = data[offset + 0] << 8 | data[offset + 1];
+				var first2Bytes = data[offset + 0] << 8 | data[offset + 1];
 
 				switch (first2Bytes)
 				{

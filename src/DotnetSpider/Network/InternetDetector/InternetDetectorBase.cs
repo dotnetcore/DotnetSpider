@@ -24,7 +24,7 @@ namespace DotnetSpider.Network.InternetDetector
 		/// <returns>如果返回 True, 表示当前可以访问互联网</returns>
 		public bool Detect()
 		{
-			int currentWaitTime = 0;
+			var currentWaitTime = 0;
 			while (currentWaitTime < Timeout)
 			{
 				currentWaitTime++;

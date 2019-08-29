@@ -37,7 +37,7 @@ namespace DotnetSpider.Tests.Selector
         public void RemoveOutboundLinks()
         {
             // 绝对路径不需要做补充
-            Selectable selectable2 = new Selectable("<div><a href=\"http://www.aaaa.com\">aaaaaaab</a></div>",
+            var selectable2 = new Selectable("<div><a href=\"http://www.aaaa.com\">aaaaaaab</a></div>",
                 "http://www.b.com");
             var value2 = selectable2.XPath(".//a").GetValues();
             Assert.Empty(value2);
@@ -46,7 +46,7 @@ namespace DotnetSpider.Tests.Selector
         [Fact(DisplayName = "DoNotFixAllRelativeHrefs")]
         public void DoNotFixAllRelativeHrefs()
         {
-            Selectable selectable = new Selectable("<div><a href=\"aaaa.com\">aaaaaaab</a></div>", null);
+            var selectable = new Selectable("<div><a href=\"aaaa.com\">aaaaaaab</a></div>", null);
             var values = selectable.XPath(".//a").GetValues();
             Assert.Equal("aaaaaaab", values.First());
         }
@@ -54,7 +54,7 @@ namespace DotnetSpider.Tests.Selector
         [Fact(DisplayName = "FixRelativeUrl")]
         public void FixRelativeUrl()
         {
-            string absoluteUrl =
+            var absoluteUrl =
                 DotnetSpider.Selector.Selectable.CanonicalizeUrl("?aa", "http://www.dianping.com/sh/ss/com");
             Assert.Equal("http://www.dianping.com/sh/ss/com?aa", absoluteUrl);
 
@@ -74,12 +74,12 @@ namespace DotnetSpider.Tests.Selector
             Assert.Equal("http://www.dianping.com/aa", absoluteUrl);
 
             // 只有相对路径需要做补充
-            Selectable selectable1 = new Selectable("<div><a href=\"/a/b\">aaaaaaab</a></div>", "http://www.b.com");
+            var selectable1 = new Selectable("<div><a href=\"/a/b\">aaaaaaab</a></div>", "http://www.b.com");
             var value1 = selectable1.XPath(".//a").Links().GetValue();
             Assert.Equal("http://www.b.com/a/b", value1);
 
             // 绝对路径不需要做补充
-            Selectable selectable2 = new Selectable("<div><a href=\"http://www.aaaa.com\">aaaaaaab</a></div>",
+            var selectable2 = new Selectable("<div><a href=\"http://www.aaaa.com\">aaaaaaab</a></div>",
                 "http://www.b.com", false);
             var value2 = selectable2.XPath(".//a").GetValues().First();
             Assert.Equal("aaaaaaab", value2);
@@ -110,15 +110,15 @@ namespace DotnetSpider.Tests.Selector
         [Fact(DisplayName = "XpathBySelectable")]
         public void XpathBySelectable()
         {
-            Selectable selectable = new Selectable("aaaaaaab");
-            string value = selectable.Regex("(.*)").GetValue();
+            var selectable = new Selectable("aaaaaaab");
+            var value = selectable.Regex("(.*)").GetValue();
             Assert.Equal("aaaaaaab", value);
         }
 
         [Fact(DisplayName = "JsonPathSelector")]
         public void JsonPath()
         {
-            JsonPathSelector jsonPathSelector = new JsonPathSelector("$.store.book[*].author");
+            var jsonPathSelector = new JsonPathSelector("$.store.book[*].author");
             var result1 = jsonPathSelector.Select(json).ToString();
             var list1 = jsonPathSelector.SelectList(json).ToList();
             Assert.Equal(result1, "Nigel Rees");
@@ -151,9 +151,9 @@ namespace DotnetSpider.Tests.Selector
         [Fact(DisplayName = "RegexSelectorWithLeftBracketQuoted")]
         public void TestRegexWithLeftBracketQuoted()
         {
-            string regex = "\\(.+";
-            string source = "(hello world";
-            RegexSelector regexSelector = new RegexSelector(regex);
+            var regex = "\\(.+";
+            var source = "(hello world";
+            var regexSelector = new RegexSelector(regex);
             string select = regexSelector.Select(source);
             Assert.Equal(select, source);
         }
@@ -161,9 +161,9 @@ namespace DotnetSpider.Tests.Selector
         [Fact(DisplayName = "XPathSelector2")]
         public void XPath2()
         {
-            Selectable selectable = new Selectable(html2);
+            var selectable = new Selectable(html2);
             var linksWithoutChain = selectable.Links().GetValues();
-            ISelectable xpath = selectable.XPath("//div");
+            var xpath = selectable.XPath("//div");
             var linksWithChainFirstCall = xpath.Links().GetValues().ToList();
             var linksWithChainSecondCall = xpath.Links().GetValues().ToList();
             Assert.Equal(linksWithoutChain.Count(), linksWithChainFirstCall.Count());
@@ -173,7 +173,7 @@ namespace DotnetSpider.Tests.Selector
         [Fact(DisplayName = "Selectable")]
         public void Selectable()
         {
-            Selectable selectable = new Selectable(html2);
+            var selectable = new Selectable(html2);
             var links = selectable.XPath(".//a/@href").Nodes();
             Assert.Equal("http://whatever.com/aaa", links.First().GetValue());
 

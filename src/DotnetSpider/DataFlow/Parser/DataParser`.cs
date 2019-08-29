@@ -59,7 +59,7 @@ namespace DotnetSpider.DataFlow.Parser
 			{
 				foreach (var selector in Model.GlobalValueSelectors)
 				{
-					string name = selector.Name;
+					var name = selector.Name;
 					if (string.IsNullOrWhiteSpace(name))
 					{
 						continue;
@@ -77,7 +77,7 @@ namespace DotnetSpider.DataFlow.Parser
 				}
 			}
 
-			bool singleExtractor = Model.Selector == null;
+			var singleExtractor = Model.Selector == null;
 			if (!singleExtractor)
 			{
 				var selector = Model.Selector.ToSelector();

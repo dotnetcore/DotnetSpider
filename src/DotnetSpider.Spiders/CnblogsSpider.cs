@@ -19,7 +19,7 @@ namespace DotnetSpider.Spiders
 		protected override void Initialize()
 		{
 			AddDataFlow(new DataParser<CnblogsEntry>()).AddDataFlow(GetDefaultStorage());
-			for (int i = 1; i < 10; ++i)
+			for (var i = 1; i < 10; ++i)
 			{
 				AddRequests(
 					new Request($"https://news.cnblogs.com/n/page/{i}/", new Dictionary<string, string> {{"网站", "博客园"}})

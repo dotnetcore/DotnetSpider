@@ -128,10 +128,10 @@ namespace DotnetSpider.Common
 		/// <returns>array of int-sized hashes</returns>
 		public static int[] CreateHashes(byte[] data, int hashes)
 		{
-			int[] result = new int[hashes];
+			var result = new int[hashes];
 
-			int k = 0;
-			byte[] salt = new byte[1];
+			var k = 0;
+			var salt = new byte[1];
 			while (k < hashes)
 			{
 				byte[] digest;
@@ -142,10 +142,10 @@ namespace DotnetSpider.Common
 					digest = DigestFunction.ComputeHash(data);
 				}
 
-				for (int i = 0; i < digest.Length / 4 && k < hashes; i++)
+				for (var i = 0; i < digest.Length / 4 && k < hashes; i++)
 				{
-					int h = 0;
-					for (int j = i * 4; j < i * 4 + 4; j++)
+					var h = 0;
+					for (var j = i * 4; j < i * 4 + 4; j++)
 					{
 						h <<= 8;
 						h |= digest[j] & 0xFF;
@@ -172,7 +172,7 @@ namespace DotnetSpider.Common
 			{
 				return false;
 			}
-			BloomFilter other = (BloomFilter)obj;
+			var other = (BloomFilter)obj;
 			if (_expectedNumberOfFilterElements != other._expectedNumberOfFilterElements)
 			{
 				return false;
@@ -199,7 +199,7 @@ namespace DotnetSpider.Common
 		/// </summary>
 		public override int GetHashCode()
 		{
-			int hash = 7;
+			var hash = 7;
 			hash = 61 * hash + (_bitSet != null ? HashBytes(_bitSet) : 0);
 			hash = 61 * hash + _expectedNumberOfFilterElements;
 			hash = 61 * hash + _bitSetSize;
@@ -285,8 +285,8 @@ namespace DotnetSpider.Common
 		/// <param name="bytes">array of bytes to add to the Bloom filter.</param>
 		public void Add(byte[] bytes)
 		{
-			int[] hashes = CreateHashes(bytes, _k);
-			foreach (int hash in hashes)
+			var hashes = CreateHashes(bytes, _k);
+			foreach (var hash in hashes)
 			{
 				_bitSet.Set(Math.Abs(hash % _bitSetSize), true);
 			}
@@ -299,7 +299,7 @@ namespace DotnetSpider.Common
 		/// <param name="c">Collection of elements.</param>
 		public void AddAll(IEnumerable<object> c)
 		{
-			foreach (object element in c)
+			foreach (var element in c)
 			{
 				Add(element);
 			}
@@ -311,7 +311,7 @@ namespace DotnetSpider.Common
 		/// <param name="c">Collection of elements.</param>
 		public void AddAll(IEnumerable<byte[]> c)
 		{
-			foreach (byte[] byteArray in c)
+			foreach (var byteArray in c)
 			{
 				Add(byteArray);
 			}
@@ -338,7 +338,7 @@ namespace DotnetSpider.Common
 		/// <returns>true if the array could have been inserted into the Bloom filter.</returns>
 		public bool Contains(byte[] bytes)
 		{
-			int[] hashes = CreateHashes(bytes, _k);
+			var hashes = CreateHashes(bytes, _k);
 			return hashes.All(hash => _bitSet.Get(Math.Abs(hash % _bitSetSize)));
 		}
 
@@ -442,7 +442,7 @@ namespace DotnetSpider.Common
 		public static int HashBytes(BitArray data)
 		{
 			// convert bit array to integer array
-			int[] intArray = new int[(data.Length + 31) / 32];
+			var intArray = new int[(data.Length + 31) / 32];
 			data.CopyTo(intArray, 0);
 			// compute the hash from integer array values
 			unchecked

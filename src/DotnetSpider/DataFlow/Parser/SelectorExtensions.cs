@@ -14,7 +14,7 @@ namespace DotnetSpider.DataFlow.Parser
         {
             if (selector != null)
             {
-                string expression = selector.Expression;
+                var expression = selector.Expression;
 
                 switch (selector.Type)
                 {

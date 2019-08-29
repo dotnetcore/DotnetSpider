@@ -243,14 +243,14 @@ namespace DotnetSpider.HtmlAgilityPack.Css
             var formalParameters = deleg.ParameterTypes;
             var actualParameters = new object[formalParameters.Count];
 
-            for (int i = 0; i < formalParameters.Count; i++)
+            for (var i = 0; i < formalParameters.Count; i++)
             {
                 if (i != 0)
                 {
                     Read(ToTokenSpec(Token.Semicolon()));
                     Read(ToTokenSpec(TokenKind.WhiteSpace));
                 }
-                Type type = formalParameters[i];
+                var type = formalParameters[i];
                 var typeName = type.Name;
                 if (typeName == TypeCode.String.ToString()) actualParameters[i] = Read(ToTokenSpec(TokenKind.String)).Text;
                 else if (

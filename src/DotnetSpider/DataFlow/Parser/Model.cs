@@ -58,8 +58,8 @@ namespace DotnetSpider.DataFlow.Parser
 			TypeName = type.FullName;
 			var entitySelector =
 				type.GetCustomAttributes(typeof(EntitySelector), true).FirstOrDefault() as EntitySelector;
-			int take = 0;
-			bool takeFromHead = true;
+			var take = 0;
+			var takeFromHead = true;
 			Attribute.Selector selector = null;
 			if (entitySelector != null)
 			{

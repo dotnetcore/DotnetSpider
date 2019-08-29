@@ -72,7 +72,7 @@ namespace DotnetSpider.Scheduler
 			}
 
 			var requests = new List<Request>();
-			for (int i = _requests.Count - 1; i >= start; --i)
+			for (var i = _requests.Count - 1; i >= start; --i)
 			{
 				requests.Add(_requests[ownerId][i]);
 			}

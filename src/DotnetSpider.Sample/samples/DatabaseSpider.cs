@@ -38,7 +38,7 @@ namespace DotnetSpider.Sample.samples
 				var typeName = typeof(EntitySpider.CnblogsEntry).FullName;
 				var entity = new EntitySpider.CnblogsEntry();
 				context.Add(typeName, entity.GetTableMetadata());
-				ParseResult<EntitySpider.CnblogsEntry> items = new ParseResult<EntitySpider.CnblogsEntry>();
+				var items = new ParseResult<EntitySpider.CnblogsEntry>();
 				entity.WebSite = context.Response.Request.Url;
 				entity.Url = context.Response.Request.Url;
 				entity.Title = context.Selectable.XPath(".//title").GetValue();

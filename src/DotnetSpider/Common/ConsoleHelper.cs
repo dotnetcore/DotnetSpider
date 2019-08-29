@@ -38,7 +38,7 @@ namespace DotnetSpider.Common
         {
             if (blankLineCount <= 0) return;
 
-            for (int i = 0; i < blankLineCount; i++)
+            for (var i = 0; i < blankLineCount; i++)
             {
                 Console.WriteLine();
             }

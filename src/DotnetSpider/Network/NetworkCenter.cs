@@ -71,7 +71,7 @@ namespace DotnetSpider.Network
 				locker = _lockerFactory.GetLocker(RedialLocker);
 
 				var interval = double.MaxValue;
-				if (DateTimeOffset.TryParse(locker.Information, out DateTimeOffset latestRedialTime))
+				if (DateTimeOffset.TryParse(locker.Information, out var latestRedialTime))
 				{
 					interval = (DateTimeOffset.Now - latestRedialTime).TotalSeconds;
 				}
@@ -84,8 +84,8 @@ namespace DotnetSpider.Network
 				{
 					WaitForAllSessionsExit();
 
-					bool success = false;
-					for (int i = 0; i < 10; ++i)
+					var success = false;
+					for (var i = 0; i < 10; ++i)
 					{
 						try
 						{

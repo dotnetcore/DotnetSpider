@@ -17,17 +17,17 @@ namespace DotnetSpider.Tests.MessageQueue
 				return;
 			}
 
-			int count = 0;
+			var count = 0;
 			var options = DistributeSpiderProvider.Value.GetRequiredService<KafkaOptions>();
 			var logger = DistributeSpiderProvider.Value.GetRequiredService<ILogger<KafkaMq>>();
 			var mq = new KafkaMq(options, logger);
 			mq.Subscribe<string>("PubAndSub", msg => { Interlocked.Increment(ref count); });
-			for (int i = 0; i < 100; ++i)
+			for (var i = 0; i < 100; ++i)
 			{
 				await mq.PublishAsync("PubAndSub", new MessageData<string>() {Data = "a"});
 			}
 
-			int j = 0;
+			var j = 0;
 			while (count < 100 && j < 150)
 			{
 				Thread.Sleep(500);
@@ -45,7 +45,7 @@ namespace DotnetSpider.Tests.MessageQueue
 				return;
 			}
 
-			int count = 0;
+			var count = 0;
 			var options = DistributeSpiderProvider.Value.GetRequiredService<KafkaOptions>();
 			var logger = DistributeSpiderProvider.Value.GetRequiredService<ILogger<KafkaMq>>();
 			var mq = new KafkaMq(options, logger);
@@ -55,7 +55,7 @@ namespace DotnetSpider.Tests.MessageQueue
 			{
 				await mq.PublishAsync("ParallelPubAndSub", new MessageData<string>() {Data = "a"});
 			});
-			int j = 0;
+			var j = 0;
 			while (count < 100 && j < 150)
 			{
 				Thread.Sleep(500);
@@ -73,13 +73,13 @@ namespace DotnetSpider.Tests.MessageQueue
 				return;
 			}
 
-			int count = 0;
+			var count = 0;
 			var options = DistributeSpiderProvider.Value.GetRequiredService<KafkaOptions>();
 			var logger = DistributeSpiderProvider.Value.GetRequiredService<ILogger<KafkaMq>>();
 			var mq = new KafkaMq(options, logger);
 			mq.Subscribe<string>("PubAndUnSub", msg => { Interlocked.Increment(ref count); });
 
-			int i = 0;
+			var i = 0;
 			Task.Factory.StartNew(async () =>
 			{
 				for (; i < 50; ++i)

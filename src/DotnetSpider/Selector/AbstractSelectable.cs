@@ -110,7 +110,7 @@ namespace DotnetSpider.Selector
         /// <returns>查询到的文本结果</returns>
         public List<string> GetValues(ValueOption option = ValueOption.None)
         {
-            List<string> result = new List<string>();
+            var result = new List<string>();
             foreach (var el in Elements)
             {
                 var value = CalculateValue(el, option);

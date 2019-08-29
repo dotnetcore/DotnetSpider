@@ -72,7 +72,7 @@ namespace DotnetSpider.RequestSupplier
 
 					FormatDataObject(dic);
 
-					object[] arguments = _formatArguments.Select(a => dic[a]).Select(x => (object)x).ToArray();
+					var arguments = _formatArguments.Select(a => dic[a]).Select(x => (object)x).ToArray();
 
 					foreach (var format in _formats)
 					{

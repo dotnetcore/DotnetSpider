@@ -278,7 +278,7 @@ namespace DotnetSpider.HtmlAgilityPack.Css
             if (keepBefore)
                 yield return CreateNodesGroup(doc, children, 0, splitterPositions[0] + (keepSeparators ? 0 : -1));
 
-            for (int i = 1; i < splitterPositions.Count; i++)
+            for (var i = 1; i < splitterPositions.Count; i++)
             {
 
                 var indexBegin = splitterPositions[i - 1] + 1;
@@ -354,7 +354,7 @@ namespace DotnetSpider.HtmlAgilityPack.Css
         private HtmlNode CreateNodesGroup(HtmlDocument doc, IList<HtmlNode> nodes, int start, int last)
         {
             var group = doc.CreateElement("fizzler_nodes_group");
-            for (int i = start; i <= last; i++)
+            for (var i = start; i <= last; i++)
             {
                 group.ChildNodes.Add(nodes[i]);
             }

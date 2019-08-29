@@ -24,7 +24,7 @@ namespace DotnetSpider.HtmlAgilityPack.Css
 
 		private bool Remove(TInput key)
 		{
-			bool existed = _data.Remove(key);
+			var existed = _data.Remove(key);
 			_lruList.Remove(key);
 			return existed;
 		}

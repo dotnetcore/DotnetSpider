@@ -53,7 +53,7 @@ namespace DotnetSpider.DataFlow.Storage
 				hash = context.Response.Request.Hash
 			};
 
-			for (int i = 0; i < 10; ++i)
+			for (var i = 0; i < 10; ++i)
 			{
 				try
 				{

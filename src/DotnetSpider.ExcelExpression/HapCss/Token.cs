@@ -25,11 +25,11 @@ namespace DotnetSpider.ExcelExpression.HapCss
             Func<char, bool> isNameToken = c => char.IsLetterOrDigit(c) || c == '-'|| c == '_';
             var rt = new List<string>();
            
-            int start = 0;
-            bool isPrefix = true;
-            bool isOpeningBracket = false;
-            char closeBracket = '\0';
-            for (int i = 0; i < token.Length; i++)
+            var start = 0;
+            var isPrefix = true;
+            var isOpeningBracket = false;
+            var closeBracket = '\0';
+            for (var i = 0; i < token.Length; i++)
             {
                 if (isOpeningBracket && token[i] != closeBracket)
                     continue;

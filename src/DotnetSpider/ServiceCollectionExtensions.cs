@@ -23,7 +23,7 @@ namespace DotnetSpider
 			Check.NotNull(services, nameof(services));
 
 			var configurationBuilder = Framework.CreateConfigurationBuilder(config);
-			IConfigurationRoot configurationRoot = configurationBuilder.Build();
+			var configurationRoot = configurationBuilder.Build();
 			services.AddSingleton<IConfiguration>(configurationRoot);
 
 			return services;
@@ -36,7 +36,7 @@ namespace DotnetSpider
 		{
 			services.AddHostedService<DefaultDownloadAgentRegisterCenter>();
 
-			DownloadAgentRegisterCenterBuilder downloadCenterBuilder = new DownloadAgentRegisterCenterBuilder(services);
+			var downloadCenterBuilder = new DownloadAgentRegisterCenterBuilder(services);
 			configure?.Invoke(downloadCenterBuilder);
 
 			return services;
@@ -77,7 +77,7 @@ namespace DotnetSpider
 			services.AddSingleton<NetworkCenter>();
 			services.AddSingleton<DownloaderAgentOptions>();
 
-			DownloaderAgentBuilder spiderAgentBuilder = new DownloaderAgentBuilder(services);
+			var spiderAgentBuilder = new DownloaderAgentBuilder(services);
 			configure?.Invoke(spiderAgentBuilder);
 
 			return services;

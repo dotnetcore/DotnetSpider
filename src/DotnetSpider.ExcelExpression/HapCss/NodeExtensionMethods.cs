@@ -22,7 +22,7 @@ namespace DotnetSpider.ExcelExpression.HapCss
 
         public static int GetIndexOnParent(this HtmlNode node)
         {
-            int idx = 0;
+            var idx = 0;
             foreach (var n in node.ParentNode.GetChildElements())
             {
                 if (n == node)

@@ -156,7 +156,7 @@ namespace DotnetSpider.Tests
 
 			spider.NewGuidId();
 			spider.Name = "RunAsyncAndStop";
-			for (int i = 0; i < 10000; i++)
+			for (var i = 0; i < 10000; i++)
 			{
 				spider.AddRequests(new Request(url + i) {DownloaderType = DownloaderType.Empty});
 			}
@@ -180,7 +180,7 @@ namespace DotnetSpider.Tests
 			spider.Name = "RunAsyncAndStop";
 			spider.EmptySleepTime = 15;
 
-			for (int i = 0; i < 10000; i++)
+			for (var i = 0; i < 10000; i++)
 			{
 				spider.AddRequests(new Request(url + i) {DownloaderType = DownloaderType.Empty});
 			}
@@ -209,7 +209,7 @@ namespace DotnetSpider.Tests
 			spider.NewGuidId();
 			spider.Name = "MmfCloseSignal";
 
-			for (int i = 0; i < 10000; i++)
+			for (var i = 0; i < 10000; i++)
 			{
 				spider.AddRequests(new Request(url + i) {DownloaderType = DownloaderType.Empty});
 			}

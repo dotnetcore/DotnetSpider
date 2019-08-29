@@ -92,7 +92,7 @@ namespace DotnetSpider.DataFlow.Storage
 
 		private void WriteInsertFile(DataFlowContext context, TableMetadata tableMetadata, IParseResult items)
 		{
-			StringBuilder builder = new StringBuilder();
+			var builder = new StringBuilder();
 			var columns = tableMetadata.Columns;
 			var isAutoIncrementPrimary = tableMetadata.IsAutoIncrementPrimary;
 			var tableSql = GenerateTableSql(tableMetadata);
@@ -121,7 +121,7 @@ namespace DotnetSpider.DataFlow.Storage
 				builder.Append($");{Environment.NewLine}");
 			}
 
-			StreamWriter writer = CreateOrOpen(context, tableMetadata, "mysql");
+			var writer = CreateOrOpen(context, tableMetadata, "mysql");
 			lock (writer)
 			{
 				writer.WriteLine(builder.ToString());
@@ -132,7 +132,7 @@ namespace DotnetSpider.DataFlow.Storage
 
 		private void WriteLoadFile(DataFlowContext context, TableMetadata tableMetadata, IParseResult items)
 		{
-			StringBuilder builder = new StringBuilder();
+			var builder = new StringBuilder();
 			var columns = tableMetadata.Columns;
 			var isAutoIncrementPrimary = tableMetadata.IsAutoIncrementPrimary;
 
@@ -150,7 +150,7 @@ namespace DotnetSpider.DataFlow.Storage
 				}
 			}
 
-			StreamWriter writer = CreateOrOpen(context, tableMetadata, "mysql");
+			var writer = CreateOrOpen(context, tableMetadata, "mysql");
 			lock (writer)
 			{
 				writer.WriteLine(builder.ToString());

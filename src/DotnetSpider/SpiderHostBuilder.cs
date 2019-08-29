@@ -97,7 +97,7 @@ namespace DotnetSpider
 			CreateServiceProvider();
 
 			_backgroundServices = _serviceProvider.GetService<IEnumerable<IHostedService>>();
-			foreach (IHostedService hostedService in _backgroundServices)
+			foreach (var hostedService in _backgroundServices)
 			{
 				hostedService.StartAsync(default).ConfigureAwait(false).GetAwaiter().GetResult();
 			}
@@ -116,7 +116,7 @@ namespace DotnetSpider
 			_services.AddOptions();
 			_services.AddLogging();
 
-			foreach (Action<IServiceCollection> configureServicesAction in _configureServiceActions)
+			foreach (var configureServicesAction in _configureServiceActions)
 			{
 				configureServicesAction(_services);
 			}
@@ -126,9 +126,9 @@ namespace DotnetSpider
 
 		private void BuildConfiguration()
 		{
-			ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
+			var configurationBuilder = new ConfigurationBuilder();
 
-			foreach (Action<IConfigurationBuilder> configureAppConfigAction in
+			foreach (var configureAppConfigAction in
 				_configureConfigActions)
 			{
 				configureAppConfigAction(configurationBuilder);

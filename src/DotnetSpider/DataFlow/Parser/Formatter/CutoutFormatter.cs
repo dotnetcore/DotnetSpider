@@ -36,11 +36,11 @@ namespace DotnetSpider.DataFlow.Parser.Formatter
 		protected override string FormatValue(string value)
 		{
 			var tmp = value;
-			int begin = tmp.IndexOf(StartPart, StringComparison.Ordinal);
+			var begin = tmp.IndexOf(StartPart, StringComparison.Ordinal);
 			int length;
 			if (!string.IsNullOrEmpty(EndPart))
 			{
-				int end = tmp.IndexOf(EndPart, begin, StringComparison.Ordinal);
+				var end = tmp.IndexOf(EndPart, begin, StringComparison.Ordinal);
 				length = end - begin;
 			}
 			else

@@ -18,7 +18,7 @@ namespace DotnetSpider.Selector
 		/// <param name="removeOutboundLinks">是否去除外链</param>
 		public Selectable(string text, string url, bool removeOutboundLinks = true)
 		{
-			HtmlDocument document = new HtmlDocument {OptionAutoCloseOnEnd = true};
+			var document = new HtmlDocument {OptionAutoCloseOnEnd = true};
 			document.LoadHtml(text);
 
 			if (!string.IsNullOrWhiteSpace(url))
@@ -28,7 +28,7 @@ namespace DotnetSpider.Selector
 				{
 					var host = new Uri(url).Host;
 					var hostSplits = host.Split('.');
-					string domain = $"{hostSplits[hostSplits.Length - 2]}\\.{hostSplits[hostSplits.Length - 1]}";
+					var domain = $"{hostSplits[hostSplits.Length - 2]}\\.{hostSplits[hostSplits.Length - 1]}";
 					RemoveOutboundLinks(document, domain);
 				}
 			}
@@ -93,8 +93,8 @@ namespace DotnetSpider.Selector
 				case "monday":
 				{
 					var now = DateTimeOffset.Now;
-					int i = now.DayOfWeek - DayOfWeek.Monday == -1 ? 6 : -1;
-					TimeSpan ts = new TimeSpan(i, 0, 0, 0);
+					var i = now.DayOfWeek - DayOfWeek.Monday == -1 ? 6 : -1;
+					var ts = new TimeSpan(i, 0, 0, 0);
 					return now.Subtract(ts).Date.ToString("yyyy/MM/dd hh:mm:ss");
 				}
 				case "today":
@@ -160,7 +160,7 @@ namespace DotnetSpider.Selector
 		{
 			if (selector != null)
 			{
-				List<dynamic> results = new List<dynamic>();
+				var results = new List<dynamic>();
 				foreach (var selectedNode in Elements)
 				{
 					var result = selector.Select(selectedNode);
@@ -185,7 +185,7 @@ namespace DotnetSpider.Selector
 		{
 			if (selector != null)
 			{
-				List<dynamic> results = new List<dynamic>();
+				var results = new List<dynamic>();
 				foreach (var selectedNode in Elements)
 				{
 					var result = selector.SelectList(selectedNode);
@@ -207,7 +207,7 @@ namespace DotnetSpider.Selector
 		/// <returns>查询接口</returns>
 		public override IEnumerable<ISelectable> Nodes()
 		{
-			List<ISelectable> result = new List<ISelectable>();
+			var result = new List<ISelectable>();
 			foreach (var element in Elements)
 			{
 				result.Add(new Selectable(new List<dynamic> {element}));
@@ -223,7 +223,7 @@ namespace DotnetSpider.Selector
 		/// <returns>查询接口</returns>
 		public override ISelectable JsonPath(string jsonPath)
 		{
-			JsonPathSelector jsonPathSelector = new JsonPathSelector(jsonPath);
+			var jsonPathSelector = new JsonPathSelector(jsonPath);
 			return SelectList(jsonPathSelector);
 		}
 
@@ -237,8 +237,8 @@ namespace DotnetSpider.Selector
 		{
 			try
 			{
-				Uri bas = new Uri(refer);
-				Uri abs = new Uri(bas, url);
+				var bas = new Uri(refer);
+				var abs = new Uri(bas, url);
 				return abs.AbsoluteUri;
 			}
 			catch (Exception)
@@ -281,10 +281,10 @@ namespace DotnetSpider.Selector
 			var nodes = document.DocumentNode.SelectNodes(".//a");
 			if (nodes != null)
 			{
-				List<HtmlNode> deleteNodes = new List<HtmlNode>();
+				var deleteNodes = new List<HtmlNode>();
 				foreach (var node in nodes)
 				{
-					bool isMatch = false;
+					var isMatch = false;
 					foreach (var domain in domains)
 					{
 						var href = node.Attributes["href"]?.Value;

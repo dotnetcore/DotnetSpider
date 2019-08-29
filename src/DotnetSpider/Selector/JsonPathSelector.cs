@@ -48,7 +48,7 @@ namespace DotnetSpider.Selector
 		{
 			if (json != null)
 			{
-				List<dynamic> list = new List<dynamic>();
+				var list = new List<dynamic>();
 				if (json is string)
 				{
 					if (JsonConvert.DeserializeObject(json) is JObject o)
@@ -61,7 +61,7 @@ namespace DotnetSpider.Selector
 					}
 					else
 					{
-						JArray array = JsonConvert.DeserializeObject(json) as JArray;
+						var array = JsonConvert.DeserializeObject(json) as JArray;
 						var items = array?.SelectTokens(_jsonPath).Select(t => t.ToString()).ToList();
 						if (items != null && items.Count > 0)
 						{
@@ -71,7 +71,7 @@ namespace DotnetSpider.Selector
 				}
 				else
 				{
-					dynamic realText = json is HtmlNode node ? JsonConvert.DeserializeObject<JObject>(node.InnerText) : json;
+					var realText = json is HtmlNode node ? JsonConvert.DeserializeObject<JObject>(node.InnerText) : json;
 
 					if (realText is JObject o)
 					{
@@ -83,7 +83,7 @@ namespace DotnetSpider.Selector
 					}
 					else
 					{
-						JArray array = json as JArray;
+						var array = json as JArray;
 						var items = array?.SelectTokens(_jsonPath).Select(t => t.ToString()).ToList();
 						if (items != null && items.Count > 0)
 						{

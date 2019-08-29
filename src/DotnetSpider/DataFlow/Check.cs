@@ -37,7 +37,7 @@ namespace DotnetSpider.DataFlow
 				throw new ArgumentNullException(nameof(message));
 			}
 
-			TException exception = (TException) Activator.CreateInstance(typeof(TException), message);
+			var exception = (TException) Activator.CreateInstance(typeof(TException), message);
 			throw exception;
 		}
 	}

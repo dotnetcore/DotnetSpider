@@ -50,7 +50,7 @@ namespace DotnetSpider.Scheduler.Component
 		{
 			Check.NotNull(request.OwnerId, nameof(request.OwnerId));
 			var hash = request.Hash;
-			bool isDuplicate = _bloomFilter.Contains(hash);
+			var isDuplicate = _bloomFilter.Contains(hash);
 			if (!isDuplicate)
 			{
 				_bloomFilter.Add(hash);

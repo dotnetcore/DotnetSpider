@@ -19,7 +19,7 @@ namespace DotnetSpider.DataFlow.Parser.Formatter
 		{
 			var filePath = value;
 			var name = Path.GetFileName(filePath);
-			string file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "images", name);
+			var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "images", name);
 			_client.DownloadFile(file, filePath);
 			return file;
 		}

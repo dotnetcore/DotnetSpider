@@ -53,7 +53,7 @@ namespace DotnetSpider.Downloader
 		{
 			var response = new Response {Request = request};
 
-			for (int i = 0; i < RetryTime; ++i)
+			for (var i = 0; i < RetryTime; ++i)
 			{
 				HttpResponseMessage httpResponseMessage = null;
 				WebProxy proxy = null;
@@ -237,7 +237,7 @@ namespace DotnetSpider.Downloader
 
 		private HttpRequestMessage GenerateHttpRequestMessage(Request request)
 		{
-			HttpRequestMessage httpRequestMessage =
+			var httpRequestMessage =
 				new HttpRequestMessage(
 					string.IsNullOrWhiteSpace(request.Method)
 						? HttpMethod.Get
@@ -373,7 +373,7 @@ namespace DotnetSpider.Downloader
 
 		private void CleanupPool()
 		{
-			List<string> needRemoveEntries = new List<string>();
+			var needRemoveEntries = new List<string>();
 			var now = DateTimeOffset.Now;
 			foreach (var pair in _httpClients)
 			{

@@ -56,7 +56,7 @@ namespace DotnetSpider.Downloader
 		{
 			if (string.IsNullOrEmpty(request.Encoding))
 			{
-				Encoding htmlCharset = EncodingHelper.GetEncoding(characterSet, contentBytes);
+				var htmlCharset = EncodingHelper.GetEncoding(characterSet, contentBytes);
 				return htmlCharset.GetString(contentBytes, 0, contentBytes.Length);
 			}
 

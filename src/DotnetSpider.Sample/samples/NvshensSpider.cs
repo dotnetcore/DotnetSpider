@@ -63,7 +63,7 @@ namespace DotnetSpider.Sample.samples
                 context.AddData("URL", context.Response.Request.Url);
                 context.AddData("Title", context.Selectable.XPath(".//title").GetValue());
 
-                Dictionary<string, string> tags = new Dictionary<string, string>();
+                var tags = new Dictionary<string, string>();
                 var tagNodes = context.Selectable
                     .XPath("//*[@id=\"post_rank\"]/div[2]/div/div[@class='tag_div']/ul/li/a").Nodes();
                 foreach (var node in tagNodes)
@@ -191,7 +191,7 @@ namespace DotnetSpider.Sample.samples
         /// <param name="context"></param>
         public static void GetSubjectPageUrl(DataFlowContext context)
         {
-            Dictionary<string, string> pageSet = new Dictionary<string, string>();
+            var pageSet = new Dictionary<string, string>();
             var pages = context.Selectable
                 .XPath("//*[@id=\"listdiv\"]/div[@class='pagesYY']/div/a[not(@class)]/@href").GetValues();
             var requestList = new List<Request>();
@@ -258,7 +258,7 @@ namespace DotnetSpider.Sample.samples
         /// <param name="context"></param>
         public static void GetDetailPageUrl(DataFlowContext context)
         {
-            Dictionary<string, string> pageSet = new Dictionary<string, string>();
+            var pageSet = new Dictionary<string, string>();
             var pages = context.Selectable.XPath("//*[@id=\"pages\"]/a[not(@class)]/@href").GetValues();
             var requestList = new List<Request>();
             foreach (var page in pages)

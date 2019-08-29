@@ -30,14 +30,14 @@ namespace DotnetSpider.Common
 			{
 				reader = command.ExecuteReader();
 
-				int row = 1;
-				StringBuilder html = new StringBuilder("<table>");
+				var row = 1;
+				var html = new StringBuilder("<table>");
 				while (reader.Read())
 				{
 					if (row == 1)
 					{
 						html.Append("<tr>");
-						for (int i = 1; i < reader.FieldCount + 1; ++i)
+						for (var i = 1; i < reader.FieldCount + 1; ++i)
 						{
 							html.Append($"<td>{reader.GetName(i - 1)}</td>");
 						}
@@ -46,7 +46,7 @@ namespace DotnetSpider.Common
 					}
 
 					html.Append("<tr>");
-					for (int j = 1; j < reader.FieldCount + 1; ++j)
+					for (var j = 1; j < reader.FieldCount + 1; ++j)
 					{
 						html.Append($"<td>{reader.GetValue(j - 1)}</td>");
 					}

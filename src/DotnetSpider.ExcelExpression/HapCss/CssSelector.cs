@@ -31,7 +31,7 @@ namespace DotnetSpider.ExcelExpression.HapCss
         public IEnumerable<HtmlNode> Filter(IEnumerable<HtmlNode> currentNodes)
         {
             var nodes = currentNodes;
-            IEnumerable<HtmlNode> rt = FilterCore(nodes).Distinct();
+            var rt = FilterCore(nodes).Distinct();
 
             if (SubSelectors.Count == 0)
                 return rt;
@@ -73,7 +73,7 @@ namespace DotnetSpider.ExcelExpression.HapCss
             selectorType = selector.GetType();
             var rt = (CssSelector)Activator.CreateInstance(selectorType);
 
-            string filter = token.Filter.Substring(selector.Token.Length);
+            var filter = token.Filter.Substring(selector.Token.Length);
             rt.SubSelectors = token.SubTokens.Select(i => ParseSelector(i)).ToList();
 
             rt.Selector = filter;

@@ -30,7 +30,7 @@ namespace DotnetSpider.Tests.Network
             var provider = services.BuildServiceProvider();
             var center = provider.GetRequiredService<NetworkCenter>();
             Assert.True(center.SupportAdsl);
-            int i = 0;
+            var i = 0;
 
             Parallel.For(0, 1000, async j =>
             {

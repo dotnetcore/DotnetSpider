@@ -40,7 +40,7 @@ namespace DotnetSpider.Selector
 			{
 				if (text is string)
 				{
-					HtmlDocument document = new HtmlDocument { OptionAutoCloseOnEnd = true };
+					var document = new HtmlDocument { OptionAutoCloseOnEnd = true };
 					document.LoadHtml(text);
 					return Select(document.DocumentNode);
 				}
@@ -64,7 +64,7 @@ namespace DotnetSpider.Selector
 					return SelectList(htmlNode);
 				}
 
-				HtmlDocument document = new HtmlDocument { OptionAutoCloseOnEnd = true };
+				var document = new HtmlDocument { OptionAutoCloseOnEnd = true };
 				document.LoadHtml(text);
 				return SelectList(document.DocumentNode);
 			}

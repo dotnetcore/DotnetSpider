@@ -143,7 +143,7 @@ namespace DotnetSpider
 				configurationBuilder.AddEnvironmentVariables();
 				var configuration = configurationBuilder.Build();
 
-				string spiderTypeName = configuration["DOTNET_SPIDER_TYPE"];
+				var spiderTypeName = configuration["DOTNET_SPIDER_TYPE"];
 				if (string.IsNullOrWhiteSpace(spiderTypeName))
 				{
 					Log.Logger.Error("There is no specified spider type");

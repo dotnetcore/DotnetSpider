@@ -102,7 +102,7 @@ namespace DotnetSpider.DataFlow.Storage
 
 		protected override async Task<DataFlowResult> Store(DataFlowContext context)
 		{
-			IDbConnection conn = TryCreateDbConnection(context);
+			var conn = TryCreateDbConnection(context);
 
 			using (conn)
 			{
@@ -110,7 +110,7 @@ namespace DotnetSpider.DataFlow.Storage
 				{
 					var tableMetadata = (TableMetadata)context[item.Key];
 
-					SqlStatements sqlStatements = GetSqlStatements(tableMetadata);
+					var sqlStatements = GetSqlStatements(tableMetadata);
 
 					// 因为同一个存储器会收到不同的数据对象，因此不能使用 initAsync 来初始化数据库
 					if (_executedCache.TryAdd(sqlStatements.CreateTableSql, new object()))
@@ -118,7 +118,7 @@ namespace DotnetSpider.DataFlow.Storage
 						EnsureDatabaseAndTableCreated(conn, sqlStatements);
 					}
 
-					for (int i = 0; i < RetryTimes; ++i)
+					for (var i = 0; i < RetryTimes; ++i)
 					{
 						IDbTransaction transaction = null;
 						try
@@ -254,7 +254,7 @@ namespace DotnetSpider.DataFlow.Storage
 
 		private IDbConnection TryCreateDbConnection(DataFlowContext context)
 		{
-			for (int i = 0; i < RetryTimes; ++i)
+			for (var i = 0; i < RetryTimes; ++i)
 			{
 				if (!string.IsNullOrWhiteSpace(ConnectionString))
 				{

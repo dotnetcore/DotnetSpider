@@ -62,7 +62,7 @@ namespace DotnetSpider.Tests.Scheduler
         public void EnqueueAndDequeueQueueBfs()
         {
             var ownerId = Guid.NewGuid().ToString("N");
-            QueueDistinctBfsScheduler scheduler = new QueueDistinctBfsScheduler();
+            var scheduler = new QueueDistinctBfsScheduler();
             scheduler.Enqueue(new[]
             {
                 new Request("http://www.a.com")
@@ -102,7 +102,7 @@ namespace DotnetSpider.Tests.Scheduler
         public void EnqueueAndDequeueQueueDfs()
         {
             var ownerId = Guid.NewGuid().ToString("N");
-            QueueDistinctDfsScheduler scheduler = new QueueDistinctDfsScheduler();
+            var scheduler = new QueueDistinctDfsScheduler();
             scheduler.Enqueue(new[]
             {
                 new Request("http://www.a.com")

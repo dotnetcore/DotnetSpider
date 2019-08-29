@@ -11,7 +11,7 @@ namespace DotnetSpider.Tests.Scheduler
         [Fact(DisplayName = "HashSetDuplicate")]
         public void HashSetDuplicate()
         {
-            HashSetDuplicateRemover scheduler = new HashSetDuplicateRemover();
+            var scheduler = new HashSetDuplicateRemover();
 
             var ownerId = Guid.NewGuid().ToString("N");
             var r1 = new Request("http://www.a.com")
@@ -19,7 +19,7 @@ namespace DotnetSpider.Tests.Scheduler
                 OwnerId = ownerId
             };
             r1.ComputeHash();
-            bool isDuplicate = scheduler.IsDuplicate(r1);
+            var isDuplicate = scheduler.IsDuplicate(r1);
 
             Assert.False(isDuplicate);
             var r2 = new Request("http://www.a.com")
@@ -50,13 +50,13 @@ namespace DotnetSpider.Tests.Scheduler
         public void ParallelHashSetDuplicate()
         {
             var ownerId = Guid.NewGuid().ToString("N");
-            HashSetDuplicateRemover scheduler = new HashSetDuplicateRemover();
+            var scheduler = new HashSetDuplicateRemover();
             var r1 = new Request("http://www.a.com")
             {
                 OwnerId = ownerId
             };
             r1.ComputeHash();
-            bool isDuplicate = scheduler.IsDuplicate(r1);
+            var isDuplicate = scheduler.IsDuplicate(r1);
 
             Assert.False(isDuplicate);
             Parallel.For(0, 1000, new ParallelOptions {MaxDegreeOfParallelism = 30}, i =>
