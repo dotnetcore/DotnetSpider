@@ -54,7 +54,7 @@
                                 <span>@item.Repository</span>
                             </td>
                             <td>
-                                <span>@item.CreationTime</span>
+                                <span>@item.CreationTime.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss")</span>
                             </td>
                             <td>
                                 <button class="btn btn-default btn-sm  btn-flat" onclick="remove('@item.Id')">Delete</button>

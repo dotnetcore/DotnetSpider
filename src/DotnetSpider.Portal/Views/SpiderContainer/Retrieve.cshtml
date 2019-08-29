@@ -65,10 +65,10 @@
                                 <span>@item.Failed</span>
                             </td>
                             <td>
-                                <span>@item.Start</span>
+                                <span>@item.Start?.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss")</span>
                             </td>
                             <td>
-                                <span>@item.Exit</span>
+                                <span>@item.Exit?.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss")</span>
                             </td>
                             <td>
                                 <button @(item.Exit == null ? "" : "disabled") class="btn btn-default btn-sm btn-flat" onclick="exit('@item.Batch')">Exit</button>

@@ -54,11 +54,18 @@ namespace DotnetSpider.Portal.Controllers
 
 			try
 			{
-				var viewModel = await _dbContext.Set<DownloaderAgentHeartbeat>().Where(x => x.AgentId == id)
-					.OrderByDescending(x => x.CreationTime)
-					.ToPagedListAsync(page, size);
+				using (var conn = _dbContext.Database.GetDbConnection())
+				{
+//					var heartbeats = conn.QueryAsync<DownloaderAgentHeartbeat>(
+//						$"select * from `dotnetspider`.`downloader_agent_heartbeat` where agent_id = @AgentId limit {(page - 1) * size},{size}",
+//						new {AgentId = id});
 
-				return View(viewModel);
+					var viewModel = await _dbContext.Set<DownloaderAgentHeartbeat>().Where(x => x.AgentId == id)
+						.OrderByDescending(x => x.Id)
+						.ToPagedListAsync(page, size);
+
+					return View(viewModel);
+				}
 			}
 			catch (Exception e)
 			{

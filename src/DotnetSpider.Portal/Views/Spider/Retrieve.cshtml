@@ -72,7 +72,7 @@
                             </td>
 
                             <td>
-                                <span>@item.LastModificationTime</span>
+                                <span>@item.LastModificationTime.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss")</span>
                             </td>
                             <td>
                                 <a class="btn btn-default btn-sm  btn-flat" href="spider/@item.Id">Edit</a>

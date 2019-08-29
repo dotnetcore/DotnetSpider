@@ -63,7 +63,7 @@
                                 <span>@item.DownloaderCount</span>
                             </td>
                             <td>
-                                <span>@item.CreationTime</span>
+                                <span>@item.CreationTime.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss")</span>
                             </td>
                         </tr>
                     }

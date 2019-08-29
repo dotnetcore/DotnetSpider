@@ -66,10 +66,10 @@
                                 <span>@item.TotalMemory</span>
                             </td>
                             <td>
-                                <span>@item.CreationTime</span>
+                                <span>@item.CreationTime.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss")</span>
                             </td>
                             <td>
-                                <span>@item.LastModificationTime</span>
+                                <span>@item.LastModificationTime.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss")</span>
                             </td>
                             <td>
                                  <button class="btn btn-default btn-sm  btn-flat" onclick="deleteAgent('@item.Id')">Delete</button>

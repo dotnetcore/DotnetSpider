@@ -36,7 +36,7 @@ namespace DotnetSpider.Portal.Controllers
 			size = size <= 20 ? 20 : size;
 
 			var containers = await _dbContext.SpiderContainers.Where(x => x.SpiderId == id)
-				.OrderByDescending(x => x.CreationTime)
+				.OrderByDescending(x => x.Id)
 				.ToPagedListAsync(page, size);
 
 			var batches = await containers.Select(x => x.Batch).ToListAsync();

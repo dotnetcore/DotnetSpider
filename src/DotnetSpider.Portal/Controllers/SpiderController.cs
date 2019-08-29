@@ -274,13 +274,13 @@ namespace DotnetSpider.Portal.Controllers
 			IPagedList<Entity.Spider> viewModel;
 			if (string.IsNullOrWhiteSpace(q))
 			{
-				viewModel = await _dbContext.Spiders.OrderByDescending(x => x.CreationTime)
+				viewModel = await _dbContext.Spiders.OrderByDescending(x => x.Id)
 					.ToPagedListAsync(page, size);
 			}
 			else
 			{
 				viewModel = await _dbContext.Spiders.Where(x => x.Name.Contains(q))
-					.OrderByDescending(x => x.CreationTime)
+					.OrderByDescending(x => x.Id)
 					.ToPagedListAsync(page, size);
 			}
 
