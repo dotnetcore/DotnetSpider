@@ -61,10 +61,12 @@ namespace DotnetSpider.Portal.Controllers
 					item.Success = dict[item.Batch].Success;
 					item.Start = dict[item.Batch].Start;
 					item.Exit = dict[item.Batch].Exit;
+					item.Left = item.Total - item.Success;
 				}
 
 				list.Add(item);
 			}
+
 			return View(new StaticPagedList<ListSpiderContainerViewModel>(list, page, size,
 				containers.GetMetaData().TotalItemCount));
 		}
@@ -74,20 +76,13 @@ namespace DotnetSpider.Portal.Controllers
 		{
 			try
 			{
-				await _mq.PublishAsync(batch,  new MessageData<string>
-				{
-					Type = Framework.ExitCommand,
-					Data = batch
-				});
+				await _mq.PublishAsync(batch, new MessageData<string> {Type = Framework.ExitCommand, Data = batch});
 				return Ok();
 			}
 			catch (Exception e)
 			{
 				_logger.LogError($"关闭失败: {e}");
-				return StatusCode((int) HttpStatusCode.InternalServerError, new
-				{
-					e.Message
-				});
+				return StatusCode((int)HttpStatusCode.InternalServerError, new {e.Message});
 			}
 		}
 	}

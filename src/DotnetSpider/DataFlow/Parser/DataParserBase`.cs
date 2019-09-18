@@ -19,13 +19,18 @@ namespace DotnetSpider.DataFlow.Parser
 			TableMetadata = new T().GetTableMetadata();
 		}
 
-		protected override  Task<DataFlowResult> Parse(DataFlowContext context)
+		protected override Task<DataFlowResult> Parse(DataFlowContext context)
+		{
+			RegisterMetadata(context);
+			return Task.FromResult(DataFlowResult.Success);
+		}
+
+		protected virtual void RegisterMetadata(DataFlowContext context)
 		{
 			if (!context.Contains(Model.TypeName))
 			{
 				context.Add(Model.TypeName, TableMetadata);
 			}
-			return Task.FromResult(DataFlowResult.Success);
 		}
 
 		protected virtual void AddParseResult(DataFlowContext context, ParseResult<T> result)
@@ -39,7 +44,7 @@ namespace DotnetSpider.DataFlow.Parser
 				}
 				else
 				{
-					((ParseResult<T>) items).AddRange(result);
+					((ParseResult<T>)items).AddRange(result);
 				}
 			}
 		}

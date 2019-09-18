@@ -120,7 +120,10 @@ namespace DotnetSpider.DataFlow.Parser
 				}
 			}
 
-			AddParseResult(context, results);
+			if (results.Count > 0)
+			{
+				AddParseResult(context, results);
+			}
 
 			return base.Parse(context);
 		}

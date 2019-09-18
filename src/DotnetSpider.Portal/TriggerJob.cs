@@ -33,6 +33,12 @@ namespace DotnetSpider.Portal
 						return;
 					}
 
+					if (!spider.Enable)
+					{
+						logger.LogError($"任务 {jobId} 被禁用");
+						return;
+					}
+
 					var client = new DockerClientConfiguration(
 							new Uri(options.Docker))
 						.CreateClient();

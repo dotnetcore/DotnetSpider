@@ -14,6 +14,11 @@ namespace DotnetSpider.Portal.Entity
 		public int Id { get; set; }
 
 		/// <summary>
+		/// 是否启用
+		/// </summary>
+		public bool Enable { get; set; }
+
+		/// <summary>
 		/// 爬虫名称
 		/// </summary>
 		[Required]

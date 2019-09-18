@@ -29,4 +29,25 @@ function run(id) {
         });
     });
 }
- 
+
+function disable(id) {
+    swal({
+        title: "Sure to disable this spider?",
+        type: "warning",
+        showCancelButton: true
+    }, function () {
+        app.post("/spider/" + id + "/disable", null, function () {
+            window.location.reload();
+        }, null, function (result) {
+            swal('Error', result.message, "error");
+        });
+    });
+}
+
+function enable(id) {
+    app.post("/spider/" + id + "/enable", null, function () {
+        window.location.reload();
+    }, null, function (result) {
+        swal('Error', result.message, "error");
+    });
+}

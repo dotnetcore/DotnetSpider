@@ -29,6 +29,8 @@ namespace DotnetSpider.Portal.Models.SpiderContainer
 
 		public long Total { get; set; }
 
+		public long Left { get; set; }
+
 		public long Success { get; set; }
 
 		public long Failed { get; set; }

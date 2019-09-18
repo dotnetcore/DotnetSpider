@@ -311,10 +311,51 @@ namespace DotnetSpider.Portal.Controllers
 			catch (Exception e)
 			{
 				_logger.LogError($"启动失败: {e}");
-				return StatusCode((int) HttpStatusCode.InternalServerError, new
+				return StatusCode((int)HttpStatusCode.InternalServerError, new {e.Message});
+			}
+		}
+
+		[HttpPost("spider/{id}/disable")]
+		public async Task<IActionResult> DisableAsync(int id)
+		{
+			try
+			{
+				var item = await _dbContext.Spiders.FirstOrDefaultAsync(x => x.Id == id);
+				if (item != null && item.Enable)
 				{
-					e.Message
-				});
+					item.Enable = false;
+					_dbContext.Spiders.Update(item);
+					await _dbContext.SaveChangesAsync();
+				}
+
+				return Ok();
+			}
+			catch (Exception e)
+			{
+				_logger.LogError($"禁用失败: {e}");
+				return StatusCode((int)HttpStatusCode.InternalServerError, new {e.Message});
+			}
+		}
+
+		[HttpPost("spider/{id}/enable")]
+		public async Task<IActionResult> EnableAsync(int id)
+		{
+			try
+			{
+				var item = await _dbContext.Spiders.FirstOrDefaultAsync(x => x.Id == id);
+				if (item != null && !item.Enable)
+				{
+					item.Enable = true;
+					_dbContext.Spiders.Update(item);
+					await _dbContext.SaveChangesAsync();
+				}
+
+				return Ok();
+			}
+			catch (Exception e)
+			{
+				_logger.LogError($"启用失败: {e}");
+				return StatusCode((int)HttpStatusCode.InternalServerError, new {e.Message});
 			}
 		}
 
@@ -331,7 +372,7 @@ namespace DotnetSpider.Portal.Controllers
 					$"{registry}/v2/{repository}/tags/list");
 				var repositoryTags = JsonConvert.DeserializeObject<RepositoryTags>(json);
 				repositoryTags.Tags.Remove("latest");
-				var list=new List<string>{"latest"};
+				var list = new List<string> {"latest"};
 				repositoryTags.Tags.Sort(new StringCompare());
 				list.AddRange(repositoryTags.Tags);
 				return list.Take(20).ToList();

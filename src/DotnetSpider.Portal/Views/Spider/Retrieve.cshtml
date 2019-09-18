@@ -76,10 +76,18 @@
                             </td>
                             <td>
                                 <a class="btn btn-default btn-sm  btn-flat" href="spider/@item.Id">Edit</a>
-                                <a class="btn btn-default btn-sm  btn-flat" href="spider/create?registry=@(item.Registry)&repository=@(item.Repository)">From</a>
-                                <button class="btn btn-default btn-sm  btn-flat" onclick="run('@item.Id')">Run</button>
-                                <a class="btn btn-default btn-sm  btn-flat" href="spider/@item.Id/containers">History</a>
                                 <button class="btn btn-default btn-sm  btn-flat" onclick="remove('@item.Id')">Delete</button>
+                                @if (item.Enable)
+                                {
+                                    <button class="btn btn-default btn-sm  btn-flat" onclick="disable('@item.Id')">Disable</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-default btn-sm  btn-flat" onclick="enable('@item.Id')">Enable</button>
+                                }
+                                <button class="btn btn-default btn-sm  btn-flat" onclick="run('@item.Id')">Execute</button>
+                                <a class="btn btn-default btn-sm  btn-flat" href="spider/create?registry=@(item.Registry)&repository=@(item.Repository)">Copy</a>
+                                <a class="btn btn-default btn-sm  btn-flat" href="spider/@item.Id/containers">History</a>
                             </td>
                         </tr>
                     }

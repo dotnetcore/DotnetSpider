@@ -99,35 +99,6 @@ namespace DotnetSpider.Downloader
 					response.CharSet = httpResponseMessage.Content.Headers.ContentType.CharSet;
 					response.Content = await httpResponseMessage.Content.ReadAsByteArrayAsync();
 
-//					if (!ExcludeMediaTypes.Any(t =>
-//						httpResponseMessage.Content.Headers.ContentType.MediaType.Contains(t)))
-//					{
-//						if (!DownloadFile)
-//						{
-//							StorageFile(request, bytes);
-//						}
-//					}
-//					else
-//					{
-//						var content = ReadContent(request, bytes,
-//							httpResponseMessage.Content.Headers.ContentType.CharSet);
-//
-//						if (DecodeHtml)
-//						{
-//#if NETFRAMEWORK
-//                            content = System.Web.HttpUtility.UrlDecode(
-//                                System.Web.HttpUtility.HtmlDecode(content),
-//                                string.IsNullOrEmpty(request.Encoding)
-//                                    ? Encoding.UTF8
-//                                    : Encoding.GetEncoding(request.Encoding));
-//#else
-//							content = WebUtility.UrlDecode(WebUtility.HtmlDecode(content));
-//#endif
-//						}
-//
-//						response.RawText = content;
-//					}
-
 					if (!string.IsNullOrWhiteSpace(request.ChangeIpPattern))
 					{
 						var rawtext = ResponseExtensions.ReadContent(request, response.Content, response.CharSet);

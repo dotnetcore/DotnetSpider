@@ -32,6 +32,7 @@
                     <th>Total</th>
                     <th>Success</th>
                     <th>Failed</th>
+                    <th>Left</th>
                     <th>StartTime</th>
                     <th>ExitTime</th>
                     <th>Action</th>
@@ -63,6 +64,9 @@
                             </td>
                             <td>
                                 <span>@item.Failed</span>
+                            </td>
+                            <td>
+                                <span>@item.Left</span>
                             </td>
                             <td>
                                 <span>@item.Start?.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss")</span>

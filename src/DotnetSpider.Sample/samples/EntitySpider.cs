@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
+using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Parser.Attribute;
 using DotnetSpider.DataFlow.Parser.Formatter;
@@ -29,6 +31,15 @@ namespace DotnetSpider.Sample.samples
 			AddRequests(
 				new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}}),
 				new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}}));
+		}
+
+		class MyClass: DataParser<CnblogsEntry>
+		{
+			protected override Task<DataFlowResult> Parse(DataFlowContext context)
+			{
+
+				return  base.Parse(context);
+			}
 		}
 
 		[Schema("cnblogs", "news")]
