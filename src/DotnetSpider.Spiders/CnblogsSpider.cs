@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Parser.Attribute;
 using DotnetSpider.DataFlow.Parser.Formatter;
@@ -16,12 +17,12 @@ namespace DotnetSpider.Spiders
 		{
 		}
 
-		protected override void Initialize()
+		protected override async Task Initialize()
 		{
 			AddDataFlow(new DataParser<CnblogsEntry>()).AddDataFlow(GetDefaultStorage());
 			for (var i = 1; i < 10; ++i)
 			{
-				AddRequests(
+				await AddRequests(
 					new Request($"https://news.cnblogs.com/n/page/{i}/", new Dictionary<string, string> {{"网站", "博客园"}})
 				);
 			}

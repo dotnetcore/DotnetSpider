@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider
 {
-	public class SpiderHostBuilder
+	public class SpiderHostBuilder : IDisposable
 	{
 		private readonly ServiceCollection _services;
 		private IConfiguration _configuration;
@@ -83,6 +83,7 @@ namespace DotnetSpider
 			{
 				throw new InvalidOperationException("Build can only be called once");
 			}
+
 			Framework.PrintInfo();
 			Framework.SetMultiThread();
 
@@ -99,7 +100,7 @@ namespace DotnetSpider
 			_backgroundServices = _serviceProvider.GetService<IEnumerable<IHostedService>>();
 			foreach (var hostedService in _backgroundServices)
 			{
-				hostedService.StartAsync(default).ConfigureAwait(false).GetAwaiter().GetResult();
+				hostedService.StartAsync(default).ConfigureAwait(true).GetAwaiter().GetResult();
 			}
 
 			Console.CancelKeyPress += (sender, arguments) => { _cancellationTokenSource.Cancel(); };
@@ -135,6 +136,19 @@ namespace DotnetSpider
 			}
 
 			_configuration = configurationBuilder.Build();
+		}
+
+		public void Dispose()
+		{
+			if (_backgroundServices == null)
+			{
+				return;
+			}
+
+			foreach (var hostedService in _backgroundServices)
+			{
+				hostedService.StopAsync(default);
+			}
 		}
 	}
 }

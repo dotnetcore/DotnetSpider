@@ -9,16 +9,16 @@ namespace DotnetSpider.Sample.samples
 {
 	public class DatabaseSpider : Spider
 	{
-		protected override void Initialize()
+		protected override async Task Initialize()
 		{
 			NewGuidId();
 			Scheduler = new QueueDistinctBfsScheduler();
 			Speed = 1;
 			Depth = 3;
 			AddDataFlow(new DatabaseSpiderDataParser()).AddDataFlow(GetDefaultStorage());
-			AddRequests(
-					new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> { { "网站", "博客园" } }),
-					new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> { { "网站", "博客园" } }));
+			await AddRequests(
+				new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}}),
+				new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}}));
 		}
 
 		class DatabaseSpiderDataParser : DataParser
@@ -35,6 +35,7 @@ namespace DotnetSpider.Sample.samples
 				context.AddData("Title", context.Selectable.XPath(".//title").GetValue());
 
 				#region add mysql database
+
 				var typeName = typeof(EntitySpider.CnblogsEntry).FullName;
 				var entity = new EntitySpider.CnblogsEntry();
 				context.Add(typeName, entity.GetTableMetadata());
@@ -44,7 +45,9 @@ namespace DotnetSpider.Sample.samples
 				entity.Title = context.Selectable.XPath(".//title").GetValue();
 				items.Add(entity);
 				context.AddParseData(typeName, items);
+
 				#endregion
+
 				return Task.FromResult(DataFlowResult.Success);
 			}
 		}

@@ -149,76 +149,88 @@ namespace DotnetSpider.Tests
 		}
 
 		[Fact(DisplayName = "RunThenExit")]
-		public void RunThenExit()
+		public async Task RunThenExit()
 		{
 			var url = "http://www.RunThenExit.com/";
-			var spider = LocalSpiderProvider.Value.Create<Spider>();
-
-			spider.NewGuidId();
-			spider.Name = "RunAsyncAndStop";
-			for (var i = 0; i < 10000; i++)
+			using (var builder = GetLocalSpiderHostBuilder())
 			{
-				spider.AddRequests(new Request(url + i) {DownloaderType = DownloaderType.Empty});
+				var provider = builder.Build();
+				var spider = provider.Create<Spider>();
+
+				spider.NewGuidId();
+				spider.Name = "RunAsyncAndStop";
+				for (var i = 0; i < 10000; i++)
+				{
+					await spider.AddRequests(new Request(url + i) {DownloaderType = DownloaderType.Empty});
+				}
+
+				spider.RunAsync().ConfigureAwait(true).GetAwaiter();
+				Thread.Sleep(2000);
+				spider.Pause();
+				Thread.Sleep(2000);
+				spider.Exit().WaitForExit();
+
+				Assert.Equal(Status.Exited, spider.Status);
 			}
-
-			spider.RunAsync();
-			Thread.Sleep(2000);
-			spider.Pause();
-			Thread.Sleep(2000);
-			spider.Exit().WaitForExit();
-
-			Assert.Equal(Status.Exited, spider.Status);
 		}
 
 		[Fact(DisplayName = "RunThenPauseThenContinueThenExit")]
-		public void RunThenPauseThenContinueThenExit()
+		public async Task RunThenPauseThenContinueThenExit()
 		{
 			var url = "http://www.RunThenPauseThenContinueThenExit.com/";
-			var spider = LocalSpiderProvider.Value.Create<Spider>();
-
-			spider.NewGuidId();
-			spider.Name = "RunAsyncAndStop";
-			spider.EmptySleepTime = 15;
-
-			for (var i = 0; i < 10000; i++)
+			using (var builder = GetLocalSpiderHostBuilder())
 			{
-				spider.AddRequests(new Request(url + i) {DownloaderType = DownloaderType.Empty});
+				var provider = builder.Build();
+				var spider = provider.Create<Spider>();
+
+				spider.NewGuidId();
+				spider.Name = "RunAsyncAndStop";
+				spider.EmptySleepTime = 15;
+
+				for (var i = 0; i < 10000; i++)
+				{
+					await spider.AddRequests(new Request(url + i) {DownloaderType = DownloaderType.Empty});
+				}
+
+				spider.RunAsync().ConfigureAwait(true).GetAwaiter();
+				Thread.Sleep(2000);
+				spider.Pause();
+				Thread.Sleep(2000);
+				spider.Continue();
+				Thread.Sleep(2000);
+				spider.Exit().WaitForExit();
+
+				Assert.Equal(Status.Exited, spider.Status);
 			}
-
-			spider.RunAsync();
-			Thread.Sleep(2000);
-			spider.Pause();
-			Thread.Sleep(2000);
-			spider.Continue();
-			Thread.Sleep(2000);
-			spider.Exit().WaitForExit();
-
-			Assert.Equal(Status.Exited, spider.Status);
 		}
 
 		/// <summary>
 		/// 测试 MMF 关闭信号是否能正常工作
 		/// </summary>
 		[Fact(DisplayName = "MmfCloseSignal")]
-		public void MmfCloseSignal()
+		public async Task MmfCloseSignal()
 		{
 			var url = "http://www.MmfCloseSignal.com/";
 
-			var spider = LocalSpiderProvider.Value.Create<Spider>();
-			spider.MmfSignal = true;
-			spider.NewGuidId();
-			spider.Name = "MmfCloseSignal";
-
-			for (var i = 0; i < 10000; i++)
+			using (var builder = GetLocalSpiderHostBuilder())
 			{
-				spider.AddRequests(new Request(url + i) {DownloaderType = DownloaderType.Empty});
+				var provider = builder.Build();
+				var spider = provider.Create<Spider>();
+				spider.MmfSignal = true;
+				spider.NewGuidId();
+				spider.Name = "MmfCloseSignal";
+
+				for (var i = 0; i < 10000; i++)
+				{
+					await spider.AddRequests(new Request(url + i) {DownloaderType = DownloaderType.Empty});
+				}
+
+				spider.RunAsync().ConfigureAwait(true).GetAwaiter();
+				Thread.Sleep(2000);
+				spider.ExitBySignal().WaitForExit(15000);
+
+				Assert.Equal(Status.Exited, spider.Status);
 			}
-
-			spider.RunAsync();
-			Thread.Sleep(2000);
-			spider.ExitBySignal().WaitForExit(15000);
-
-			Assert.Equal(Status.Exited, spider.Status);
 		}
 
 		/// <summary>
@@ -229,28 +241,32 @@ namespace DotnetSpider.Tests
 		[Fact(DisplayName = "RetryDownloadTimes")]
 		public async Task RetryDownloadTimes()
 		{
-			var spider = LocalSpiderProvider.Value.Create<Spider>();
-			spider.NewGuidId();
-			spider.Name = "RetryDownloadTimes";
-			spider.EmptySleepTime = 15;
-			var scheduler = new QueueDistinctBfsScheduler();
-			spider.Scheduler = scheduler;
-			spider.AddRequests(new Request("http://www.RetryDownloadTimes.com")
+			using (var builder = GetLocalSpiderHostBuilder())
 			{
-				DownloaderType = DownloaderType.Exception, RetryTimes = 5
-			});
-			await spider.RunAsync();
+				var provider = builder.Build();
+				var spider = provider.Create<Spider>();
+				spider.NewGuidId();
+				spider.Name = "RetryDownloadTimes";
+				spider.EmptySleepTime = 15;
+				var scheduler = new QueueDistinctBfsScheduler();
+				spider.Scheduler = scheduler;
+				await spider.AddRequests(new Request("http://www.RetryDownloadTimes.com")
+				{
+					DownloaderType = DownloaderType.Exception, RetryTimes = 5
+				});
+				await spider.RunAsync();
+				spider.WaitForExit();
+				var statisticsStore = provider.GetRequiredService<IStatisticsStore>();
+				var s = statisticsStore.GetSpiderStatisticsAsync(spider.Id).Result;
+				Assert.Equal(1, s.Total);
+				Assert.Equal(1, s.Failed);
+				Assert.Equal(0, s.Success);
 
-			var statisticsStore = LocalSpiderProvider.Value.GetRequiredService<IStatisticsStore>();
-			var s = statisticsStore.GetSpiderStatisticsAsync(spider.Id).Result;
-			Assert.Equal(1, s.Total);
-			Assert.Equal(1, s.Failed);
-			Assert.Equal(0, s.Success);
-
-			var dss = statisticsStore.GetDownloadStatisticsListAsync(1, 10).Result;
-			var ds = dss[0];
-			Assert.Equal(6, ds.Failed);
-			Assert.Equal(0, ds.Success);
+				var dss = statisticsStore.GetDownloadStatisticsListAsync(1, 10).Result;
+				var ds = dss[0];
+				Assert.Equal(6, ds.Failed);
+				Assert.Equal(0, ds.Success);
+			}
 		}
 
 		[Fact(DisplayName = "DoNotRetryWhenResultIsEmpty")]
@@ -278,7 +294,7 @@ namespace DotnetSpider.Tests
 			spider.EmptySleepTime = 15;
 			spider.RetryWhenResultIsEmpty = false;
 			spider.Scheduler = new QueueDistinctBfsScheduler();
-			spider.AddRequests(new Request("http://www.DoNotRetryWhenResultIsEmpty.com")
+			await spider.AddRequests(new Request("http://www.DoNotRetryWhenResultIsEmpty.com")
 			{
 				DownloaderType = DownloaderType.Empty, RetryTimes = 5
 			});
@@ -303,7 +319,7 @@ namespace DotnetSpider.Tests
 		/// 2. 重试的请求的 Depth 不变
 		/// </summary>
 		[Fact(DisplayName = "RetryWhenResultIsEmpty")]
-		public void RetryWhenResultIsEmpty()
+		public async Task RetryWhenResultIsEmpty()
 		{
 			var builder = new SpiderHostBuilder()
 				.ConfigureLogging(x => x.AddSerilog())
@@ -328,11 +344,11 @@ namespace DotnetSpider.Tests
 			spider.EmptySleepTime = 15;
 			spider.RetryWhenResultIsEmpty = true;
 			spider.Scheduler = new QueueDistinctBfsScheduler();
-			spider.AddRequests(new Request("http://www.RetryWhenResultIsEmpty.com")
+			await spider.AddRequests(new Request("http://www.RetryWhenResultIsEmpty.com")
 			{
 				DownloaderType = DownloaderType.Empty, RetryTimes = 5
 			});
-			spider.RunAsync().Wait();
+			await spider.RunAsync();
 
 			var statisticsStore = provider.GetRequiredService<IStatisticsStore>();
 			var s = statisticsStore.GetSpiderStatisticsAsync(spider.Id).Result;

@@ -44,11 +44,11 @@ namespace DotnetSpider.Sample.samples
 		{
 		}
 
-		protected override void Initialize()
+		protected override async Task Initialize()
 		{
 			NewGuidId();
 			AddDataFlow(new Parser()).AddDataFlow(new ConsoleStorage());
-			AddRequests(new Request("https://github.com/zlzforever"));
+			await AddRequests(new Request("https://github.com/zlzforever"));
 		}
 	}
 }

@@ -179,7 +179,7 @@ namespace DotnetSpider.DataFlow.Storage
 					if (index.IsUnique)
 					{
 						builder.Append(
-							$"CREATE UNIQUE NONCLUSTERED INDEX [INDEX_{name}] ON {tableName} ({columnNames}) {(StorageType == StorageType.InsertIgnoreDuplicate ? "WITH (IGNORE_DUP_KEY = ON)" : "")};");	
+							$"CREATE UNIQUE NONCLUSTERED INDEX [INDEX_{name}] ON {tableName} ({columnNames}) {(StorageType == StorageType.InsertIgnoreDuplicate ? "WITH (IGNORE_DUP_KEY = ON)" : "")};");
 					}
 					else
 					{

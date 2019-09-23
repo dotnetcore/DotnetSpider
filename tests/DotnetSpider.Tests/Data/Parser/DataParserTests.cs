@@ -14,26 +14,30 @@ namespace DotnetSpider.Tests.Data.Parser
 		[Fact(DisplayName = "XpathFollow")]
 		public void XpathFollow()
 		{
-			var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
-			var dataContext =
-				new DataFlowContext(
-					new Response
-					{
-						Request = new Request("http://cnblogs.com"),
-						Content = File.ReadAllBytes("cnblogs.html"),
-						CharSet = "UTF-8"
-					}, services);
-			if (dataContext.Selectable == null)
+			using (var builder = GetLocalSpiderHostBuilder())
 			{
-				dataContext.Selectable = dataContext.Response?.ToSelectable();
+				var provider = builder.Build();
+				var services = provider.CreateScopeServiceProvider();
+				var dataContext =
+					new DataFlowContext(
+						new Response
+						{
+							Request = new Request("http://cnblogs.com"),
+							Content = File.ReadAllBytes("cnblogs.html"),
+							CharSet = "UTF-8"
+						}, services);
+				if (dataContext.Selectable == null)
+				{
+					dataContext.Selectable = dataContext.Response?.ToSelectable();
+				}
+
+				var xpathFollow = DataParserHelper.QueryFollowRequestsByXPath(".//div[@class='pager']");
+
+				var requests = xpathFollow.Invoke(dataContext);
+
+				Assert.Equal(12, requests.Count);
+				Assert.Contains(requests, r => r == "http://cnblogs.com/sitehome/p/2");
 			}
-
-			var xpathFollow = DataParserHelper.QueryFollowRequestsByXPath(".//div[@class='pager']");
-
-			var requests = xpathFollow.Invoke(dataContext);
-
-			Assert.Equal(12, requests.Count);
-			Assert.Contains(requests, r => r == "http://cnblogs.com/sitehome/p/2");
 		}
 
 		/// <summary>

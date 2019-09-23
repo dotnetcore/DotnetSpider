@@ -130,7 +130,7 @@ namespace DotnetSpider.Kafka
 
 					if (msg != null)
 					{
-						try
+						Task.Factory.StartNew(() =>
 						{
 							action?.Invoke(new MessageData<TData>
 							{
@@ -139,11 +139,13 @@ namespace DotnetSpider.Kafka
 								Data = LZ4MessagePackSerializer.Deserialize<TData>(msg.Data,
 									TypelessContractlessStandardResolver.Instance)
 							});
-						}
-						catch (Exception e)
+						}).ContinueWith(t =>
 						{
-							_logger?.LogError($"Handle kafka message failed on topic {topic}: {e}");
-						}
+							if (t.Exception != null)
+							{
+								_logger?.LogError($"Handle kafka message failed on topic {topic}: {t}");
+							}
+						});
 					}
 					else
 					{
@@ -152,7 +154,7 @@ namespace DotnetSpider.Kafka
 				}
 
 				_logger?.LogWarning($"Exit consume kafka topic {topic}");
-			}).ConfigureAwait(false).GetAwaiter();
+			}).ConfigureAwait(true);
 		}
 
 		[MethodImpl(MethodImplOptions.Synchronized)]

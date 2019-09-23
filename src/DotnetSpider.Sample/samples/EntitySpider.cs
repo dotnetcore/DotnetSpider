@@ -20,7 +20,7 @@ namespace DotnetSpider.Sample.samples
 		{
 		}
 
-		protected override void Initialize()
+		protected override async Task Initialize()
 		{
 			NewGuidId();
 			Scheduler = new QueueDistinctBfsScheduler();
@@ -28,17 +28,16 @@ namespace DotnetSpider.Sample.samples
 			Depth = 3;
 			AddDataFlow(new DataParser<CnblogsEntry>())
 				.AddDataFlow(GetDefaultStorage());
-			AddRequests(
+			await AddRequests(
 				new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}}),
 				new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}}));
 		}
 
-		class MyClass: DataParser<CnblogsEntry>
+		class MyClass : DataParser<CnblogsEntry>
 		{
 			protected override Task<DataFlowResult> Parse(DataFlowContext context)
 			{
-
-				return  base.Parse(context);
+				return base.Parse(context);
 			}
 		}
 

@@ -25,7 +25,6 @@ namespace DotnetSpider.DownloadAgent
 		private readonly IMq _mq;
 		private readonly DownloaderAgentOptions _options;
 		private readonly SpiderOptions _spiderOptions;
-		private bool _exit;
 
 		private readonly ConcurrentDictionary<string, IDownloader> _cache =
 			new ConcurrentDictionary<string, IDownloader>();
@@ -64,48 +63,50 @@ namespace DotnetSpider.DownloadAgent
 				new MessageData<byte[]>
 				{
 					Type = Framework.RegisterCommand,
-					Data = LZ4MessagePackSerializer.Serialize(new DownloaderAgent
-					{
-						Id = _options.AgentId,
-						Name = _options.Name,
-						ProcessorCount = Environment.ProcessorCount,
-						TotalMemory = Framework.TotalMemory,
-						CreationTime = DateTimeOffset.Now,
-						LastModificationTime = DateTimeOffset.Now
-					}, TypelessContractlessStandardResolver.Instance)
+					Data = LZ4MessagePackSerializer.Serialize(
+						new DownloaderAgent
+						{
+							Id = _options.AgentId,
+							Name = _options.Name,
+							ProcessorCount = Environment.ProcessorCount,
+							TotalMemory = Framework.TotalMemory,
+							CreationTime = DateTimeOffset.Now,
+							LastModificationTime = DateTimeOffset.Now
+						}, TypelessContractlessStandardResolver.Instance)
 				});
 			Logger?.LogInformation($"Agent {_options.AgentId} register success");
+
 			// 订阅节点
 			Subscribe();
 
 			await SendHeartbeatAsync();
 
 			// 开始心跳
-			HeartbeatAsync(stoppingToken).ConfigureAwait(false).GetAwaiter();
+			StartHeartbeat(stoppingToken);
 
-			ReleaseDownloaderAsync(stoppingToken).ConfigureAwait(false).GetAwaiter();
+			ReleaseDownloader(stoppingToken);
 
 			Logger?.LogInformation($"Agent {_options.AgentId} started");
 		}
 
-		public override Task StopAsync(CancellationToken cancellationToken)
+		public override async Task StopAsync(CancellationToken cancellationToken)
 		{
-			_exit = true;
+			await base.StopAsync(cancellationToken);
+
 			_mq.Unsubscribe(_options.AgentId);
 			_mq.Unsubscribe("DownloadQueue");
 			_mq.Unsubscribe("AdslDownloadQueue");
 
-
-			// 一小时
-			var times = 12 * 60;
-			for (var i = 0; i < times && !cancellationToken.IsCancellationRequested; ++i)
+			if (cancellationToken != default)
 			{
-				Thread.Sleep(5000);
-				Logger?.LogInformation($"Agent {_options.AgentId} is exiting, please exit agent after safe time");
+				// 一小时
+				var times = 12 * 60;
+				for (var i = 0; i < times; ++i)
+				{
+					Thread.Sleep(5000);
+					Logger?.LogInformation($"Agent {_options.AgentId} is exiting, please exit agent after safe time");
+				}
 			}
-
-
-			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -138,11 +139,11 @@ namespace DotnetSpider.DownloadAgent
 			}
 		}
 
-		private Task HeartbeatAsync(CancellationToken stoppingToken)
+		private void StartHeartbeat(CancellationToken stoppingToken)
 		{
-			return Task.Factory.StartNew(async () =>
+			Task.Factory.StartNew(async () =>
 			{
-				while (!stoppingToken.IsCancellationRequested && !_exit)
+				while (!stoppingToken.IsCancellationRequested)
 				{
 					Thread.Sleep(5000);
 					try
@@ -154,19 +155,20 @@ namespace DotnetSpider.DownloadAgent
 						Logger?.LogDebug($"Agent {_options.AgentId} send heartbeat failed: {e}");
 					}
 				}
-			}, stoppingToken);
+			}, stoppingToken).ConfigureAwait(true);
 		}
 
 		private async Task SendHeartbeatAsync()
 		{
-			var bytes = LZ4MessagePackSerializer.Serialize(new DownloaderAgentHeartbeat
-			{
-				AgentId = _options.AgentId,
-				AgentName = _options.Name,
-				FreeMemory = (int)Framework.GetFreeMemory(),
-				DownloaderCount = _cache.Count,
-				CreationTime = DateTimeOffset.Now
-			}, TypelessContractlessStandardResolver.Instance);
+			var bytes = LZ4MessagePackSerializer.Serialize(
+				new DownloaderAgentHeartbeat
+				{
+					AgentId = _options.AgentId,
+					AgentName = _options.Name,
+					FreeMemory = (int)Framework.GetFreeMemory(),
+					DownloaderCount = _cache.Count,
+					CreationTime = DateTimeOffset.Now
+				}, TypelessContractlessStandardResolver.Instance);
 
 			await _mq.PublishAsync(_spiderOptions.TopicDownloaderAgentRegisterCenter,
 				new MessageData<byte[]> {Type = Framework.HeartbeatCommand, Data = bytes});
@@ -174,11 +176,11 @@ namespace DotnetSpider.DownloadAgent
 			Logger?.LogDebug($"Agent {_options.AgentId} send heartbeat success");
 		}
 
-		private Task ReleaseDownloaderAsync(CancellationToken stoppingToken)
+		private void ReleaseDownloader(CancellationToken stoppingToken)
 		{
-			return Task.Factory.StartNew(() =>
+			Task.Factory.StartNew(() =>
 			{
-				while (!stoppingToken.IsCancellationRequested && !_exit)
+				while (!stoppingToken.IsCancellationRequested)
 				{
 					Thread.Sleep(1000);
 
@@ -215,7 +217,7 @@ namespace DotnetSpider.DownloadAgent
 						Logger?.LogError($"下载器代理 {_options.AgentId} 释放过期下载器失败: {e}");
 					}
 				}
-			}, stoppingToken);
+			}, stoppingToken).ConfigureAwait(true);
 		}
 
 		private void HandleCommand(MessageData<string> message)
@@ -242,7 +244,7 @@ namespace DotnetSpider.DownloadAgent
 					{
 						if (message.Data == _options.AgentId)
 						{
-							StopAsync(default).ConfigureAwait(true).GetAwaiter();
+							StopAsync(default).ConfigureAwait(true);
 						}
 						else
 						{
@@ -287,7 +289,7 @@ namespace DotnetSpider.DownloadAgent
 				{
 					case Framework.DownloadCommand:
 					{
-						DownloadAsync(message.Data).ConfigureAwait(false).GetAwaiter();
+						DownloadAsync(message.Data).ConfigureAwait(true);
 						break;
 					}
 

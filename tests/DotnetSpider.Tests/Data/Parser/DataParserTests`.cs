@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Parser.Attribute;
@@ -61,33 +62,37 @@ namespace DotnetSpider.Tests.Data.Parser
 		/// 测试实体类的解析是否正确
 		/// </summary>
 		[Fact(DisplayName = "ParseEntity")]
-		public void ParseEntity()
+		public async Task ParseEntity()
 		{
-			var service = LocalSpiderProvider.Value.CreateScopeServiceProvider();
-			var dataContext = new DataFlowContext(new Response
+			using (var builder = GetLocalSpiderHostBuilder())
 			{
-				Request = new Request("https://list.jd.com/list.html?cat=9987,653,655",
-					new Dictionary<string, string> {{"cat", "手机"}, {"cat3", "110"}}),
-				Content = File.ReadAllBytes("Jd.html"),
-				CharSet = "UTF-8"
-			}, service);
+				var provider = builder.Build();
+				var services = provider.CreateScopeServiceProvider();
+				var dataContext = new DataFlowContext(new Response
+				{
+					Request = new Request("https://list.jd.com/list.html?cat=9987,653,655",
+						new Dictionary<string, string> {{"cat", "手机"}, {"cat3", "110"}}),
+					Content = File.ReadAllBytes("Jd.html"),
+					CharSet = "UTF-8"
+				}, services);
 
-			var extractor = new DataParser<Product>();
+				var extractor = new DataParser<Product>();
 
 
-			extractor.HandleAsync(dataContext).GetAwaiter().GetResult();
+				await extractor.HandleAsync(dataContext);
 
-			var results = (ParseResult<Product>)dataContext.GetParseData(typeof(Product).FullName);
-			Assert.Equal(60, results.Count);
-			Assert.Equal("手机", results[0].CategoryName);
-			Assert.Equal(110, results[0].CategoryId);
-			Assert.Equal("https://item.jd.com/3031737.html", results[0].Url);
-			Assert.Equal("3031737", results[0].Sku);
-			Assert.Equal("荣耀官方旗舰店", results[0].ShopName);
-			Assert.Equal("荣耀 NOTE 8 4GB+32GB 全网通版 冰河银", results[0].Name);
-			Assert.Equal("1000000904", results[0].VenderId);
-			Assert.Equal("1000000904", results[0].JdzyShopId);
-			Assert.Equal(DateTimeOffset.Now.ToString("yyyy-MM-dd"), results[0].RunId.ToString("yyyy-MM-dd"));
+				var results = (ParseResult<Product>)dataContext.GetParseData(typeof(Product).FullName);
+				Assert.Equal(60, results.Count);
+				Assert.Equal("手机", results[0].CategoryName);
+				Assert.Equal(110, results[0].CategoryId);
+				Assert.Equal("https://item.jd.com/3031737.html", results[0].Url);
+				Assert.Equal("3031737", results[0].Sku);
+				Assert.Equal("荣耀官方旗舰店", results[0].ShopName);
+				Assert.Equal("荣耀 NOTE 8 4GB+32GB 全网通版 冰河银", results[0].Name);
+				Assert.Equal("1000000904", results[0].VenderId);
+				Assert.Equal("1000000904", results[0].JdzyShopId);
+				Assert.Equal(DateTimeOffset.Now.ToString("yyyy-MM-dd"), results[0].RunId.ToString("yyyy-MM-dd"));
+			}
 		}
 
 		private string Html = @"
@@ -105,25 +110,29 @@ namespace DotnetSpider.Tests.Data.Parser
 		[Fact(DisplayName = "SingleEntitySelector")]
 		public void SingleEntitySelector()
 		{
-			var service = LocalSpiderProvider.Value.CreateScopeServiceProvider();
-			var dataContext =
-				new DataFlowContext(
-					new Response
-					{
-						Request = new Request("http://abcd.com"),
-						Content = Encoding.UTF8.GetBytes(Html),
-						CharSet = "UTF-8"
-					}, service);
+			using (var builder = GetLocalSpiderHostBuilder())
+			{
+				var provider = builder.Build();
+				var services = provider.CreateScopeServiceProvider();
+				var dataContext =
+					new DataFlowContext(
+						new Response
+						{
+							Request = new Request("http://abcd.com"),
+							Content = Encoding.UTF8.GetBytes(Html),
+							CharSet = "UTF-8"
+						}, services);
 
-			var parser = new DataParser<N>();
+				var parser = new DataParser<N>();
 
 
-			parser.HandleAsync(dataContext).GetAwaiter().GetResult();
+				parser.HandleAsync(dataContext).GetAwaiter().GetResult();
 
-			var results = (ParseResult<N>)dataContext.GetParseData(typeof(N).FullName);
+				var results = (ParseResult<N>)dataContext.GetParseData(typeof(N).FullName);
 
-			Assert.Equal("i am title", results[0].title);
-			Assert.Equal("i am dotnetspider", results[0].dotnetspider);
+				Assert.Equal("i am title", results[0].title);
+				Assert.Equal("i am dotnetspider", results[0].dotnetspider);
+			}
 		}
 
 		/// <summary>
@@ -132,24 +141,28 @@ namespace DotnetSpider.Tests.Data.Parser
 		[Fact(DisplayName = "MultiEntitySelector")]
 		public void MultiEntitySelector()
 		{
-			var service = LocalSpiderProvider.Value.CreateScopeServiceProvider();
-			var dataContext =
-				new DataFlowContext(
-					new Response
-					{
-						Request = new Request("http://abcd.com"),
-						Content = Encoding.UTF8.GetBytes(Html),
-						CharSet = "UTF-8"
-					}, service);
+			using (var builder = GetLocalSpiderHostBuilder())
+			{
+				var provider = builder.Build();
+				var services = provider.CreateScopeServiceProvider();
+				var dataContext =
+					new DataFlowContext(
+						new Response
+						{
+							Request = new Request("http://abcd.com"),
+							Content = Encoding.UTF8.GetBytes(Html),
+							CharSet = "UTF-8"
+						}, services);
 
-			var parser = new DataParser<E>();
+				var parser = new DataParser<E>();
 
-			parser.HandleAsync(dataContext).GetAwaiter().GetResult();
+				parser.HandleAsync(dataContext).GetAwaiter().GetResult();
 
-			var results = (ParseResult<E>)dataContext.GetParseData(typeof(E).FullName);
+				var results = (ParseResult<E>)dataContext.GetParseData(typeof(E).FullName);
 
-			Assert.Equal("a", results[0].title);
-			Assert.Equal("b", results[1].title);
+				Assert.Equal("a", results[0].title);
+				Assert.Equal("b", results[1].title);
+			}
 		}
 
 		private class N : EntityBase<N>

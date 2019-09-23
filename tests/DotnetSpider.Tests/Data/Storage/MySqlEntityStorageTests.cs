@@ -69,29 +69,30 @@ namespace DotnetSpider.Tests.Data.Storage
 			{
 				// 如果实体的 Schema 没有配置表名，则使用类名
 				await conn.ExecuteAsync("drop table if exists createtableentity1;");
-				var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
-				var storage = CreateStorage(StorageType.Insert);
-				var dfc = new DataFlowContext(null, services);
-				var typeName = typeof(CreateTableEntity1).FullName;
-				var entity = new CreateTableEntity1();
-				dfc.Add(typeName, entity.GetTableMetadata());
-				var items = new ParseResult<CreateTableEntity1>
+				using (var builder = GetLocalSpiderHostBuilder())
 				{
-					entity
-				};
-				dfc.AddParseData(typeName, items);
-				await storage.HandleAsync(dfc);
-				var list = (await conn.QueryAsync<CreateTableEntity1>("SELECT * FROM createtableentity1")).ToList();
-				Assert.Single(list);
-				entity = list.First();
-				Assert.Equal("xxx", entity.Str1);
-				Assert.Equal("yyy", entity.Str2);
-				Assert.Equal(655, entity.Required);
-				Assert.Equal(0, entity.Decimal);
-				Assert.Equal(600, entity.Long);
-				Assert.Equal(400, entity.Double);
-				Assert.Equal(200.0F, entity.Float);
-				await conn.ExecuteAsync("drop table if exists createtableentity1;");
+					var provider = builder.Build();
+					var services = provider.CreateScopeServiceProvider();
+					var storage = CreateStorage(StorageType.Insert);
+					var dfc = new DataFlowContext(null, services);
+					var typeName = typeof(CreateTableEntity1).FullName;
+					var entity = new CreateTableEntity1();
+					dfc.Add(typeName, entity.GetTableMetadata());
+					var items = new ParseResult<CreateTableEntity1> {entity};
+					dfc.AddParseData(typeName, items);
+					await storage.HandleAsync(dfc);
+					var list = (await conn.QueryAsync<CreateTableEntity1>("SELECT * FROM createtableentity1")).ToList();
+					Assert.Single(list);
+					entity = list.First();
+					Assert.Equal("xxx", entity.Str1);
+					Assert.Equal("yyy", entity.Str2);
+					Assert.Equal(655, entity.Required);
+					Assert.Equal(0, entity.Decimal);
+					Assert.Equal(600, entity.Long);
+					Assert.Equal(400, entity.Double);
+					Assert.Equal(200.0F, entity.Float);
+					await conn.ExecuteAsync("drop table if exists createtableentity1;");
+				}
 			}
 		}
 
@@ -102,29 +103,31 @@ namespace DotnetSpider.Tests.Data.Storage
 			{
 				// 如果实体的 Schema 没有配置表名，则使用类名
 				await conn.ExecuteAsync("drop table if exists createtablenotablename;");
-				var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
-				var storage = CreateStorage(StorageType.Insert);
-				var dfc = new DataFlowContext(null, services);
-				var typeName = typeof(CreateTableEntity2).FullName;
-				var entity = new CreateTableEntity2();
-				dfc.Add(typeName, entity.GetTableMetadata());
-				var items = new ParseResult<CreateTableEntity2>
+				using (var builder = GetLocalSpiderHostBuilder())
 				{
-					entity
-				};
-				dfc.AddParseData(typeName, items);
-				await storage.HandleAsync(dfc);
-				var list = (await conn.QueryAsync<CreateTableEntity2>("SELECT * FROM createtablenotablename")).ToList();
-				Assert.Single(list);
-				entity = list.First();
-				Assert.Equal("xxx", entity.Str1);
-				Assert.Equal("yyy", entity.Str2);
-				Assert.Equal(655, entity.Required);
-				Assert.Equal(0, entity.Decimal);
-				Assert.Equal(600, entity.Long);
-				Assert.Equal(400, entity.Double);
-				Assert.Equal(200.0F, entity.Float);
-				await conn.ExecuteAsync("drop table if exists createtablenotablename;");
+					var provider = builder.Build();
+					var services = provider.CreateScopeServiceProvider();
+					var storage = CreateStorage(StorageType.Insert);
+					var dfc = new DataFlowContext(null, services);
+					var typeName = typeof(CreateTableEntity2).FullName;
+					var entity = new CreateTableEntity2();
+					dfc.Add(typeName, entity.GetTableMetadata());
+					var items = new ParseResult<CreateTableEntity2> {entity};
+					dfc.AddParseData(typeName, items);
+					await storage.HandleAsync(dfc);
+					var list = (await conn.QueryAsync<CreateTableEntity2>("SELECT * FROM createtablenotablename"))
+						.ToList();
+					Assert.Single(list);
+					entity = list.First();
+					Assert.Equal("xxx", entity.Str1);
+					Assert.Equal("yyy", entity.Str2);
+					Assert.Equal(655, entity.Required);
+					Assert.Equal(0, entity.Decimal);
+					Assert.Equal(600, entity.Long);
+					Assert.Equal(400, entity.Double);
+					Assert.Equal(200.0F, entity.Float);
+					await conn.ExecuteAsync("drop table if exists createtablenotablename;");
+				}
 			}
 		}
 
@@ -135,30 +138,31 @@ namespace DotnetSpider.Tests.Data.Storage
 			{
 				// 如果实体的 Schema 没有配置表名，则使用类名
 				await conn.ExecuteAsync($"drop table if exists {Escape}test{Escape}.{Escape}createtable{Escape};");
-				var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
-				var storage = CreateStorage(StorageType.Insert);
-				var dfc = new DataFlowContext(null, services);
-				var typeName = typeof(CreateTableEntity3).FullName;
-				var entity = new CreateTableEntity3();
-				dfc.Add(typeName, entity.GetTableMetadata());
-				var items = new ParseResult<CreateTableEntity3>
+				using (var builder = GetLocalSpiderHostBuilder())
 				{
-					entity
-				};
-				dfc.AddParseData(typeName, items);
-				await storage.HandleAsync(dfc);
-				var list = (await conn.QueryAsync<CreateTableEntity3>(
-					$"SELECT * FROM {Escape}test{Escape}.{Escape}createtable{Escape}")).ToList();
-				Assert.Single(list);
-				entity = list.First();
-				Assert.Equal("xxx", entity.Str1);
-				Assert.Equal("yyy", entity.Str2);
-				Assert.Equal(655, entity.Required);
-				Assert.Equal(0, entity.Decimal);
-				Assert.Equal(600, entity.Long);
-				Assert.Equal(400, entity.Double);
-				Assert.Equal(200.0F, entity.Float);
-				await conn.ExecuteAsync($"drop table if exists {Escape}test{Escape}.{Escape}createtable{Escape};");
+					var provider = builder.Build();
+					var services = provider.CreateScopeServiceProvider();
+					var storage = CreateStorage(StorageType.Insert);
+					var dfc = new DataFlowContext(null, services);
+					var typeName = typeof(CreateTableEntity3).FullName;
+					var entity = new CreateTableEntity3();
+					dfc.Add(typeName, entity.GetTableMetadata());
+					var items = new ParseResult<CreateTableEntity3> {entity};
+					dfc.AddParseData(typeName, items);
+					await storage.HandleAsync(dfc);
+					var list = (await conn.QueryAsync<CreateTableEntity3>(
+						$"SELECT * FROM {Escape}test{Escape}.{Escape}createtable{Escape}")).ToList();
+					Assert.Single(list);
+					entity = list.First();
+					Assert.Equal("xxx", entity.Str1);
+					Assert.Equal("yyy", entity.Str2);
+					Assert.Equal(655, entity.Required);
+					Assert.Equal(0, entity.Decimal);
+					Assert.Equal(600, entity.Long);
+					Assert.Equal(400, entity.Double);
+					Assert.Equal(200.0F, entity.Float);
+					await conn.ExecuteAsync($"drop table if exists {Escape}test{Escape}.{Escape}createtable{Escape};");
+				}
 			}
 		}
 
@@ -170,39 +174,40 @@ namespace DotnetSpider.Tests.Data.Storage
 				// 如果实体的 Schema 没有配置表名，则使用类名
 				await conn.ExecuteAsync(
 					$"drop table if exists {Escape}test{Escape}.{Escape}createtablemultiprimay{Escape};");
-				var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
-				var storage = CreateStorage(StorageType.Insert);
-				var dfc = new DataFlowContext(null, services);
-				var typeName = typeof(CreateTableEntity8).FullName;
-				var entity = new CreateTableEntity8();
-				dfc.Add(typeName, entity.GetTableMetadata());
-				var items = new ParseResult<CreateTableEntity8>
+				using (var builder = GetLocalSpiderHostBuilder())
 				{
-					entity
-				};
-				dfc.AddParseData(typeName, items);
-				await storage.HandleAsync(dfc);
-				var list = (await conn.QueryAsync<CreateTableEntity8>(
-						$"SELECT * FROM {Escape}test{Escape}.{Escape}createtablemultiprimay{Escape}"))
-					.ToList();
-				Assert.Single(list);
-				entity = list.First();
-				Assert.Equal("xxx", entity.Str1);
-				Assert.Equal("yyy", entity.Str2);
-				Assert.Equal(655, entity.Required);
-				Assert.Equal(0, entity.Decimal);
-				Assert.Equal(600, entity.Long);
-				Assert.Equal(400, entity.Double);
-				Assert.Equal(200.0F, entity.Float);
+					var provider = builder.Build();
+					var services = provider.CreateScopeServiceProvider();
+					var storage = CreateStorage(StorageType.Insert);
+					var dfc = new DataFlowContext(null, services);
+					var typeName = typeof(CreateTableEntity8).FullName;
+					var entity = new CreateTableEntity8();
+					dfc.Add(typeName, entity.GetTableMetadata());
+					var items = new ParseResult<CreateTableEntity8> {entity};
+					dfc.AddParseData(typeName, items);
+					await storage.HandleAsync(dfc);
+					var list = (await conn.QueryAsync<CreateTableEntity8>(
+							$"SELECT * FROM {Escape}test{Escape}.{Escape}createtablemultiprimay{Escape}"))
+						.ToList();
+					Assert.Single(list);
+					entity = list.First();
+					Assert.Equal("xxx", entity.Str1);
+					Assert.Equal("yyy", entity.Str2);
+					Assert.Equal(655, entity.Required);
+					Assert.Equal(0, entity.Decimal);
+					Assert.Equal(600, entity.Long);
+					Assert.Equal(400, entity.Double);
+					Assert.Equal(200.0F, entity.Float);
 
-				var primaries = (await conn.QueryAsync<PrimaryInfo>(
-						"SELECT t.CONSTRAINT_TYPE, c.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS t, INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c WHERE t.TABLE_NAME = c.TABLE_NAME AND t.TABLE_SCHEMA = 'test' AND t.CONSTRAINT_TYPE = 'PRIMARY KEY' AND t.TABLE_NAME='createtablemultiprimay';")
-					).ToList();
-				Assert.Equal(2, primaries.Count);
-				Assert.Equal("str2", primaries[0].COLUMN_NAME);
-				Assert.Equal("decimal", primaries[1].COLUMN_NAME);
-				await conn.ExecuteAsync(
-					$"drop table if exists {Escape}test{Escape}.{Escape}createtablemultiprimay{Escape};");
+					var primaries = (await conn.QueryAsync<PrimaryInfo>(
+							"SELECT t.CONSTRAINT_TYPE, c.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS t, INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c WHERE t.TABLE_NAME = c.TABLE_NAME AND t.TABLE_SCHEMA = 'test' AND t.CONSTRAINT_TYPE = 'PRIMARY KEY' AND t.TABLE_NAME='createtablemultiprimay';")
+						).ToList();
+					Assert.Equal(2, primaries.Count);
+					Assert.Equal("str2", primaries[0].COLUMN_NAME);
+					Assert.Equal("decimal", primaries[1].COLUMN_NAME);
+					await conn.ExecuteAsync(
+						$"drop table if exists {Escape}test{Escape}.{Escape}createtablemultiprimay{Escape};");
+				}
 			}
 		}
 
@@ -214,38 +219,39 @@ namespace DotnetSpider.Tests.Data.Storage
 				// 如果实体的 Schema 没有配置表名，则使用类名
 				await conn.ExecuteAsync(
 					$"drop table if exists {Escape}test{Escape}.{Escape}createtableprimay{Escape};");
-				var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
-				var storage = CreateStorage(StorageType.Insert);
-				var dfc = new DataFlowContext(null, services);
-				var typeName = typeof(CreateTableEntity4).FullName;
-				var entity = new CreateTableEntity4();
-				dfc.Add(typeName, entity.GetTableMetadata());
-				var items = new ParseResult<CreateTableEntity4>
+				using (var builder = GetLocalSpiderHostBuilder())
 				{
-					entity
-				};
-				dfc.AddParseData(typeName, items);
-				await storage.HandleAsync(dfc);
-				var list = (await conn.QueryAsync<CreateTableEntity4>(
-						$"SELECT * FROM {Escape}test{Escape}.{Escape}createtableprimay{Escape}"))
-					.ToList();
-				Assert.Single(list);
-				entity = list.First();
-				Assert.Equal("xxx", entity.Str1);
-				Assert.Equal("yyy", entity.Str2);
-				Assert.Equal(655, entity.Required);
-				Assert.Equal(0, entity.Decimal);
-				Assert.Equal(600, entity.Long);
-				Assert.Equal(400, entity.Double);
-				Assert.Equal(200.0F, entity.Float);
+					var provider = builder.Build();
+					var services = provider.CreateScopeServiceProvider();
+					var storage = CreateStorage(StorageType.Insert);
+					var dfc = new DataFlowContext(null, services);
+					var typeName = typeof(CreateTableEntity4).FullName;
+					var entity = new CreateTableEntity4();
+					dfc.Add(typeName, entity.GetTableMetadata());
+					var items = new ParseResult<CreateTableEntity4> {entity};
+					dfc.AddParseData(typeName, items);
+					await storage.HandleAsync(dfc);
+					var list = (await conn.QueryAsync<CreateTableEntity4>(
+							$"SELECT * FROM {Escape}test{Escape}.{Escape}createtableprimay{Escape}"))
+						.ToList();
+					Assert.Single(list);
+					entity = list.First();
+					Assert.Equal("xxx", entity.Str1);
+					Assert.Equal("yyy", entity.Str2);
+					Assert.Equal(655, entity.Required);
+					Assert.Equal(0, entity.Decimal);
+					Assert.Equal(600, entity.Long);
+					Assert.Equal(400, entity.Double);
+					Assert.Equal(200.0F, entity.Float);
 
-				var primaries = (await conn.QueryAsync<PrimaryInfo>(
-						"SELECT t.CONSTRAINT_TYPE, c.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS t, INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c WHERE t.TABLE_NAME = c.TABLE_NAME AND t.TABLE_SCHEMA = 'test' AND t.CONSTRAINT_TYPE = 'PRIMARY KEY' AND t.TABLE_NAME='createtableprimay';")
-					).ToList();
-				Assert.Single(primaries);
-				Assert.Equal("str2", primaries[0].COLUMN_NAME);
-				await conn.ExecuteAsync(
-					$"drop table if exists {Escape}test{Escape}.{Escape}createtableprimay{Escape};");
+					var primaries = (await conn.QueryAsync<PrimaryInfo>(
+							"SELECT t.CONSTRAINT_TYPE, c.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS t, INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c WHERE t.TABLE_NAME = c.TABLE_NAME AND t.TABLE_SCHEMA = 'test' AND t.CONSTRAINT_TYPE = 'PRIMARY KEY' AND t.TABLE_NAME='createtableprimay';")
+						).ToList();
+					Assert.Single(primaries);
+					Assert.Equal("str2", primaries[0].COLUMN_NAME);
+					await conn.ExecuteAsync(
+						$"drop table if exists {Escape}test{Escape}.{Escape}createtableprimay{Escape};");
+				}
 			}
 		}
 
@@ -257,42 +263,42 @@ namespace DotnetSpider.Tests.Data.Storage
 				// 如果实体的 Schema 没有配置表名，则使用类名
 				await conn.ExecuteAsync(
 					$"drop table if exists {Escape}test{Escape}.{Escape}createtableautoincprimay{Escape};");
-				var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
-				var storage = CreateStorage(StorageType.Insert);
-				var dfc = new DataFlowContext(null, services);
-				var typeName = typeof(CreateTableEntity5).FullName;
-				var entity = new CreateTableEntity5();
-				dfc.Add(typeName, entity.GetTableMetadata());
-				var items = new ParseResult<CreateTableEntity5>
+				using (var builder = GetLocalSpiderHostBuilder())
 				{
-					entity,
-					entity
-				};
-				dfc.AddParseData(typeName, items);
-				await storage.HandleAsync(dfc);
-				var list =
-					(await conn.QueryAsync<CreateTableEntity5>(
-						$"SELECT * FROM {Escape}test{Escape}.{Escape}createtableautoincprimay{Escape}"))
-					.ToList();
-				Assert.Equal(2, list.Count);
-				entity = list.First();
-				Assert.Equal("xxx", entity.Str1);
-				Assert.Equal("yyy", entity.Str2);
-				Assert.Equal(655, entity.Required);
-				Assert.Equal(0, entity.Decimal);
-				Assert.Equal(600, entity.Long);
-				Assert.Equal(400, entity.Double);
-				Assert.Equal(200.0F, entity.Float);
-				Assert.Equal(1, entity.Id);
-				Assert.Equal(2, list[1].Id);
+					var provider = builder.Build();
+					var services = provider.CreateScopeServiceProvider();
+					var storage = CreateStorage(StorageType.Insert);
+					var dfc = new DataFlowContext(null, services);
+					var typeName = typeof(CreateTableEntity5).FullName;
+					var entity = new CreateTableEntity5();
+					dfc.Add(typeName, entity.GetTableMetadata());
+					var items = new ParseResult<CreateTableEntity5> {entity, entity};
+					dfc.AddParseData(typeName, items);
+					await storage.HandleAsync(dfc);
+					var list =
+						(await conn.QueryAsync<CreateTableEntity5>(
+							$"SELECT * FROM {Escape}test{Escape}.{Escape}createtableautoincprimay{Escape}"))
+						.ToList();
+					Assert.Equal(2, list.Count);
+					entity = list.First();
+					Assert.Equal("xxx", entity.Str1);
+					Assert.Equal("yyy", entity.Str2);
+					Assert.Equal(655, entity.Required);
+					Assert.Equal(0, entity.Decimal);
+					Assert.Equal(600, entity.Long);
+					Assert.Equal(400, entity.Double);
+					Assert.Equal(200.0F, entity.Float);
+					Assert.Equal(1, entity.Id);
+					Assert.Equal(2, list[1].Id);
 
-				var primaries = (await conn.QueryAsync<PrimaryInfo>(
-						"SELECT t.CONSTRAINT_TYPE, c.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS t, INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c WHERE t.TABLE_NAME = c.TABLE_NAME AND t.TABLE_SCHEMA = 'test' AND t.CONSTRAINT_TYPE = 'PRIMARY KEY' AND t.TABLE_NAME='createtableautoincprimay';")
-					).ToList();
-				Assert.Single(primaries);
-				Assert.Equal("id", primaries[0].COLUMN_NAME);
-				await conn.ExecuteAsync(
-					$"drop table if exists {Escape}test{Escape}.{Escape}createtableautoincprimay{Escape};");
+					var primaries = (await conn.QueryAsync<PrimaryInfo>(
+							"SELECT t.CONSTRAINT_TYPE, c.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS t, INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c WHERE t.TABLE_NAME = c.TABLE_NAME AND t.TABLE_SCHEMA = 'test' AND t.CONSTRAINT_TYPE = 'PRIMARY KEY' AND t.TABLE_NAME='createtableautoincprimay';")
+						).ToList();
+					Assert.Single(primaries);
+					Assert.Equal("id", primaries[0].COLUMN_NAME);
+					await conn.ExecuteAsync(
+						$"drop table if exists {Escape}test{Escape}.{Escape}createtableautoincprimay{Escape};");
+				}
 			}
 		}
 
@@ -316,35 +322,34 @@ namespace DotnetSpider.Tests.Data.Storage
 				// 如果实体的 Schema 没有配置表名，则使用类名
 				await conn.ExecuteAsync(
 					$"drop table if exists {Escape}test{Escape}.{Escape}createtableprimay{Escape};");
-				var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
-				var storage = CreateStorage(StorageType.InsertIgnoreDuplicate);
-				var dfc = new DataFlowContext(null, services);
-				var typeName = typeof(CreateTableEntity4).FullName;
-				var entity = new CreateTableEntity4();
-				dfc.Add(typeName, entity.GetTableMetadata());
-				var items = new ParseResult<CreateTableEntity4>
+				using (var builder = GetLocalSpiderHostBuilder())
 				{
-					entity,
-					entity,
-					entity
-				};
-				dfc.AddParseData(typeName, items);
-				await storage.HandleAsync(dfc);
-				var list = (await conn.QueryAsync<CreateTableEntity4>(
-						$"SELECT * FROM {Escape}test{Escape}.{Escape}createtableprimay{Escape}"))
-					.ToList();
-				Assert.Single(list);
-				entity = list.First();
-				Assert.Equal("xxx", entity.Str1);
-				Assert.Equal("yyy", entity.Str2);
-				Assert.Equal(655, entity.Required);
-				Assert.Equal(0, entity.Decimal);
-				Assert.Equal(600, entity.Long);
-				Assert.Equal(400, entity.Double);
-				Assert.Equal(200.0F, entity.Float);
+					var provider = builder.Build();
+					var services = provider.CreateScopeServiceProvider();
+					var storage = CreateStorage(StorageType.InsertIgnoreDuplicate);
+					var dfc = new DataFlowContext(null, services);
+					var typeName = typeof(CreateTableEntity4).FullName;
+					var entity = new CreateTableEntity4();
+					dfc.Add(typeName, entity.GetTableMetadata());
+					var items = new ParseResult<CreateTableEntity4> {entity, entity, entity};
+					dfc.AddParseData(typeName, items);
+					await storage.HandleAsync(dfc);
+					var list = (await conn.QueryAsync<CreateTableEntity4>(
+							$"SELECT * FROM {Escape}test{Escape}.{Escape}createtableprimay{Escape}"))
+						.ToList();
+					Assert.Single(list);
+					entity = list.First();
+					Assert.Equal("xxx", entity.Str1);
+					Assert.Equal("yyy", entity.Str2);
+					Assert.Equal(655, entity.Required);
+					Assert.Equal(0, entity.Decimal);
+					Assert.Equal(600, entity.Long);
+					Assert.Equal(400, entity.Double);
+					Assert.Equal(200.0F, entity.Float);
 
-				await conn.ExecuteAsync(
-					$"drop table if exists {Escape}test{Escape}.{Escape}createtableprimay{Escape};");
+					await conn.ExecuteAsync(
+						$"drop table if exists {Escape}test{Escape}.{Escape}createtableprimay{Escape};");
+				}
 			}
 		}
 
@@ -361,38 +366,35 @@ namespace DotnetSpider.Tests.Data.Storage
 				// 如果实体的 Schema 没有配置表名，则使用类名
 				await conn.ExecuteAsync(
 					$"drop table if exists {Escape}test{Escape}.{Escape}createtableprimay{Escape};");
-				var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
-				var storage = CreateStorage(StorageType.InsertAndUpdate);
-				var dfc = new DataFlowContext(null, services);
-				var typeName = typeof(CreateTableEntity4).FullName;
-				var entity = new CreateTableEntity4();
-				dfc.Add(typeName, entity.GetTableMetadata());
-				var items = new ParseResult<CreateTableEntity4>
+				using (var builder = GetLocalSpiderHostBuilder())
 				{
-					entity,
-					new CreateTableEntity4
-					{
-						Str1 = "zzz"
-					}
-				};
-				dfc.AddParseData(typeName, items);
+					var provider = builder.Build();
+					var services = provider.CreateScopeServiceProvider();
+					var storage = CreateStorage(StorageType.InsertAndUpdate);
+					var dfc = new DataFlowContext(null, services);
+					var typeName = typeof(CreateTableEntity4).FullName;
+					var entity = new CreateTableEntity4();
+					dfc.Add(typeName, entity.GetTableMetadata());
+					var items = new ParseResult<CreateTableEntity4> {entity, new CreateTableEntity4 {Str1 = "zzz"}};
+					dfc.AddParseData(typeName, items);
 
-				await storage.HandleAsync(dfc);
-				var list = (await conn.QueryAsync<CreateTableEntity4>(
-						$"SELECT * FROM {Escape}test{Escape}.{Escape}createtableprimay{Escape}"))
-					.ToList();
-				Assert.Single(list);
-				entity = list.First();
-				Assert.Equal("zzz", entity.Str1);
-				Assert.Equal("yyy", entity.Str2);
-				Assert.Equal(655, entity.Required);
-				Assert.Equal(0, entity.Decimal);
-				Assert.Equal(600, entity.Long);
-				Assert.Equal(400, entity.Double);
-				Assert.Equal(200.0F, entity.Float);
+					await storage.HandleAsync(dfc);
+					var list = (await conn.QueryAsync<CreateTableEntity4>(
+							$"SELECT * FROM {Escape}test{Escape}.{Escape}createtableprimay{Escape}"))
+						.ToList();
+					Assert.Single(list);
+					entity = list.First();
+					Assert.Equal("zzz", entity.Str1);
+					Assert.Equal("yyy", entity.Str2);
+					Assert.Equal(655, entity.Required);
+					Assert.Equal(0, entity.Decimal);
+					Assert.Equal(600, entity.Long);
+					Assert.Equal(400, entity.Double);
+					Assert.Equal(200.0F, entity.Float);
 
-				await conn.ExecuteAsync(
-					$"drop table if exists {Escape}test{Escape}.{Escape}createtableprimay{Escape};");
+					await conn.ExecuteAsync(
+						$"drop table if exists {Escape}test{Escape}.{Escape}createtableprimay{Escape};");
+				}
 			}
 		}
 
@@ -407,51 +409,50 @@ namespace DotnetSpider.Tests.Data.Storage
 				// 如果实体的 Schema 没有配置表名，则使用类名
 				await conn.ExecuteAsync(
 					$"drop table if exists {Escape}test{Escape}.{Escape}createtableprimay{Escape};");
-				var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
-				var storage = CreateStorage(StorageType.InsertIgnoreDuplicate);
-				var dfc = new DataFlowContext(null, services);
-				var typeName = typeof(CreateTableEntity4).FullName;
-				var entity = new CreateTableEntity4();
-				dfc.Add(typeName, entity.GetTableMetadata());
-				var items = new ParseResult<CreateTableEntity4>
+				using (var builder = GetLocalSpiderHostBuilder())
 				{
-					entity
-				};
-				dfc.AddParseData(typeName, items);
+					var provider = builder.Build();
+					var services = provider.CreateScopeServiceProvider();
+					var storage = CreateStorage(StorageType.InsertIgnoreDuplicate);
+					var dfc = new DataFlowContext(null, services);
+					var typeName = typeof(CreateTableEntity4).FullName;
+					var entity = new CreateTableEntity4();
+					dfc.Add(typeName, entity.GetTableMetadata());
+					var items = new ParseResult<CreateTableEntity4> {entity};
+					dfc.AddParseData(typeName, items);
 
-				await storage.HandleAsync(dfc);
+					await storage.HandleAsync(dfc);
 
-				var dfc2 = new DataFlowContext(null, services);
-				dfc2.Add(typeName, entity.GetTableMetadata());
-				var now = DateTime.Now;
-				dfc2.AddParseData(typeName, new ParseResult<CreateTableEntity4>
-				{
-					new CreateTableEntity4
-					{
-						Str1 = "TTT",
-						DateTime = now,
-						DateTimeOffset = now,
-						Double = 888
-					}
-				});
-				var storage2 = CreateStorage(StorageType.Update);
-				await storage2.HandleAsync(dfc2);
+					var dfc2 = new DataFlowContext(null, services);
+					dfc2.Add(typeName, entity.GetTableMetadata());
+					var now = DateTime.Now;
+					dfc2.AddParseData(typeName,
+						new ParseResult<CreateTableEntity4>
+						{
+							new CreateTableEntity4
+							{
+								Str1 = "TTT", DateTime = now, DateTimeOffset = now, Double = 888
+							}
+						});
+					var storage2 = CreateStorage(StorageType.Update);
+					await storage2.HandleAsync(dfc2);
 
-				var list = (await conn.QueryAsync<CreateTableEntity4>(
-						$"SELECT * FROM {Escape}test{Escape}.{Escape}createtableprimay{Escape}"))
-					.ToList();
-				Assert.Single(list);
-				entity = list.First();
-				Assert.Equal("TTT", entity.Str1);
-				Assert.Equal("yyy", entity.Str2);
-				Assert.Equal(655, entity.Required);
-				Assert.Equal(0, entity.Decimal);
-				Assert.Equal(600, entity.Long);
-				Assert.Equal(888, entity.Double);
-				Assert.Equal(200.0F, entity.Float);
+					var list = (await conn.QueryAsync<CreateTableEntity4>(
+							$"SELECT * FROM {Escape}test{Escape}.{Escape}createtableprimay{Escape}"))
+						.ToList();
+					Assert.Single(list);
+					entity = list.First();
+					Assert.Equal("TTT", entity.Str1);
+					Assert.Equal("yyy", entity.Str2);
+					Assert.Equal(655, entity.Required);
+					Assert.Equal(0, entity.Decimal);
+					Assert.Equal(600, entity.Long);
+					Assert.Equal(888, entity.Double);
+					Assert.Equal(200.0F, entity.Float);
 
-				await conn.ExecuteAsync(
-					$"drop table if exists {Escape}test{Escape}.{Escape}createtableprimay{Escape};");
+					await conn.ExecuteAsync(
+						$"drop table if exists {Escape}test{Escape}.{Escape}createtableprimay{Escape};");
+				}
 			}
 		}
 
@@ -466,52 +467,54 @@ namespace DotnetSpider.Tests.Data.Storage
 				// 如果实体的 Schema 没有配置表名，则使用类名
 				await conn.ExecuteAsync(
 					$"drop table if exists {Escape}test{Escape}.{Escape}updatepartcolumns{Escape};");
-				var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
-				var storage = CreateStorage(StorageType.InsertIgnoreDuplicate);
-				var dfc = new DataFlowContext(null, services);
-				var typeName = typeof(CreateTableEntity6).FullName;
-				var entity = new CreateTableEntity6();
-				dfc.Add(typeName, entity.GetTableMetadata());
-				var items = new ParseResult<CreateTableEntity6>
+				using (var builder = GetLocalSpiderHostBuilder())
 				{
-					entity
-				};
-				dfc.AddParseData(typeName, items);
-				await storage.HandleAsync(dfc);
+					var provider = builder.Build();
+					var services = provider.CreateScopeServiceProvider();
+					var storage = CreateStorage(StorageType.InsertIgnoreDuplicate);
+					var dfc = new DataFlowContext(null, services);
+					var typeName = typeof(CreateTableEntity6).FullName;
+					var entity = new CreateTableEntity6();
+					dfc.Add(typeName, entity.GetTableMetadata());
+					var items = new ParseResult<CreateTableEntity6> {entity};
+					dfc.AddParseData(typeName, items);
+					await storage.HandleAsync(dfc);
 
-				var dfc2 = new DataFlowContext(null, services);
-				dfc2.Add(typeName, entity.GetTableMetadata());
-				var now = DateTime.Now;
-				dfc2.AddParseData(typeName, new ParseResult<CreateTableEntity6>
-				{
-					new CreateTableEntity6
-					{
-						Str1 = "TTT",
-						DateTime = now,
-						DateTimeOffset = now,
-						Double = 888,
-						Float = 999F,
-						Required = 888
-					}
-				});
-				var storage2 = CreateStorage(StorageType.Update);
-				await storage2.HandleAsync(dfc2);
+					var dfc2 = new DataFlowContext(null, services);
+					dfc2.Add(typeName, entity.GetTableMetadata());
+					var now = DateTime.Now;
+					dfc2.AddParseData(typeName,
+						new ParseResult<CreateTableEntity6>
+						{
+							new CreateTableEntity6
+							{
+								Str1 = "TTT",
+								DateTime = now,
+								DateTimeOffset = now,
+								Double = 888,
+								Float = 999F,
+								Required = 888
+							}
+						});
+					var storage2 = CreateStorage(StorageType.Update);
+					await storage2.HandleAsync(dfc2);
 
-				var list = (await conn.QueryAsync<CreateTableEntity6>(
-						$"SELECT * FROM {Escape}test{Escape}.{Escape}updatepartcolumns{Escape}"))
-					.ToList();
-				Assert.Single(list);
-				entity = list.First();
-				Assert.Equal("TTT", entity.Str1);
-				Assert.Equal("yyy", entity.Str2);
-				Assert.Equal(655, entity.Required);
-				Assert.Equal(0, entity.Decimal);
-				Assert.Equal(600, entity.Long);
-				Assert.Equal(888, entity.Double);
-				Assert.Equal(200.0F, entity.Float);
+					var list = (await conn.QueryAsync<CreateTableEntity6>(
+							$"SELECT * FROM {Escape}test{Escape}.{Escape}updatepartcolumns{Escape}"))
+						.ToList();
+					Assert.Single(list);
+					entity = list.First();
+					Assert.Equal("TTT", entity.Str1);
+					Assert.Equal("yyy", entity.Str2);
+					Assert.Equal(655, entity.Required);
+					Assert.Equal(0, entity.Decimal);
+					Assert.Equal(600, entity.Long);
+					Assert.Equal(888, entity.Double);
+					Assert.Equal(200.0F, entity.Float);
 
-				await conn.ExecuteAsync(
-					$"drop table if exists {Escape}test{Escape}.{Escape}updatepartcolumns{Escape};");
+					await conn.ExecuteAsync(
+						$"drop table if exists {Escape}test{Escape}.{Escape}updatepartcolumns{Escape};");
+				}
 			}
 		}
 
@@ -526,36 +529,35 @@ namespace DotnetSpider.Tests.Data.Storage
 				// 如果实体的 Schema 没有配置表名，则使用类名
 				await conn.ExecuteAsync(
 					$"drop table if exists {Escape}test{Escape}.{Escape}createtableprimay{Escape};");
-				var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
-				var storage = (RelationalDatabaseEntityStorageBase)CreateStorage(StorageType.InsertIgnoreDuplicate);
-				storage.UseTransaction = true;
-				var dfc = new DataFlowContext(null, services);
-				var typeName = typeof(CreateTableEntity4).FullName;
-				var entity = new CreateTableEntity4();
-				dfc.Add(typeName, entity.GetTableMetadata());
-				var items = new ParseResult<CreateTableEntity4>
+				using (var builder = GetLocalSpiderHostBuilder())
 				{
-					entity,
-					entity,
-					entity
-				};
-				dfc.AddParseData(typeName, items);
-				await storage.HandleAsync(dfc);
-				var list = (await conn.QueryAsync<CreateTableEntity4>(
-						$"SELECT * FROM {Escape}test{Escape}.{Escape}createtableprimay{Escape}"))
-					.ToList();
-				Assert.Single(list);
-				entity = list.First();
-				Assert.Equal("xxx", entity.Str1);
-				Assert.Equal("yyy", entity.Str2);
-				Assert.Equal(655, entity.Required);
-				Assert.Equal(0, entity.Decimal);
-				Assert.Equal(600, entity.Long);
-				Assert.Equal(400, entity.Double);
-				Assert.Equal(200.0F, entity.Float);
+					var provider = builder.Build();
+					var services = provider.CreateScopeServiceProvider();
+					var storage = (RelationalDatabaseEntityStorageBase)CreateStorage(StorageType.InsertIgnoreDuplicate);
+					storage.UseTransaction = true;
+					var dfc = new DataFlowContext(null, services);
+					var typeName = typeof(CreateTableEntity4).FullName;
+					var entity = new CreateTableEntity4();
+					dfc.Add(typeName, entity.GetTableMetadata());
+					var items = new ParseResult<CreateTableEntity4> {entity, entity, entity};
+					dfc.AddParseData(typeName, items);
+					await storage.HandleAsync(dfc);
+					var list = (await conn.QueryAsync<CreateTableEntity4>(
+							$"SELECT * FROM {Escape}test{Escape}.{Escape}createtableprimay{Escape}"))
+						.ToList();
+					Assert.Single(list);
+					entity = list.First();
+					Assert.Equal("xxx", entity.Str1);
+					Assert.Equal("yyy", entity.Str2);
+					Assert.Equal(655, entity.Required);
+					Assert.Equal(0, entity.Decimal);
+					Assert.Equal(600, entity.Long);
+					Assert.Equal(400, entity.Double);
+					Assert.Equal(200.0F, entity.Float);
 
-				await conn.ExecuteAsync(
-					$"drop table if exists {Escape}test{Escape}.{Escape}createtableprimay{Escape};");
+					await conn.ExecuteAsync(
+						$"drop table if exists {Escape}test{Escape}.{Escape}createtableprimay{Escape};");
+				}
 			}
 		}
 
@@ -569,31 +571,32 @@ namespace DotnetSpider.Tests.Data.Storage
 			{
 				// 如果实体的 Schema 没有配置表名，则使用类名
 				await conn.ExecuteAsync($"drop table if exists {Escape}test{Escape}.{Escape}IgnoreCase{Escape};");
-				var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
-				var storage = (RelationalDatabaseEntityStorageBase)CreateStorage(StorageType.Insert);
-				storage.IgnoreCase = false;
-				var dfc = new DataFlowContext(null, services);
-				var typeName = typeof(CreateTableEntity7).FullName;
-				var entity = new CreateTableEntity7();
-				dfc.Add(typeName, entity.GetTableMetadata());
-				var items = new ParseResult<CreateTableEntity7>
+				using (var builder = GetLocalSpiderHostBuilder())
 				{
-					entity
-				};
-				dfc.AddParseData(typeName, items);
-				await storage.HandleAsync(dfc);
-				var list = (await conn.QueryAsync<CreateTableEntity7>(
-					$"SELECT * FROM {Escape}test{Escape}.{Escape}IgnoreCase{Escape}")).ToList();
-				Assert.Single(list);
-				entity = list.First();
-				Assert.Equal("xxx", entity.Str1);
-				Assert.Equal("yyy", entity.Str2);
-				Assert.Equal(655, entity.Required);
-				Assert.Equal(0, entity.Decimal);
-				Assert.Equal(600, entity.Long);
-				Assert.Equal(400, entity.Double);
-				Assert.Equal(200.0F, entity.Float);
-				await conn.ExecuteAsync($"drop table if exists {Escape}test{Escape}.{Escape}IgnoreCase{Escape};");
+					var provider = builder.Build();
+					var services = provider.CreateScopeServiceProvider();
+					var storage = (RelationalDatabaseEntityStorageBase)CreateStorage(StorageType.Insert);
+					storage.IgnoreCase = false;
+					var dfc = new DataFlowContext(null, services);
+					var typeName = typeof(CreateTableEntity7).FullName;
+					var entity = new CreateTableEntity7();
+					dfc.Add(typeName, entity.GetTableMetadata());
+					var items = new ParseResult<CreateTableEntity7> {entity};
+					dfc.AddParseData(typeName, items);
+					await storage.HandleAsync(dfc);
+					var list = (await conn.QueryAsync<CreateTableEntity7>(
+						$"SELECT * FROM {Escape}test{Escape}.{Escape}IgnoreCase{Escape}")).ToList();
+					Assert.Single(list);
+					entity = list.First();
+					Assert.Equal("xxx", entity.Str1);
+					Assert.Equal("yyy", entity.Str2);
+					Assert.Equal(655, entity.Required);
+					Assert.Equal(0, entity.Decimal);
+					Assert.Equal(600, entity.Long);
+					Assert.Equal(400, entity.Double);
+					Assert.Equal(200.0F, entity.Float);
+					await conn.ExecuteAsync($"drop table if exists {Escape}test{Escape}.{Escape}IgnoreCase{Escape};");
+				}
 			}
 		}
 
@@ -604,38 +607,39 @@ namespace DotnetSpider.Tests.Data.Storage
 			{
 				await conn.ExecuteAsync(
 					$"drop table if exists {Escape}test{Escape}.{Escape}createtableindexes{Escape};");
-				var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
-				var storage = CreateStorage(StorageType.Insert);
-
-				var dfc = new DataFlowContext(null, services);
-				var typeName = typeof(CreateTableEntity5).FullName;
-				var entity = new CreateTableEntity9();
-				dfc.Add(typeName, entity.GetTableMetadata());
-				var items = new ParseResult<CreateTableEntity9>
+				using (var builder = GetLocalSpiderHostBuilder())
 				{
-					entity
-				};
-				dfc.AddParseData(typeName, items);
-				await storage.HandleAsync(dfc);
-				var indexes = (await conn.QueryAsync<IndexInfo>
-						("show index from test.createtableindexes")
-					).ToList();
-				Assert.Equal(6, indexes.Count);
-				Assert.Contains(indexes,
-					x => x.Key_name == "INDEX_STR1" && x.Non_unique == 1 && x.Column_name == "str1");
-				Assert.Contains(indexes, x =>
-					x.Key_name == "INDEX_STR1_STR2" && x.Non_unique == 1 && x.Column_name == "str1");
-				Assert.Contains(indexes, x =>
-					x.Key_name == "INDEX_STR1_STR2" && x.Non_unique == 1 && x.Column_name == "str2");
-				Assert.Contains(indexes,
-					x => x.Key_name == "UNIQUE_STR3" && x.Non_unique == 0 && x.Column_name == "str3");
-				Assert.Contains(indexes, x =>
-					x.Key_name == "UNIQUE_STR3_STR4" && x.Non_unique == 0 && x.Column_name == "str3");
-				Assert.Contains(indexes, x =>
-					x.Key_name == "UNIQUE_STR3_STR4" && x.Non_unique == 0 && x.Column_name == "str4");
+					var provider = builder.Build();
+					var services = provider.CreateScopeServiceProvider();
+					var storage = CreateStorage(StorageType.Insert);
 
-				await conn.ExecuteAsync(
-					$"drop table if exists {Escape}test{Escape}.{Escape}createtableindexes{Escape};");
+					var dfc = new DataFlowContext(null, services);
+					var typeName = typeof(CreateTableEntity5).FullName;
+					var entity = new CreateTableEntity9();
+					dfc.Add(typeName, entity.GetTableMetadata());
+					var items = new ParseResult<CreateTableEntity9> {entity};
+					dfc.AddParseData(typeName, items);
+					await storage.HandleAsync(dfc);
+					var indexes = (await conn.QueryAsync<IndexInfo>
+							("show index from test.createtableindexes")
+						).ToList();
+					Assert.Equal(6, indexes.Count);
+					Assert.Contains(indexes,
+						x => x.Key_name == "INDEX_STR1" && x.Non_unique == 1 && x.Column_name == "str1");
+					Assert.Contains(indexes, x =>
+						x.Key_name == "INDEX_STR1_STR2" && x.Non_unique == 1 && x.Column_name == "str1");
+					Assert.Contains(indexes, x =>
+						x.Key_name == "INDEX_STR1_STR2" && x.Non_unique == 1 && x.Column_name == "str2");
+					Assert.Contains(indexes,
+						x => x.Key_name == "UNIQUE_STR3" && x.Non_unique == 0 && x.Column_name == "str3");
+					Assert.Contains(indexes, x =>
+						x.Key_name == "UNIQUE_STR3_STR4" && x.Non_unique == 0 && x.Column_name == "str3");
+					Assert.Contains(indexes, x =>
+						x.Key_name == "UNIQUE_STR3_STR4" && x.Non_unique == 0 && x.Column_name == "str4");
+
+					await conn.ExecuteAsync(
+						$"drop table if exists {Escape}test{Escape}.{Escape}createtableindexes{Escape};");
+				}
 			}
 		}
 

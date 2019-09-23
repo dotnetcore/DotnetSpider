@@ -5,6 +5,20 @@ namespace DotnetSpider.Common
 {
     public static class DirectoryHelper
     {
+	    public static void PrepareFromFilePath(string file)
+	    {
+		    var folder = Path.GetDirectoryName(file);
+		    if (string.IsNullOrWhiteSpace(folder))
+		    {
+			    throw new SpiderException("文件路径不合法");
+		    }
+
+		    if (!Directory.Exists(folder))
+		    {
+			    Directory.CreateDirectory(folder);
+		    }
+	    }
+
         /// <summary>
         /// 复制文件夹
         /// </summary>

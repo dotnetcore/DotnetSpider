@@ -111,8 +111,7 @@ namespace DotnetSpider
 		/// </summary>
 		/// <param name="requests">请求</param>
 		/// <returns></returns>
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		public Spider AddRequests(params Request[] requests)
+		public async Task AddRequests(params Request[] requests)
 		{
 			Check.NotNull(requests, nameof(requests));
 
@@ -128,11 +127,9 @@ namespace DotnetSpider
 				_requests.Add(request);
 				if (_requests.Count % EnqueueBatchCount == 0)
 				{
-					EnqueueRequestsToScheduler();
+					await AddRequestsToScheduler();
 				}
 			}
-
-			return this;
 		}
 
 		/// <summary>
@@ -140,8 +137,7 @@ namespace DotnetSpider
 		/// </summary>
 		/// <param name="urls">链接</param>
 		/// <returns></returns>
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		public Spider AddRequests(params string[] urls)
+		public async Task AddRequests(params string[] urls)
 		{
 			Check.NotNull(urls, nameof(urls));
 
@@ -151,11 +147,9 @@ namespace DotnetSpider
 				_requests.Add(request);
 				if (_requests.Count % EnqueueBatchCount == 0)
 				{
-					EnqueueRequestsToScheduler();
+					await AddRequestsToScheduler();
 				}
 			}
-
-			return this;
 		}
 
 		/// <summary>
@@ -168,6 +162,7 @@ namespace DotnetSpider
 			CheckIfRunning();
 
 			PrintEnvironment(Services.GetRequiredService<IConfiguration>());
+
 			try
 			{
 				ResetMmfSignal();
@@ -175,7 +170,7 @@ namespace DotnetSpider
 				Logger.LogInformation("Initialize spider");
 
 				// 定制化的设置
-				Initialize();
+				await Initialize();
 
 				var dataFlowInfo = string.Join(" ==> ", _dataFlows.Select(x => x.Name));
 				Logger.LogInformation($"DataFlow: {dataFlowInfo}");
@@ -208,18 +203,18 @@ namespace DotnetSpider
 				// 通过供应接口添加请求
 				foreach (var requestSupplier in _requestSupplies)
 				{
-					requestSupplier.Execute(request => AddRequests(request));
+					requestSupplier.Execute(async request => await AddRequests(request));
 				}
 
 				// 把列表中可能剩余的请求加入队列
-				EnqueueRequestsToScheduler();
+				await AddRequestsToScheduler();
 
 				_enqueued.Set(0);
 				_responded.Set(0);
 				_enqueuedRequestDict.Clear();
 
 				// 启动速度控制器
-				StartSpeedControllerAsync().ConfigureAwait(false).GetAwaiter();
+				StartSpeedController();
 
 				_lastRequestedTime = DateTimeOffset.Now;
 
@@ -341,8 +336,9 @@ namespace DotnetSpider
 		/// <summary>
 		/// 初始化配置
 		/// </summary>
-		protected virtual void Initialize()
+		protected virtual Task Initialize()
 		{
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -408,9 +404,9 @@ namespace DotnetSpider
 		/// 爬虫速度控制器
 		/// </summary>
 		/// <returns></returns>
-		private Task StartSpeedControllerAsync()
+		private void StartSpeedController()
 		{
-			return Task.Factory.StartNew(async () =>
+			Task.Factory.StartNew(async () =>
 			{
 				var @break = false;
 
@@ -486,7 +482,10 @@ namespace DotnetSpider
 										{
 											var requests = _scheduler.Dequeue(Id, _dequeueBatchCount);
 
-											if (requests == null || requests.Length == 0) break;
+											if (requests == null || requests.Length == 0)
+											{
+												break;
+											}
 
 											foreach (var request in requests)
 											{
@@ -535,7 +534,7 @@ namespace DotnetSpider
 				}
 
 				Logger.LogInformation($"{Id} speed controller exit");
-			});
+			}).ConfigureAwait(true);
 		}
 
 		private Task HandleCommandAsync(MessageData<string> command)
@@ -801,15 +800,17 @@ namespace DotnetSpider
 		/// <summary>
 		/// 把当前缓存的所有 Request 入队
 		/// </summary>
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		private void EnqueueRequestsToScheduler()
+		private async Task AddRequestsToScheduler()
 		{
-			if (_requests.Count <= 0) return;
+			if (_requests.Count <= 0)
+			{
+				return;
+			}
 
 			_scheduler = _scheduler ?? new QueueDistinctBfsScheduler();
 
 			var count = _scheduler.Enqueue(_requests);
-			_statisticsService.IncrementTotalAsync(Id, count).ConfigureAwait(false).GetAwaiter();
+			await _statisticsService.IncrementTotalAsync(Id, count);
 			Logger.LogInformation($"{Id} enqueue requests to scheduler，count {_requests.Count}");
 			_requests.Clear();
 

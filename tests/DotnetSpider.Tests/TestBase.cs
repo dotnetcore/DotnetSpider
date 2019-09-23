@@ -12,7 +12,7 @@ namespace DotnetSpider.Tests
 	{
 		protected TestBase()
 		{
-			var	configure = new LoggerConfiguration()
+			var configure = new LoggerConfiguration()
 #if DEBUG
 				.MinimumLevel.Verbose()
 #else
@@ -25,7 +25,7 @@ namespace DotnetSpider.Tests
 			Log.Logger = configure.CreateLogger();
 		}
 
-		protected readonly Lazy<SpiderProvider> LocalSpiderProvider = new Lazy<SpiderProvider>(() =>
+		protected SpiderHostBuilder GetLocalSpiderHostBuilder()
 		{
 			var builder = new SpiderHostBuilder()
 				.ConfigureLogging(x => x.AddSerilog())
@@ -42,8 +42,8 @@ namespace DotnetSpider.Tests
 					});
 					services.AddStatisticsCenter(x => x.UseMemory());
 				});
-			return builder.Build();
-		});
+			return builder ;
+		}
 
 		protected readonly Lazy<SpiderProvider> DistributeSpiderProvider = new Lazy<SpiderProvider>(() =>
 		{

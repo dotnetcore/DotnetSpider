@@ -18,11 +18,11 @@ namespace DotnetSpider
 	{
 		public static void Execute<TSpider>(params string[] args)
 		{
-			var logfile = Environment.GetEnvironmentVariable("DOTNET_SPIDER_ID");
-			logfile = string.IsNullOrWhiteSpace(logfile) ? "dotnet-spider.log" : $"/logs/{logfile}.log";
+			var logfile = GetLogPathFormat();
+
 			Environment.SetEnvironmentVariable("LOGFILE", logfile);
 
-			if (Log.Logger == null)
+			if (Log.Logger.GetType().FullName == "Serilog.Core.Pipeline.SilentLogger")
 			{
 				var configure = new LoggerConfiguration()
 #if DEBUG
@@ -129,8 +129,8 @@ namespace DotnetSpider
 		{
 			try
 			{
-				var logfile = Environment.GetEnvironmentVariable("DOTNET_SPIDER_ID");
-				logfile = string.IsNullOrWhiteSpace(logfile) ? "dotnet-spider.log" : $"/logs/{logfile}.log";
+				var logfile = GetLogPathFormat();
+
 				Environment.SetEnvironmentVariable("LOGFILE", logfile);
 
 				ConfigureSerialLog(logfile);
@@ -283,6 +283,22 @@ namespace DotnetSpider
 			return
 				files.Where(f => !f.Contains("DotnetSpider")
 				                 && DetectAssembles.Any(n => f.ToLower().Contains(n))).ToList();
+		}
+
+		private static string GetLogPathFormat()
+		{
+			var logfile = Environment.GetEnvironmentVariable("DOTNET_SPIDER_ID");
+			var date = $"logs/{DateTimeOffset.Now.ToLocalTime():yyyyMMdd}";
+//			if (!Directory.Exists(date))
+//			{
+//				Directory.CreateDirectory(date);
+//			}
+
+			logfile = !string.IsNullOrWhiteSpace(logfile)
+				? $"{date}/{logfile}.log"
+				: $"{date}/dotnet-spider.log";
+
+			return logfile;
 		}
 	}
 }

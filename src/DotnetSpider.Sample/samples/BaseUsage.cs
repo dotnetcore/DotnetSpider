@@ -37,10 +37,8 @@ namespace DotnetSpider.Sample.samples
 			spider.Speed = 10; // 设置采集速度, 表示每秒下载多少个请求, 大于 1 时越大速度越快, 小于 1 时越小越慢, 不能为0.
 			spider.Depth = 3; // 设置采集深度
 			spider.AddDataFlow(new CnblogsDataParser()).AddDataFlow(new ConsoleStorage());
-			spider.AddRequests(new Request("http://www.cnblogs.com/", new Dictionary<string, string>
-			{
-				{"key1", "value1"}
-			})); // 设置起始链接
+			await spider.AddRequests(new Request("http://www.cnblogs.com/",
+				new Dictionary<string, string> {{"key1", "value1"}})); // 设置起始链接
 			await spider.RunAsync(); // 启动
 		}
 

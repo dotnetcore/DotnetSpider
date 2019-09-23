@@ -13,7 +13,7 @@ namespace DotnetSpider.Tests.Statistics
 		{
 			var s = new SpiderTests();
 			await s.RetryDownloadTimes();
-			s.RetryWhenResultIsEmpty();
+			await s.RetryWhenResultIsEmpty();
 		}
 	}
 }

@@ -8,12 +8,12 @@ namespace DotnetSpider.Sample.samples
 {
 	public class CnblogsSpider : Spider
 	{
-		protected override void Initialize()
+		protected override async Task Initialize()
 		{
 			NewGuidId();
 			Depth = 3;
 			AddDataFlow(new ListNewsParser()).AddDataFlow(new NewsParser()).AddDataFlow(new ConsoleStorage());
-			AddRequests("https://news.cnblogs.com/n/page/1/");
+			await AddRequests("https://news.cnblogs.com/n/page/1/");
 		}
 
 		class ListNewsParser : DataParser
