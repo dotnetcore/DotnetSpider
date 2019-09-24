@@ -29,8 +29,14 @@ namespace DotnetSpider.Sample.samples
 			AddDataFlow(new DataParser<CnblogsEntry>())
 				.AddDataFlow(GetDefaultStorage());
 			await AddRequests(
-				new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}}),
-				new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}}));
+				new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}})
+				{
+					UseProxy = true
+				},
+				new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}})
+				{
+					UseProxy = true
+				});
 		}
 
 		class MyClass : DataParser<CnblogsEntry>

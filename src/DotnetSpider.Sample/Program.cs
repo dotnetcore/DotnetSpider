@@ -9,9 +9,6 @@ namespace DotnetSpider.Sample
 	{
 		static void Main(string[] args)
 		{
-
-
-
 			Startup.Execute<EntitySpider>(args);
 
 			// await DistributedSpider.Run();

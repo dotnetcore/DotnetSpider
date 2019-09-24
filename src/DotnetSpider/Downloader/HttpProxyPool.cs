@@ -100,7 +100,7 @@ namespace DotnetSpider.Downloader
 					break;
 			}
 
-			if (p.FailedNum > 20)
+			if (p.FailedNum > 6)
 			{
 				return;
 			}
