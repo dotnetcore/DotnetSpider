@@ -9,8 +9,8 @@ services:
       ZOO_MY_ID: 1
       ZOO_SERVERS: server.1=0.0.0.0:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=zoo3:2888:3888;2181
     volumes:
-      - "/storage/var/lib/zookeeper/zoo1/data:/data"
-      - "/storage/var/lib/zookeeper/zoo1/datalog:/datalog"
+      - "/storage/data/dotnetspider/zk1/data:/data"
+      - "/storage/data/dotnetspider/zk1/datalog:/datalog"
   zoo2:
     image: zookeeper
     restart: always
@@ -20,8 +20,8 @@ services:
       ZOO_MY_ID: 2
       ZOO_SERVERS: server.1=zoo1:2888:3888;2181 server.2=0.0.0.0:2888:3888;2181 server.3=zoo3:2888:3888;2181
     volumes:
-      - "/storage/var/lib/zookeeper/zoo2/data:/data"
-      - "/storage/var/lib/zookeeper/zoo2/datalog:/datalog"
+      - "/storage/data/dotnetspider/zk2/data:/data"
+      - "/storage/data/dotnetspider/zk2/datalog:/datalog"
   zoo3:
     image: zookeeper
     restart: always
@@ -31,8 +31,8 @@ services:
       ZOO_MY_ID: 3
       ZOO_SERVERS: server.1=zoo1:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=0.0.0.0:2888:3888;2181
     volumes:
-      - "/storage/var/lib/zookeeper/zoo3/data:/data"
-      - "/storage/var/lib/zookeeper/zoo3/datalog:/datalog"
+      - "/storage/data/dotnetspider/zk3/data:/data"
+      - "/storage/data/dotnetspider/zk3/datalog:/datalog"
   kafka1:
     image: 'bitnami/kafka:latest'
     restart: always
@@ -49,7 +49,7 @@ services:
       - KAFKA_BROKER_USER=user
       - KAFKA_BROKER_PASSWORD=bitnami
     volumes:
-      - /storage/var/lib/kafka/data1:/bitnami/kafka
+      - /storage/data/dotnetspider/kafka1:/bitnami/kafka
   kafka2:
     image: 'bitnami/kafka:latest'
     restart: always
@@ -66,7 +66,7 @@ services:
       - KAFKA_BROKER_USER=user
       - KAFKA_BROKER_PASSWORD=bitnami
     volumes:
-      - /storage/var/lib/kafka/data2:/bitnami/kafka
+      - /storage/data/dotnetspider/kafka2:/bitnami/kafka
   kafka3:
     image: 'bitnami/kafka:latest'
     restart: always
@@ -83,4 +83,4 @@ services:
       - KAFKA_BROKER_USER=user
       - KAFKA_BROKER_PASSWORD=bitnami
     volumes:
-      - /storage/var/lib/kafka/data3:/bitnami/kafka
+      - /storage/data/dotnetspider/kafka3:/bitnami/kafka

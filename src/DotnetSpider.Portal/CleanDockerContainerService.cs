@@ -43,11 +43,14 @@ namespace DotnetSpider.Portal
 						}, stoppingToken);
 						foreach (var container in containers)
 						{
-							await client.Containers.RemoveContainerAsync(container.ID,
-								new ContainerRemoveParameters(),
-								stoppingToken);
+							if ((DateTime.Now - container.Created).TotalMinutes > 30)
+							{
+								await client.Containers.RemoveContainerAsync(container.ID,
+									new ContainerRemoveParameters(),
+									stoppingToken);
 
-							_logger.LogInformation($"删除过期实例: {JsonConvert.SerializeObject(container.Labels)}");
+								_logger.LogInformation($"删除过期实例: {JsonConvert.SerializeObject(container.Labels)}");
+							}
 						}
 					}
 					catch (Exception e)
@@ -55,7 +58,7 @@ namespace DotnetSpider.Portal
 						_logger.LogError(e.ToString());
 					}
 
-					Thread.Sleep(15000);
+					Thread.Sleep(60000);
 				}
 			}, stoppingToken);
 		}

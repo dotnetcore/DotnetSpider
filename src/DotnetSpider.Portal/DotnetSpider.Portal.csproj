@@ -14,7 +14,7 @@
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.2.0" />
     <PackageReference Include="Quartz" Version="3.0.7" />
     <PackageReference Include="X.PagedList.Mvc.Core" Version="7.9.1" />
-    <PackageReference Include="MySqlConnector" Version="0.57.0" />
+    <PackageReference Include="MySqlConnector" Version="0.56.0" />
   </ItemGroup>
 
 

@@ -89,7 +89,14 @@ namespace DotnetSpider.Kafka
 				SetClientConfig(adminClientConfig);
 				using (var adminClient = new AdminClientBuilder(adminClientConfig).Build())
 				{
-					PrepareTopic(adminClient, topic);
+					try
+					{
+						PrepareTopic(adminClient, topic);
+					}
+					catch (CreateTopicsException)
+					{
+						// ignore
+					}
 				}
 			}
 

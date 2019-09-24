@@ -295,8 +295,8 @@ namespace DotnetSpider
 //			}
 
 			logfile = !string.IsNullOrWhiteSpace(logfile)
-				? $"{date}/{logfile}.log"
-				: $"{date}/dotnet-spider.log";
+				? $"{date}/{logfile}"
+				: $"{date}/dotnet-spider";
 
 			return logfile;
 		}
