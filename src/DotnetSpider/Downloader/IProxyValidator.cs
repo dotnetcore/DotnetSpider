@@ -1,4 +1,5 @@
 using System.Net;
+using System.Threading.Tasks;
 
 namespace DotnetSpider.Downloader
 {
@@ -12,6 +13,6 @@ namespace DotnetSpider.Downloader
 		/// </summary>
 		/// <param name="proxy">代理</param>
 		/// <returns></returns>
-		bool IsAvailable(WebProxy proxy);
+		Task<bool> IsAvailable(WebProxy proxy);
 	}
 }

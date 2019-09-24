@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using DotnetSpider.Common;
 
 namespace DotnetSpider.Downloader
@@ -65,7 +66,7 @@ namespace DotnetSpider.Downloader
 		/// </summary>
 		/// <param name="proxy">代理</param>
 		/// <param name="statusCode">通过此代理请求数据后的返回状态</param>
-		public void ReturnProxy(WebProxy proxy, HttpStatusCode statusCode)
+		public async Task ReturnProxy(WebProxy proxy, HttpStatusCode statusCode)
 		{
 			if (proxy == null)
 			{
@@ -105,7 +106,7 @@ namespace DotnetSpider.Downloader
 				return;
 			}
 
-			if (ProxyValidator != null && p.FailedNum % 3 == 0 && ProxyValidator.IsAvailable(proxy))
+			if (ProxyValidator != null && p.FailedNum % 3 == 0 && await ProxyValidator.IsAvailable(proxy))
 			{
 				return;
 			}
@@ -154,11 +155,11 @@ namespace DotnetSpider.Downloader
 
 					foreach (var proxy in proxies)
 					{
-						threadCommonPool.QueueUserWork(item =>
+						threadCommonPool.QueueUserWork(async item =>
 						{
 							if (!_proxies.ContainsKey(item.Key))
 							{
-								if (ProxyValidator.IsAvailable(item.Value.WebProxy))
+								if (await ProxyValidator.IsAvailable(item.Value.WebProxy))
 								{
 									item.Value.SetFailedNum(0);
 									item.Value.SetReuseTime(_reuseInterval);

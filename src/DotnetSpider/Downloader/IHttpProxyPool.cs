@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace DotnetSpider.Downloader
 {
@@ -19,6 +20,6 @@ namespace DotnetSpider.Downloader
 		/// </summary>
 		/// <param name="proxy">代理</param>
 		/// <param name="statusCode">通过此代理请求数据后的返回状态</param>
-		void ReturnProxy(WebProxy proxy, HttpStatusCode statusCode);
+		Task ReturnProxy(WebProxy proxy, HttpStatusCode statusCode);
 	}
 }

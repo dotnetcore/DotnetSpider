@@ -150,7 +150,7 @@ namespace DotnetSpider.Downloader
 				{
 					if (HttpProxyPool != null && proxy != null)
 					{
-						HttpProxyPool.ReturnProxy(proxy,
+					await	HttpProxyPool.ReturnProxy(proxy,
 							httpResponseMessage?.StatusCode ?? HttpStatusCode.ServiceUnavailable);
 					}
 
