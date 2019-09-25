@@ -16,6 +16,7 @@ using DotnetSpider.Scheduler;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 [assembly: InternalsVisibleTo("DotnetSpider.Tests")]
 
@@ -721,6 +722,16 @@ namespace DotnetSpider
 				var failedResponses =
 					responses.Where(x => !x.Success && x.Request.RetriedTimes >= x.Request.RetryTimes)
 						.ToList();
+
+				foreach (var response in downloadFailedResponses)
+				{
+					Logger.LogError($"{Id} download failed: {JsonConvert.SerializeObject(response)}");
+				}
+
+				foreach (var response in failedResponses)
+				{
+					Logger.LogError($"{Id} failed: {JsonConvert.SerializeObject(response)}");
+				}
 
 				if (retryResponses.Count > 0)
 				{

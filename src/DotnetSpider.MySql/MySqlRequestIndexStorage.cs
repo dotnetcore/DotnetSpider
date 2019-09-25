@@ -35,7 +35,8 @@ namespace DotnetSpider.DataFlow.Storage
     spider_id     varchar(48)                         not null,
     hash          varchar(48)                         not null,
     creation_time timestamp default CURRENT_TIMESTAMP null,
-    primary key (spider_id, hash)
+    primary key (spider_id, hash),
+    key CREATION_TIME_INDEX (`creation_time`)
 );";
 			if (_executedCache.TryAdd(sql, new object()))
 			{

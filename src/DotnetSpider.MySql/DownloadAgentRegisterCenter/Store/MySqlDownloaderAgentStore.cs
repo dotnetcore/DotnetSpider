@@ -24,9 +24,9 @@ namespace DotnetSpider.MySql.DownloadAgentRegisterCenter.Store
 			{
 				await conn.ExecuteAsync("CREATE SCHEMA IF NOT EXISTS dotnetspider DEFAULT CHARACTER SET utf8mb4;");
 				var sql1 =
-					"create table if not exists dotnetspider.downloader_agent(id nvarchar(40) primary key, `name` nvarchar(255) null, processor_count int null, total_memory int null, is_deleted tinyint(1) default 0 null, creation_time timestamp default CURRENT_TIMESTAMP not null, last_modification_time timestamp default CURRENT_TIMESTAMP not null, key NAME_INDEX (`name`));";
+					$"create table if not exists dotnetspider.downloader_agent(id nvarchar(40) primary key, `name` nvarchar(255) null, processor_count int null, total_memory int null, is_deleted tinyint(1) default 0 null, creation_time timestamp default CURRENT_TIMESTAMP not null, last_modification_time timestamp default CURRENT_TIMESTAMP not null, key NAME_INDEX (`name`));";
 				var sql2 =
-					"create table if not exists dotnetspider.downloader_agent_heartbeat(id bigint AUTO_INCREMENT primary key, agent_id nvarchar(40) not null, `agent_name` nvarchar(255) null, free_memory int null, downloader_count int null, creation_time timestamp default CURRENT_TIMESTAMP not null, key NAME_INDEX (`agent_name`), key ID_INDEX (`agent_id`));";
+					$"create table if not exists dotnetspider.downloader_agent_heartbeat(id bigint AUTO_INCREMENT primary key, agent_id nvarchar(40) not null, `agent_name` nvarchar(255) null, free_memory int null, downloader_count int null, creation_time timestamp default CURRENT_TIMESTAMP not null, key NAME_INDEX (`agent_name`), key ID_INDEX (`agent_id`));";
 				await conn.ExecuteAsync(sql1);
 				await conn.ExecuteAsync(sql2);
 			}
@@ -37,7 +37,7 @@ namespace DotnetSpider.MySql.DownloadAgentRegisterCenter.Store
 			using (var conn = new MySqlConnection(_options.ConnectionString))
 			{
 				return (await conn.QueryAsync<DownloaderAgent>(
-						"SELECT * FROM dotnetspider.downloader_agent"))
+						$"SELECT * FROM dotnetspider.downloader_agent"))
 					.ToList();
 			}
 		}
@@ -47,7 +47,7 @@ namespace DotnetSpider.MySql.DownloadAgentRegisterCenter.Store
 			using (var conn = new MySqlConnection(_options.ConnectionString))
 			{
 				await conn.ExecuteAsync(
-					"INSERT IGNORE INTO dotnetspider.downloader_agent (id, `name`, processor_count, total_memory, creation_time, last_modification_time) VALUES (@Id, @Name, @ProcessorCount, @TotalMemory, @CreationTime, @LastModificationTime); UPDATE dotnetspider.downloader_agent SET is_deleted = false WHERE id = @Id",
+					$"INSERT IGNORE INTO dotnetspider.downloader_agent (id, `name`, processor_count, total_memory, creation_time, last_modification_time) VALUES (@Id, @Name, @ProcessorCount, @TotalMemory, @CreationTime, @LastModificationTime); UPDATE dotnetspider.downloader_agent SET is_deleted = false WHERE id = @Id",
 					agent);
 			}
 		}
@@ -57,7 +57,7 @@ namespace DotnetSpider.MySql.DownloadAgentRegisterCenter.Store
 			using (var conn = new MySqlConnection(_options.ConnectionString))
 			{
 				var obj = await conn.QueryFirstOrDefaultAsync<dynamic>(
-					"SELECT id FROM dotnetspider.downloader_agent WHERE id = @Id && is_deleted = false LIMIT 1;",
+					$"SELECT id FROM dotnetspider.downloader_agent WHERE id = @Id && is_deleted = false LIMIT 1;",
 					new
 					{
 						agent.Id
