@@ -67,7 +67,7 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 				Logger.LogError($"Initialize register center database failed: {e}");
 			}
 
-			Mq.Subscribe<byte[]>(Options.TopicDownloaderAgentRegisterCenter, async message =>
+			Mq.Subscribe<object>(Options.TopicDownloaderAgentRegisterCenter, async message =>
 			{
 				if (message == null)
 				{
@@ -86,7 +86,7 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 					case Framework.RegisterCommand:
 					{
 						// 此处不考虑消息的超时，一是因为节点数量不会很多，二是因为超时的可以释放掉
-						var agent = LZ4MessagePackSerializer.Deserialize<DownloaderAgent>(message.Data, TypelessContractlessStandardResolver.Instance);
+						var agent = message.Data as DownloaderAgent;
 						if (agent != null)
 						{
 							await DownloaderAgentStore.RegisterAsync(agent);
@@ -102,7 +102,7 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 
 					case Framework.HeartbeatCommand:
 					{
-						var heartbeat = LZ4MessagePackSerializer.Deserialize<DownloaderAgentHeartbeat>(message.Data, TypelessContractlessStandardResolver.Instance);
+						var heartbeat = message.Data as DownloaderAgentHeartbeat;
 						if (heartbeat != null)
 						{
 							var interval = (DateTimeOffset.Now - heartbeat.CreationTime).TotalSeconds;
