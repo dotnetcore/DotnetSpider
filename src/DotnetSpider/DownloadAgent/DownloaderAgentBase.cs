@@ -354,7 +354,8 @@ namespace DotnetSpider.DownloadAgent
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		private IDownloader GetDownloader(Request request)
 		{
-			if (!_cache.ContainsKey(request.OwnerId))
+			var key = $"{request.OwnerId}-{request.UseProxy}";
+			if (!_cache.ContainsKey(key))
 			{
 				IDownloader downloader = null;
 				switch (request.DownloaderType)
@@ -392,9 +393,11 @@ namespace DotnetSpider.DownloadAgent
 							AllowAutoRedirect = request.AllowAutoRedirect,
 							Timeout = request.Timeout,
 							UseCookies = request.UseCookies,
-							HttpProxyPool = string.IsNullOrWhiteSpace(_options.ProxySupplyUrl)
-								? null
-								: new HttpProxyPool(new HttpRowTextProxySupplier(_options.ProxySupplyUrl)),
+							HttpProxyPool = request.UseProxy
+								? string.IsNullOrWhiteSpace(_options.ProxySupplyUrl)
+									? null
+									: new HttpProxyPool(new HttpRowTextProxySupplier(_options.ProxySupplyUrl))
+								: null,
 							RetryTime = request.RetryTimes
 						};
 						if (!string.IsNullOrWhiteSpace(request.Cookie))
@@ -417,10 +420,10 @@ namespace DotnetSpider.DownloadAgent
 					}
 				}
 
-				_cache.TryAdd(request.OwnerId, downloader);
+				_cache.TryAdd(key, downloader);
 			}
 
-			return _cache[request.OwnerId];
+			return _cache[key];
 		}
 	}
 }

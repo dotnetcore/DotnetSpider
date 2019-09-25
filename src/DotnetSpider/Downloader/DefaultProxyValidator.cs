@@ -39,9 +39,16 @@ namespace DotnetSpider.Downloader
 			_httpClientDict.TryAdd(key, new HttpClient(new HttpClientHandler {Proxy = proxy, UseProxy = true}));
 			if (_httpClientDict.TryGetValue(key, out var httpClient))
 			{
-				var msg = new HttpRequestMessage(HttpMethod.Get, _targetUrl);
-				var response = await httpClient.SendAsync(msg);
-				return response.IsSuccessStatusCode;
+				try
+				{
+					var msg = new HttpRequestMessage(HttpMethod.Get, _targetUrl);
+					var response = await httpClient.SendAsync(msg);
+					return response.IsSuccessStatusCode;
+				}
+				catch
+				{
+					return false;
+				}
 			}
 			else
 			{
