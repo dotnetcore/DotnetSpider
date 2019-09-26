@@ -46,7 +46,7 @@ namespace DotnetSpider.DataFlow.Storage
 				}
 			}
 
-			sql = $"INSERT INTO {tableName} (`spider_id`, `hash`) VALUES (@spider_id, @hash);";
+			sql = $"INSERT IGNORE INTO {tableName} (`spider_id`, `hash`) VALUES (@spider_id, @hash);";
 			var item = new
 			{
 				spider_id = context.Response.Request.OwnerId,
