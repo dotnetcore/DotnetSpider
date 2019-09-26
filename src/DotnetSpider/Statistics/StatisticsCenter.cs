@@ -123,8 +123,11 @@ namespace DotnetSpider.Statistics
 					var statistics = await _statisticsStore.GetSpiderStatisticsAsync(ownerId);
 					if (statistics != null)
 					{
+						var left = statistics.Total >= statistics.Success
+							? (statistics.Total - statistics.Success - statistics.Failed).ToString()
+							: "unknown";
 						_logger.LogInformation(
-							$"{ownerId} total {statistics.Total}, success {statistics.Success}, failed {statistics.Failed}, left {statistics.Total - statistics.Success - statistics.Failed}");
+							$"{ownerId} total {statistics.Total}, success {statistics.Success}, failed {statistics.Failed}, left {left}");
 					}
 
 					break;

@@ -725,12 +725,12 @@ namespace DotnetSpider
 
 				foreach (var response in downloadFailedResponses)
 				{
-					Logger.LogError($"{Id} download failed: {JsonConvert.SerializeObject(response)}");
+					Logger.LogError($"{Id} download {JsonConvert.SerializeObject(response)} failed");
 				}
 
 				foreach (var response in failedResponses)
 				{
-					Logger.LogError($"{Id} failed: {JsonConvert.SerializeObject(response)}");
+					Logger.LogError($"{Id} process {JsonConvert.SerializeObject(response)} failed");
 				}
 
 				if (retryResponses.Count > 0)
@@ -738,7 +738,7 @@ namespace DotnetSpider
 					retryResponses.ForEach(x =>
 					{
 						x.Request.RetriedTimes++;
-						Logger.LogInformation($"{Id} download {x.Request.Url} failed: {x.Exception}");
+						Logger.LogInformation($"{Id} download {JsonConvert.SerializeObject(x)} failed and retry");
 					});
 					await EnqueueRequests(retryResponses.Select(x => x.Request).ToArray());
 				}
