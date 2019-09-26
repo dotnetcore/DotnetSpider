@@ -396,7 +396,7 @@ namespace DotnetSpider.DownloadAgent
 							HttpProxyPool = request.UseProxy
 								? string.IsNullOrWhiteSpace(_options.ProxySupplyUrl)
 									? null
-									: new HttpProxyPool(new HttpRowTextProxySupplier(_options.ProxySupplyUrl))
+									: new HttpProxyPool(Logger, new HttpRowTextProxySupplier(_options.ProxySupplyUrl))
 								: null,
 							RetryTime = request.RetryTimes
 						};
