@@ -68,13 +68,7 @@ namespace DotnetSpider.Common
 				TotalMemory = (int) (infoDic["MemTotal:"] / 1024);
 			}
 
-			var networkInterface = NetworkInterface.GetAllNetworkInterfaces()
-				.First(i => i.NetworkInterfaceType == NetworkInterfaceType.Ethernet ||
-				            i.NetworkInterfaceType == NetworkInterfaceType.Wireless80211);
-			var unicastAddresses = networkInterface.GetIPProperties().UnicastAddresses;
-			IpAddress = unicastAddresses.First(a =>
-					a.IPv4Mask.ToString() != "255.255.255.255" && a.Address.AddressFamily == AddressFamily.InterNetwork)
-				.Address.ToString();
+			IpAddress = NetworkHelper.CurrentIpAddress();
 
 			OsDescription = $"{Environment.OSVersion.Platform} {Environment.OSVersion.Version}";
 		}
