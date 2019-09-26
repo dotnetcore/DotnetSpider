@@ -26,6 +26,7 @@ namespace DotnetSpider.DownloadAgent
 		private readonly DownloaderAgentOptions _options;
 		private readonly SpiderOptions _spiderOptions;
 
+		private readonly ILogger _logger;
 		private readonly ConcurrentDictionary<string, IDownloader> _cache =
 			new ConcurrentDictionary<string, IDownloader>();
 
@@ -55,6 +56,7 @@ namespace DotnetSpider.DownloadAgent
 			Framework.NetworkCenter = networkCenter;
 
 			Logger = _mq is ThroughMessageQueue ? null : logger;
+			_logger = logger;
 		}
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -362,19 +364,19 @@ namespace DotnetSpider.DownloadAgent
 				{
 					case DownloaderType.Empty:
 					{
-						downloader = new EmptyDownloader {AgentId = _options.AgentId, Logger = Logger};
+						downloader = new EmptyDownloader {AgentId = _options.AgentId, Logger = _logger};
 						break;
 					}
 
 					case DownloaderType.Test:
 					{
-						downloader = new TestDownloader {AgentId = _options.AgentId, Logger = Logger};
+						downloader = new TestDownloader {AgentId = _options.AgentId, Logger = _logger};
 						break;
 					}
 
 					case DownloaderType.Exception:
 					{
-						downloader = new ExceptionDownloader {AgentId = _options.AgentId, Logger = Logger};
+						downloader = new ExceptionDownloader {AgentId = _options.AgentId, Logger = _logger};
 						break;
 					}
 
@@ -396,7 +398,7 @@ namespace DotnetSpider.DownloadAgent
 							HttpProxyPool = request.UseProxy
 								? string.IsNullOrWhiteSpace(_options.ProxySupplyUrl)
 									? null
-									: new HttpProxyPool(Logger, new HttpRowTextProxySupplier(_options.ProxySupplyUrl))
+									: new HttpProxyPool(_logger, new HttpRowTextProxySupplier(_options.ProxySupplyUrl))
 								: null,
 							RetryTime = request.RetryTimes
 						};
