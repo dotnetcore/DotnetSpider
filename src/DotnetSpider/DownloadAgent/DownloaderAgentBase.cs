@@ -318,6 +318,7 @@ namespace DotnetSpider.DownloadAgent
 					Logger?.LogError($"Can't create/get downloader for {requests[0].OwnerId}");
 				}
 
+				List<Response> responses = new List<Response>();
 				foreach (var request in requests)
 				{
 					Response response;
@@ -335,9 +336,13 @@ namespace DotnetSpider.DownloadAgent
 					{
 						response = await downloader.DownloadAsync(request);
 					}
+					responses.Add(response);
+				}
 
-					await _mq.PublishAsync($"{_spiderOptions.TopicResponseHandler}{request.OwnerId}",
-						new MessageData<Response[]> {Data = new[] {response}});
+				foreach (var group in responses.GroupBy(x => x.Request.OwnerId))
+				{
+					await _mq.PublishAsync($"{_spiderOptions.TopicResponseHandler}{group.Key}",
+					   new MessageData<Response[]> { Data = group.ToArray() });
 				}
 			}
 			else
