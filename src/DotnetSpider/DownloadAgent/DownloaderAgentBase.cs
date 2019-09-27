@@ -62,19 +62,18 @@ namespace DotnetSpider.DownloadAgent
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
 			await _mq.PublishAsync(_spiderOptions.TopicDownloaderAgentRegisterCenter,
-				new MessageData<byte[]>
+				new MessageData<object>
 				{
 					Type = Framework.RegisterCommand,
-					Data = LZ4MessagePackSerializer.Serialize(
-						new DownloaderAgent
-						{
-							Id = _options.AgentId,
-							Name = _options.Name,
-							ProcessorCount = Environment.ProcessorCount,
-							TotalMemory = Framework.TotalMemory,
-							CreationTime = DateTimeOffset.Now,
-							LastModificationTime = DateTimeOffset.Now
-						}, TypelessContractlessStandardResolver.Instance)
+					Data = new DownloaderAgent
+					{
+						Id = _options.AgentId,
+						Name = _options.Name,
+						ProcessorCount = Environment.ProcessorCount,
+						TotalMemory = Framework.TotalMemory,
+						CreationTime = DateTimeOffset.Now,
+						LastModificationTime = DateTimeOffset.Now
+					}
 				});
 			Logger?.LogInformation($"Agent {_options.AgentId} register success");
 
@@ -162,18 +161,18 @@ namespace DotnetSpider.DownloadAgent
 
 		private async Task SendHeartbeatAsync()
 		{
-			var bytes = LZ4MessagePackSerializer.Serialize(
-				new DownloaderAgentHeartbeat
+			await _mq.PublishAsync(_spiderOptions.TopicDownloaderAgentRegisterCenter, new MessageData<object>
+			{
+				Type = Framework.HeartbeatCommand,
+				Data = new DownloaderAgentHeartbeat
 				{
 					AgentId = _options.AgentId,
 					AgentName = _options.Name,
 					FreeMemory = (int)Framework.GetFreeMemory(),
 					DownloaderCount = _cache.Count,
 					CreationTime = DateTimeOffset.Now
-				}, TypelessContractlessStandardResolver.Instance);
-
-			await _mq.PublishAsync(_spiderOptions.TopicDownloaderAgentRegisterCenter,
-				new MessageData<byte[]> {Type = Framework.HeartbeatCommand, Data = bytes});
+				}
+			});
 
 			Logger?.LogDebug($"Agent {_options.AgentId} send heartbeat success");
 		}
@@ -321,6 +320,7 @@ namespace DotnetSpider.DownloadAgent
 					Logger?.LogError($"Can't create/get downloader for {requests[0].OwnerId}");
 				}
 
+				List<Response> responses = new List<Response>();
 				foreach (var request in requests)
 				{
 					Response response;
@@ -338,9 +338,13 @@ namespace DotnetSpider.DownloadAgent
 					{
 						response = await downloader.DownloadAsync(request);
 					}
+					responses.Add(response);
+				}
 
-					await _mq.PublishAsync($"{_spiderOptions.TopicResponseHandler}{request.OwnerId}",
-						new MessageData<Response[]> {Data = new[] {response}});
+				foreach (var group in responses.GroupBy(x => x.Request.OwnerId))
+				{
+					await _mq.PublishAsync($"{_spiderOptions.TopicResponseHandler}{group.Key}",
+					   new MessageData<Response[]> { Data = group.ToArray() });
 				}
 			}
 			else

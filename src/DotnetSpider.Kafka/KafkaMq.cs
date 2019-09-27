@@ -39,7 +39,7 @@ namespace DotnetSpider.Kafka
 			_options = options;
 			var productConfig = new ProducerConfig
 			{
-				Partitioner = Partitioner.ConsistentRandom, CompressionType = CompressionType.Lz4
+				Partitioner = Partitioner.ConsistentRandom,
 			};
 			SetClientConfig(productConfig);
 			var builder =
@@ -64,12 +64,11 @@ namespace DotnetSpider.Kafka
 				new Message<Null, byte[]>
 				{
 					Value = LZ4MessagePackSerializer.Serialize(
-						new TransferMessage
+						new MessageData<TData>
 						{
 							Timestamp = (long)DateTimeHelper.GetCurrentUnixTimeNumber(),
 							Type = message.Type,
-							Data = LZ4MessagePackSerializer.Serialize(message.Data,
-								TypelessContractlessStandardResolver.Instance)
+							Data = message.Data,
 						}, TypelessContractlessStandardResolver.Instance)
 				});
 		}
@@ -119,11 +118,11 @@ namespace DotnetSpider.Kafka
 				_logger.LogInformation("Subscribe: " + topic);
 				while (_consumers.ContainsKey(topic))
 				{
-					TransferMessage msg = null;
+					MessageData<TData> msg = null;
 					try
 					{
 						var value = consumer.Consume().Value;
-						msg = LZ4MessagePackSerializer.Deserialize<TransferMessage>(value,
+						msg = LZ4MessagePackSerializer.Deserialize<MessageData<TData>>(value,
 							TypelessContractlessStandardResolver.Instance);
 					}
 					catch (ObjectDisposedException)
@@ -139,13 +138,7 @@ namespace DotnetSpider.Kafka
 					{
 						Task.Factory.StartNew(() =>
 						{
-							action?.Invoke(new MessageData<TData>
-							{
-								Timestamp = msg.Timestamp,
-								Type = msg.Type,
-								Data = LZ4MessagePackSerializer.Deserialize<TData>(msg.Data,
-									TypelessContractlessStandardResolver.Instance)
-							});
+							action?.Invoke(msg);
 						}).ContinueWith(t =>
 						{
 							if (t.Exception != null)
