@@ -44,25 +44,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Portal", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.DownloaderAgentRegisterCenter", "src\DotnetSpider.DownloaderAgentRegisterCenter\DotnetSpider.DownloaderAgentRegisterCenter.csproj", "{2AE96969-4113-492F-8307-FA6FEC90C3B8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "kafka", "kafka", "{2E67FEB1-1C96-4335-AC2D-09FDF001978E}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "zookeeper", "zookeeper", "{D29F96ED-E481-4CB4-BED8-09CFF0F87061}"
-	ProjectSection(SolutionItems) = preProject
-		docker\zookeeper\docker-compose.yml = docker\zookeeper\docker-compose.yml
-		docker\zookeeper\start.sh = docker\zookeeper\start.sh
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{0096D2D4-06F0-4E57-A215-4DFA7FADE0FA}"
-	ProjectSection(SolutionItems) = preProject
-		docker\kafka.yml = docker\kafka.yml
-		docker\reset_kafka.sh = docker\reset_kafka.sh
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Spiders.Startup", "src\DotnetSpider.Spiders.Startup\DotnetSpider.Spiders.Startup.csproj", "{8D23B30D-D4A7-46D1-BB33-D799B4AE96DC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.MySql", "src\DotnetSpider.MySql\DotnetSpider.MySql.csproj", "{3850DAC4-F700-4E56-B415-BF6890C832CB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.HBase", "src\DotnetSpider.HBase\DotnetSpider.HBase.csproj", "{36298F8B-DC34-4637-854D-DA79A89766AE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dotnetspider", "dotnetspider", "{ADD09844-553A-4235-8CAB-14A5FB8288F9}"
+ProjectSection(SolutionItems) = preProject
+	docker\dotnetspider\kafka.yml = docker\dotnetspider\kafka.yml
+	docker\dotnetspider\reset_kafka.sh = docker\dotnetspider\reset_kafka.sh
+EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -132,8 +126,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{32A4F6B5-0377-4353-BF06-A0E7328CBB9C} = {31B052DB-A9AA-49F5-AE8C-1660546A8903}
-		{2E67FEB1-1C96-4335-AC2D-09FDF001978E} = {0096D2D4-06F0-4E57-A215-4DFA7FADE0FA}
-		{D29F96ED-E481-4CB4-BED8-09CFF0F87061} = {0096D2D4-06F0-4E57-A215-4DFA7FADE0FA}
+		{ADD09844-553A-4235-8CAB-14A5FB8288F9} = {0096D2D4-06F0-4E57-A215-4DFA7FADE0FA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6D7249B6-81E3-4FA4-93A6-BB915D72C934}
