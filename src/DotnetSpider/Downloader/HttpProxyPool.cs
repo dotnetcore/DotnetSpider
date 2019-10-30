@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
@@ -14,7 +15,7 @@ namespace DotnetSpider.Downloader
 	{
 		private readonly IProxySupplier _supplier;
 		private readonly List<Proxy> _proxyQueue = new List<Proxy>();
-		private readonly Dictionary<string, Proxy> _proxies = new Dictionary<string, Proxy>();
+		private readonly ConcurrentDictionary<string, Proxy> _proxies = new ConcurrentDictionary<string, Proxy>();
 		private bool _isDispose;
 		private readonly int _reuseInterval;
 		private readonly object _proxyQueueLocker = new object();
@@ -173,7 +174,7 @@ namespace DotnetSpider.Downloader
 										_proxyQueue.Add(item.Value);
 									}
 
-									_proxies.Add(item.Key, item.Value);
+									_proxies.TryAdd(item.Key, item.Value);
 									_logger.LogInformation($"Acquired available proxy {proxy.Value.WebProxy.Address}");
 								}
 							}
