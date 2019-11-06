@@ -238,8 +238,15 @@ namespace DotnetSpider.Selector
 			try
 			{
 				var bas = new Uri(refer);
-				var abs = new Uri(bas, url);
-				return abs.AbsoluteUri;
+				if (url.StartsWith("//"))
+				{
+					return $"{bas.Scheme}:{url}";
+				}
+				else
+				{
+					var abs = new Uri(bas, url);
+					return abs.AbsoluteUri;
+				}
 			}
 			catch (Exception)
 			{

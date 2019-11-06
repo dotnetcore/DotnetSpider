@@ -772,7 +772,7 @@ namespace DotnetSpider
 			var waited = 0;
 			while (Status != Status.Exiting)
 			{
-				if ((DateTimeOffset.Now - _lastRequestedTime).Seconds > EmptySleepTime)
+				if ((DateTimeOffset.Now - _lastRequestedTime).TotalSeconds > EmptySleepTime)
 				{
 					break;
 				}
