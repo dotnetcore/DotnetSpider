@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Text;
 using DotnetSpider.Common;
 using DotnetSpider.Selector;
@@ -22,6 +23,7 @@ namespace DotnetSpider.Downloader
 
 				case ContentType.Html:
 				{
+					content = WebUtility.HtmlDecode(content);
 					return new Selectable(content, response.Request.Url, removeOutboundLinks);
 				}
 
