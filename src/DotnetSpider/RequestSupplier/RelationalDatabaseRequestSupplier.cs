@@ -68,7 +68,7 @@ namespace DotnetSpider.RequestSupplier
 				foreach (var data in conn.Query(_sql))
 				{
 					var dic =
-						((IDictionary<string, string>)data).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+						((IDictionary<string, object>)data).ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToString());
 
 					FormatDataObject(dic);
 
