@@ -14,9 +14,9 @@ using DotnetSpider.Selector;
 
 namespace DotnetSpider.Sample.samples
 {
-	public class EntitySpider : Spider
+	public class EntitySpider2 : Spider
 	{
-		public EntitySpider(SpiderParameters parameters) : base(parameters)
+		public EntitySpider2(SpiderParameters parameters) : base(parameters)
 		{
 		}
 
@@ -26,26 +26,35 @@ namespace DotnetSpider.Sample.samples
 			Scheduler = new QueueDistinctBfsScheduler();
 			Speed = 1;
 			Depth = 3;
-			AddDataFlow(new DataParser<CnblogsEntry>())
+			AddDataFlow(new MyParser())
 				.AddDataFlow(GetDefaultStorage());
 			await AddRequests(
 				new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}}),
 				new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}}));
 		}
 
-		class MyClass : DataParser<CnblogsEntry>
+		class MyParser : DataParser<CnblogsEntry>
 		{
 			protected override Task<DataFlowResult> Parse(DataFlowContext context)
 			{
+				// parse your data and add to parse data
+				context.AddParseData(typeof(CnblogsEntry).FullName,
+					new ParseResult<CnblogsEntry>
+					{
+						new CnblogsEntry
+						{
+							Category = "cat1",
+							WebSite = "http://cnblogs.com",
+							Title = "title",
+							CreationTime = DateTime.Now
+						}
+					});
 				return base.Parse(context);
 			}
 		}
 
 		[Schema("cnblogs", "news")]
-		[EntitySelector(Expression = ".//div[@class='news_block']", Type = SelectorType.XPath)]
-		[GlobalValueSelector(Expression = ".//a[@class='current']", Name = "类别", Type = SelectorType.XPath)]
-		[FollowSelector(XPaths = new[] {"//div[@class='pager']"})]
-		public class CnblogsEntry : EntityBase<CnblogsEntry>
+		class CnblogsEntry : EntityBase<CnblogsEntry>
 		{
 			protected override void Configure()
 			{
@@ -55,35 +64,20 @@ namespace DotnetSpider.Sample.samples
 
 			public int Id { get; set; }
 
-			[Required]
-			[StringLength(200)]
-			[ValueSelector(Expression = "类别", Type = SelectorType.Enviroment)]
 			public string Category { get; set; }
 
-			[Required]
-			[StringLength(200)]
-			[ValueSelector(Expression = "网站", Type = SelectorType.Enviroment)]
 			public string WebSite { get; set; }
 
-			[StringLength(200)]
-			[ValueSelector(Expression = "//title")]
-			[ReplaceFormatter(NewValue = "", OldValue = " - 博客园")]
 			public string Title { get; set; }
 
-			[StringLength(40)]
-			[ValueSelector(Expression = "GUID", Type = SelectorType.Enviroment)]
 			public string Guid { get; set; }
 
-			[ValueSelector(Expression = ".//h2[@class='news_entry']/a")]
 			public string News { get; set; }
 
-			[ValueSelector(Expression = ".//h2[@class='news_entry']/a/@href")]
 			public string Url { get; set; }
 
-			[ValueSelector(Expression = ".//div[@class='entry_summary']", ValueOption = ValueOption.InnerText)]
 			public string PlainText { get; set; }
 
-			[ValueSelector(Expression = "DATETIME", Type = SelectorType.Enviroment)]
 			public DateTime CreationTime { get; set; }
 		}
 	}
