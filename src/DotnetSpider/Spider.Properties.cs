@@ -13,7 +13,6 @@ namespace DotnetSpider
 {
 	public partial class Spider
 	{
-		private readonly List<Request> _requests = new List<Request>();
 		private readonly List<IDataFlow> _dataFlows = new List<IDataFlow>();
 		private readonly IMq _mq;
 

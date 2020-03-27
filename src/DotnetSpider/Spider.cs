@@ -116,6 +116,7 @@ namespace DotnetSpider
 		{
 			Check.NotNull(requests, nameof(requests));
 
+			var _requests = new List<Request>();
 			foreach (var request in requests)
 			{
 				if (!string.IsNullOrWhiteSpace(request.Cookie) && string.IsNullOrWhiteSpace(request.Domain))
@@ -128,8 +129,13 @@ namespace DotnetSpider
 				_requests.Add(request);
 				if (_requests.Count % EnqueueBatchCount == 0)
 				{
-					await AddRequestsToScheduler();
+					await AddRequestsToScheduler(_requests);
+					_requests.Clear();
 				}
+			}
+			if (_requests.Count > 0)
+			{
+				await AddRequestsToScheduler(_requests);
 			}
 		}
 
@@ -141,15 +147,20 @@ namespace DotnetSpider
 		public async Task AddRequests(params string[] urls)
 		{
 			Check.NotNull(urls, nameof(urls));
-
+			var requests = new List<Request>();
 			foreach (var url in urls)
 			{
-				var request = new Request {Url = url, OwnerId = Id, Depth = 1};
-				_requests.Add(request);
-				if (_requests.Count % EnqueueBatchCount == 0)
+				var request = new Request { Url = url, OwnerId = Id, Depth = 1 };
+				requests.Add(request);
+				if (requests.Count % EnqueueBatchCount == 0)
 				{
-					await AddRequestsToScheduler();
+					await AddRequestsToScheduler(requests);
+					requests.Clear();
 				}
+			}
+			if (requests.Count > 0)
+			{
+				await AddRequestsToScheduler(requests);
 			}
 		}
 
@@ -206,9 +217,6 @@ namespace DotnetSpider
 				{
 					requestSupplier.Execute(async request => await AddRequests(request));
 				}
-
-				// 把列表中可能剩余的请求加入队列
-				await AddRequestsToScheduler();
 
 				_enqueued.Set(0);
 				_responded.Set(0);
@@ -372,7 +380,7 @@ namespace DotnetSpider
 				throw new SpiderException($"Storage {type} didn't implement method CreateFromOptions");
 			}
 
-			var storage = method.Invoke(null, new object[] {options});
+			var storage = method.Invoke(null, new object[] { options });
 			if (storage == null)
 			{
 				throw new SpiderException("Create default storage failed");
@@ -430,95 +438,95 @@ namespace DotnetSpider
 							switch (Status)
 							{
 								case Status.Running:
-								{
-									try
 									{
-										// 判断是否过多下载请求未得到回应
-										if (_enqueued.Value - _responded.Value > NonRespondedLimitation)
+										try
 										{
-											if (paused > NonRespondedTimeLimitation)
+											// 判断是否过多下载请求未得到回应
+											if (_enqueued.Value - _responded.Value > NonRespondedLimitation)
 											{
+												if (paused > NonRespondedTimeLimitation)
+												{
+													Logger.LogInformation(
+														$"{Id} didn't receive response after {NonRespondedTimeLimitation} second");
+													@break = true;
+													break;
+												}
+
+												paused += _speedControllerInterval;
 												Logger.LogInformation(
-													$"{Id} didn't receive response after {NonRespondedTimeLimitation} second");
-												@break = true;
-												break;
-											}
-
-											paused += _speedControllerInterval;
-											Logger.LogInformation(
-												$"{Id} stop speed controller because too much request timeout");
-											continue;
-										}
-
-										paused = 0;
-
-										// 重试超时的下载请求
-										var timeoutRequests = new List<Request>();
-										var now = DateTimeOffset.Now;
-										foreach (var kv in _enqueuedRequestDict)
-										{
-											if (!((now - kv.Value.CreationTime).TotalSeconds > RespondedTimeout))
-											{
+													$"{Id} stop speed controller because too much request timeout");
 												continue;
 											}
 
-											kv.Value.RetriedTimes++;
-											if (kv.Value.RetriedTimes > RespondedTimeoutRetryTimes)
+											paused = 0;
+
+											// 重试超时的下载请求
+											var timeoutRequests = new List<Request>();
+											var now = DateTimeOffset.Now;
+											foreach (var kv in _enqueuedRequestDict)
 											{
-												Logger.LogWarning(
-													$"{Id} download {kv.Value.Url} more than {RespondedTimeoutRetryTimes} times");
-												@break = true;
-												break;
-											}
-
-											timeoutRequests.Add(kv.Value);
-										}
-
-										// 如果有超时的下载则重试，无超时的下载则从调度队列里取
-										if (timeoutRequests.Count > 0)
-										{
-											await EnqueueRequests(timeoutRequests.ToArray());
-										}
-										else
-										{
-											var requests = _scheduler.Dequeue(Id, _dequeueBatchCount);
-
-											if (requests == null || requests.Length == 0)
-											{
-												break;
-											}
-
-											foreach (var request in requests)
-											{
-												foreach (var configureRequestDelegate in _configureRequestDelegates)
+												if (!((now - kv.Value.CreationTime).TotalSeconds > RespondedTimeout))
 												{
-													configureRequestDelegate(request);
+													continue;
 												}
+
+												kv.Value.RetriedTimes++;
+												if (kv.Value.RetriedTimes > RespondedTimeoutRetryTimes)
+												{
+													Logger.LogWarning(
+														$"{Id} download {kv.Value.Url} more than {RespondedTimeoutRetryTimes} times");
+													@break = true;
+													break;
+												}
+
+												timeoutRequests.Add(kv.Value);
 											}
 
-											await EnqueueRequests(requests);
-										}
-									}
-									catch (Exception e)
-									{
-										Logger.LogError($"{Id} speed controller failed: {e}");
-									}
+											// 如果有超时的下载则重试，无超时的下载则从调度队列里取
+											if (timeoutRequests.Count > 0)
+											{
+												await EnqueueRequests(timeoutRequests.ToArray());
+											}
+											else
+											{
+												var requests = _scheduler.Dequeue(Id, _dequeueBatchCount);
 
-									break;
-								}
+												if (requests == null || requests.Length == 0)
+												{
+													break;
+												}
+
+												foreach (var request in requests)
+												{
+													foreach (var configureRequestDelegate in _configureRequestDelegates)
+													{
+														configureRequestDelegate(request);
+													}
+												}
+
+												await EnqueueRequests(requests);
+											}
+										}
+										catch (Exception e)
+										{
+											Logger.LogError($"{Id} speed controller failed: {e}");
+										}
+
+										break;
+									}
 
 								case Status.Paused:
-								{
-									Logger.LogDebug($"{Id} pause speed controller");
-									break;
-								}
+									{
+										Logger.LogDebug($"{Id} pause speed controller");
+										break;
+									}
 
 								case Status.Exiting:
 								case Status.Exited:
-								{
-									@break = true;
-									break;
-								}
+									{
+										@break = true;
+										break;
+									}
 							}
 
 							if (!@break && accessor != null && accessor.ReadBoolean(0))
@@ -549,10 +557,10 @@ namespace DotnetSpider
 			switch (command.Type)
 			{
 				case Framework.ExitCommand:
-				{
-					Exit();
-					break;
-				}
+					{
+						Exit();
+						break;
+					}
 			}
 
 			return Task.CompletedTask;
@@ -616,24 +624,24 @@ namespace DotnetSpider
 								switch (dataFlowResult)
 								{
 									case DataFlowResult.Success:
-									{
-										continue;
-									}
+										{
+											continue;
+										}
 
 									case DataFlowResult.Failed:
-									{
-										// 如果处理失败，则直接返回
-										Logger.LogInformation(
-											$"{Id} handle {response.Request.Url} failed: {context.Message}");
-										await _statisticsService.IncrementFailedAsync(Id);
-										return;
-									}
+										{
+											// 如果处理失败，则直接返回
+											Logger.LogInformation(
+												$"{Id} handle {response.Request.Url} failed: {context.Message}");
+											await _statisticsService.IncrementFailedAsync(Id);
+											return;
+										}
 
 									case DataFlowResult.Terminated:
-									{
-										@break = true;
-										break;
-									}
+										{
+											@break = true;
+											break;
+										}
 								}
 
 								if (@break)
@@ -811,20 +819,18 @@ namespace DotnetSpider
 		/// <summary>
 		/// 把当前缓存的所有 Request 入队
 		/// </summary>
-		private async Task AddRequestsToScheduler()
+		private async Task AddRequestsToScheduler(IReadOnlyList<Request> requests)
 		{
-			if (_requests.Count <= 0)
+			if (requests.Count <= 0)
 			{
 				return;
 			}
 
 			_scheduler = _scheduler ?? new QueueDistinctBfsScheduler();
 
-			var count = _scheduler.Enqueue(_requests);
+			var count = _scheduler.Enqueue(requests);
 			await _statisticsService.IncrementTotalAsync(Id, count);
-			Logger.LogInformation($"{Id} enqueue requests to scheduler，count {_requests.Count}");
-			_requests.Clear();
-
+			Logger.LogInformation($"{Id} enqueue requests to scheduler，count {requests.Count}");
 			Logger.LogInformation($"{Id} load requests success");
 		}
 
@@ -847,24 +853,24 @@ namespace DotnetSpider
 						{
 							// 非初始请求如果是链式模式则使用旧的下载器
 							case DownloadPolicy.Chained:
-							{
-								topic = $"{request.AgentId}-DownloadQueue";
-								break;
-							}
+								{
+									topic = $"{request.AgentId}-DownloadQueue";
+									break;
+								}
 
 							default:
-							{
-								topic = request.UseAdsl
-									? Options.TopicAdslDownloadQueue
-									: Options.TopicDownloadQueue;
-								break;
-							}
+								{
+									topic = request.UseAdsl
+										? Options.TopicAdslDownloadQueue
+										: Options.TopicDownloadQueue;
+									break;
+								}
 						}
 					}
 
 					_enqueuedRequestDict.TryAdd(request.Hash, request);
 					await _mq.PublishAsync(topic,
-						new MessageData<Request[]> {Type = Framework.DownloadCommand, Data = new[] {request}});
+						new MessageData<Request[]> { Type = Framework.DownloadCommand, Data = new[] { request } });
 				}
 
 
