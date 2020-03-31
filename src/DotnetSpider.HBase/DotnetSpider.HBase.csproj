@@ -1,13 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="../../package.props" />
-
+  <Import Project="../../package.props"/>
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
+    <PackageId>DotnetSpider.HBase</PackageId>
   </PropertyGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj" />
+    <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj"/>
   </ItemGroup>
+
 </Project>

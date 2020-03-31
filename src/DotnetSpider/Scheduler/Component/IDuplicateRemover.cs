@@ -1,5 +1,6 @@
 using System;
-using DotnetSpider.Downloader;
+using System.Threading.Tasks;
+using DotnetSpider.Http;
 
 namespace DotnetSpider.Scheduler.Component
 {
@@ -10,9 +11,9 @@ namespace DotnetSpider.Scheduler.Component
 		/// </summary>
 		/// <param name="request">Request</param>
 		/// <returns>Whether the request is duplicate.</returns>
-		bool IsDuplicate(Request request);
+		Task<bool> IsDuplicateAsync(Request request);
 
-		int Total { get; }
+		long Total { get; }
 
 		/// <summary>
 		/// Reset duplicate check.

@@ -1,208 +1,139 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using DotnetSpider.Statistics.Entity;
+using DotnetSpider.Infrastructure;
 
 namespace DotnetSpider.Statistics.Store
 {
-	/// <summary>
-	/// 基于内存的统计存储
-	/// </summary>
-	public class MemoryStatisticsStore : IStatisticsStore
-	{
-		private readonly ConcurrentDictionary<string, SpiderStatistics> _spiderStatisticsDict =
-			new ConcurrentDictionary<string, SpiderStatistics>();
+    public class MemoryStatisticsStore : IStatisticsStore
+    {
+        private readonly Dictionary<string, dynamic> _dict =
+            new Dictionary<string, dynamic>();
 
-		private readonly ConcurrentDictionary<string, DownloadStatistics> _downloadStatisticsDict =
-			new ConcurrentDictionary<string, DownloadStatistics>();
+        public Task EnsureDatabaseAndTableCreatedAsync()
+        {
+            return Task.CompletedTask;
+        }
 
-		/// <summary>
-		/// 添加总请求数
-		/// </summary>
-		/// <param name="ownerId">爬虫标识</param>
-		/// <param name="count">请求数</param>
-		/// <returns></returns>
-		public Task IncrementTotalAsync(string ownerId, int count)
-		{
-			_spiderStatisticsDict.AddOrUpdate(ownerId, s => new SpiderStatistics
-			{
-				Total = count
-			}, (s, statistics) =>
-			{
-				statistics.AddTotal(count);
-				return statistics;
-			});
-			return Task.CompletedTask;
-		}
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public Task IncreaseTotalAsync(string id, long count)
+        {
+            var statistics = GetSpiderStatistics(id);
+            statistics.IncrementTotal(count);
+            return Task.CompletedTask;
+        }
 
-		public Task EnsureDatabaseAndTableCreatedAsync()
-		{
-			return Task.CompletedTask;
-		}
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public Task IncreaseSuccessAsync(string id)
+        {
+            var statistics = GetSpiderStatistics(id);
+            statistics.IncrementSuccess();
+            return Task.CompletedTask;
+        }
 
-		/// <summary>
-		/// 增加成功次数 1
-		/// </summary>
-		/// <param name="ownerId">爬虫标识</param>
-		/// <returns></returns>
-		public Task IncrementSuccessAsync(string ownerId)
-		{
-			_spiderStatisticsDict.AddOrUpdate(ownerId, s => new SpiderStatistics
-			{
-				Success = 1
-			}, (s, statistics) =>
-			{
-				statistics.IncSuccess();
-				return statistics;
-			});
-			return Task.CompletedTask;
-		}
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public Task IncreaseFailureAsync(string id)
+        {
+            var statistics = GetSpiderStatistics(id);
+            statistics.IncrementFailure();
+            return Task.CompletedTask;
+        }
 
-		/// <summary>
-		/// 添加指定失败次数
-		/// </summary>
-		/// <param name="ownerId">爬虫标识</param>
-		/// <param name="count">失败次数</param>
-		/// <returns></returns>
-		public Task IncrementFailedAsync(string ownerId, int count = 1)
-		{
-			_spiderStatisticsDict.AddOrUpdate(ownerId, s => new SpiderStatistics
-			{
-				Failed = count
-			}, (s, statistics) =>
-			{
-				statistics.AddFailed(count);
-				return statistics;
-			});
-			return Task.CompletedTask;
-		}
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public Task StartAsync(string id, string name)
+        {
+            var statistics = GetSpiderStatistics(id);
+            statistics.SetName(name);
+            statistics.OnStarted();
+            return Task.CompletedTask;
+        }
 
-		/// <summary>
-		/// 设置爬虫启动时间
-		/// </summary>
-		/// <param name="ownerId">爬虫标识</param>
-		/// <returns></returns>
-		public Task StartAsync(string ownerId)
-		{
-			_spiderStatisticsDict.AddOrUpdate(ownerId, s => new SpiderStatistics
-			{
-				Start = DateTimeOffset.Now
-			}, (s, statistics) =>
-			{
-				statistics.Start = DateTimeOffset.Now;
-				return statistics;
-			});
-			return Task.CompletedTask;
-		}
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public Task ExitAsync(string id)
+        {
+            var statistics = GetSpiderStatistics(id);
+            statistics.OnExited();
+            return Task.CompletedTask;
+        }
 
-		/// <summary>
-		/// 设置爬虫退出时间
-		/// </summary>
-		/// <param name="ownerId">爬虫标识</param>
-		/// <returns></returns>
-		public Task ExitAsync(string ownerId)
-		{
-			_spiderStatisticsDict.AddOrUpdate(ownerId, s => new SpiderStatistics
-			{
-				Exit = DateTimeOffset.Now
-			}, (s, statistics) =>
-			{
-				statistics.Exit = DateTimeOffset.Now;
-				return statistics;
-			});
-			return Task.CompletedTask;
-		}
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public Task IncreaseAgentSuccessAsync(string agentId, int elapsedMilliseconds)
+        {
+            var statistics = GetAgentStatistics(agentId);
+            statistics.IncreaseSuccess();
+            statistics.IncreaseElapsedMilliseconds(elapsedMilliseconds);
+            return Task.CompletedTask;
+        }
 
-		/// <summary>
-		/// 添加指定下载代理器的下载成功次数
-		/// </summary>
-		/// <param name="agentId">下载代理器标识</param>
-		/// <param name="count">下载成功次数</param>
-		/// <param name="elapsedMilliseconds">下载总消耗的时间</param>
-		/// <returns></returns>
-		public Task IncrementDownloadSuccessAsync(string agentId, int count, long elapsedMilliseconds)
-		{
-			_downloadStatisticsDict.AddOrUpdate(agentId, s => new DownloadStatistics
-			{
-				AgentId = agentId,
-				Success = count,
-				ElapsedMilliseconds = elapsedMilliseconds
-			}, (s, statistics) =>
-			{
-				statistics.AddSuccess(count);
-				statistics.AddElapsedMilliseconds(elapsedMilliseconds);
-				return statistics;
-			});
-			return Task.CompletedTask;
-		}
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public Task IncreaseAgentFailureAsync(string agentId, int elapsedMilliseconds)
+        {
+            var statistics = GetAgentStatistics(agentId);
+            statistics.IncreaseFailure();
+            statistics.IncreaseElapsedMilliseconds(elapsedMilliseconds);
+            return Task.CompletedTask;
+        }
 
-		/// <summary>
-		/// 添加指定下载代理器的下载失败次数
-		/// </summary>
-		/// <param name="agentId">下载代理器标识</param>
-		/// <param name="count">下载失败次数</param>
-		/// <param name="elapsedMilliseconds">下载总消耗的时间</param>
-		/// <returns></returns>
-		public Task IncrementDownloadFailedAsync(string agentId, int count, long elapsedMilliseconds)
-		{
-			_downloadStatisticsDict.AddOrUpdate(agentId, s => new DownloadStatistics
-			{
-				AgentId = agentId,
-				Failed = count,
-				ElapsedMilliseconds = elapsedMilliseconds
-			}, (s, statistics) =>
-			{
-				statistics.AddFailed(count);
-				statistics.AddElapsedMilliseconds(elapsedMilliseconds);
-				return statistics;
-			});
-			return Task.CompletedTask;
-		}
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public Task<PagedQueryResult<AgentStatistics>> PagedQueryAgentStatisticsAsync(string keyword, int page, int limit)
+        {
+            throw new NotImplementedException();
+        }
 
-		/// <summary>
-		/// 分页查询下载代理器的统计信息
-		/// </summary>
-		/// <param name="page"></param>
-		/// <param name="size"></param>
-		/// <returns></returns>
-		public Task<List<DownloadStatistics>> GetDownloadStatisticsListAsync(int page, int size)
-		{
-			return Task.FromResult(_downloadStatisticsDict.Values.ToList());
-		}
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public Task<AgentStatistics> GetAgentStatisticsAsync(string id)
+        {
+ 
+            return _dict.ContainsKey(id)
+                ?   Task.FromResult(_dict[id])
+                : Task.FromResult<AgentStatistics>(null);
+        }
 
-		/// <summary>
-		/// 查询指定下载代理器的统计信息
-		/// </summary>
-		/// <param name="agentId">下载代理器标识</param>
-		/// <returns></returns>
-		public Task<DownloadStatistics> GetDownloadStatisticsAsync(string agentId)
-		{
-			return Task.FromResult(_downloadStatisticsDict.TryGetValue(agentId, out var statistics)
-				? statistics
-				: null);
-		}
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public Task<SpiderStatistics> GetSpiderStatisticsAsync(string id)
+        {
+            return _dict.ContainsKey(id)
+                ? (Task<SpiderStatistics>) Task.FromResult(_dict[id])
+                : Task.FromResult<SpiderStatistics>(null);
+        }
 
-		/// <summary>
-		/// 查询指定爬虫的统计信息
-		/// </summary>
-		/// <param name="ownerId">爬虫标识</param>
-		/// <returns></returns>
-		public Task<SpiderStatistics> GetSpiderStatisticsAsync(string ownerId)
-		{
-			return Task.FromResult(_spiderStatisticsDict.TryGetValue(ownerId, out var statistics) ? statistics : null);
-		}
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public Task<PagedQueryResult<SpiderStatistics>> PagedQuerySpiderStatisticsAsync(string keyword, int page, int size)
+        {
+            throw new NotImplementedException();
+        }
 
-		/// <summary>
-		/// 分页查询爬虫的统计信息
-		/// </summary>
-		/// <param name="page"></param>
-		/// <param name="size"></param>
-		/// <returns></returns>
-		public Task<List<SpiderStatistics>> GetSpiderStatisticsListAsync(int page, int size)
-		{
-			return Task.FromResult(_spiderStatisticsDict.Values.ToList());
-		}
-	}
+        private SpiderStatistics GetSpiderStatistics(string id)
+        {
+            SpiderStatistics statistics;
+            if (!_dict.ContainsKey(id))
+            {
+                statistics = new SpiderStatistics(id);
+                _dict.Add(id, statistics);
+            }
+            else
+            {
+                statistics = _dict[id];
+            }
+
+            return statistics;
+        }
+
+        private AgentStatistics GetAgentStatistics(string id)
+        {
+            AgentStatistics statistics;
+            if (!_dict.ContainsKey(id))
+            {
+                statistics = new AgentStatistics(id);
+                _dict.Add(id, statistics);
+            }
+            else
+            {
+                statistics = _dict[id];
+            }
+
+            return statistics;
+        }
+    }
 }

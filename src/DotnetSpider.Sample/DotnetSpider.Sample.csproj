@@ -1,27 +1,28 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\DotnetSpider.HBase\DotnetSpider.HBase.csproj" />
-        <ProjectReference Include="..\DotnetSpider.Kafka\DotnetSpider.Kafka.csproj" />
-        <ProjectReference Include="..\DotnetSpider.Mongo\DotnetSpider.Mongo.csproj" />
-        <ProjectReference Include="..\DotnetSpider.MySql\DotnetSpider.MySql.csproj" />
-        <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj" />
+      <ProjectReference Include="..\DotnetSpider.HBase\DotnetSpider.HBase.csproj" />
+      <ProjectReference Include="..\DotnetSpider.Mongo\DotnetSpider.Mongo.csproj" />
+      <ProjectReference Include="..\DotnetSpider.MySql\DotnetSpider.MySql.csproj" />
+      <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="appsettings.json">
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
-    <ItemGroup>
-        <PackageReference Include="xunit" Version="2.4.1" />
+        <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+        <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
+        <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="2.3.0" />
+        <PackageReference Include="System.Text.Json" Version="4.7.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="appsettings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
 </Project>

@@ -1,15 +1,14 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Linq;
 using System.Text;
 using Dapper;
-using DotnetSpider.Common;
-using DotnetSpider.DataFlow.Storage.Model;
+using DotnetSpider.DataFlow;
+using DotnetSpider.DataFlow.Storage;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
-// ReSharper disable once CheckNamespace
-namespace DotnetSpider.DataFlow.Storage
+namespace DotnetSpider.PostgreSql
 {
 	/// <summary>
 	/// PostgreSql 保存解析(实体)结果
@@ -17,18 +16,13 @@ namespace DotnetSpider.DataFlow.Storage
 	public class PostgreSqlEntityStorage : RelationalDatabaseEntityStorageBase
 	{
 		/// <summary>
-		/// 根据配置返回存储器
+		/// 根据配置返回存储器¬
 		/// </summary>
 		/// <param name="options">配置</param>
 		/// <returns></returns>
-		public static PostgreSqlEntityStorage CreateFromOptions(SpiderOptions options)
+		public static IDataFlow CreateFromOptions(SpiderOptions options)
 		{
-			return new PostgreSqlEntityStorage(options.StorageType, options.StorageConnectionString)
-			{
-				IgnoreCase = options.StorageIgnoreCase,
-				RetryTimes = options.StorageRetryTimes,
-				UseTransaction = options.StorageUseTransaction
-			};
+			return new PostgreSqlEntityStorage(options.StorageMode, options.StorageConnectionString);
 		}
 
 		/// <summary>
@@ -43,7 +37,6 @@ namespace DotnetSpider.DataFlow.Storage
 			{
 				try
 				{
-					conn.Execute(sqlStatements.CreateDatabaseSql);
 					conn.Execute(sqlStatements.CreateDatabaseSql);
 				}
 				catch (Exception e)
@@ -128,10 +121,10 @@ namespace DotnetSpider.DataFlow.Storage
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		/// <param name="storageType">存储器类型</param>
+		/// <param name="mode">存储器类型</param>
 		/// <param name="connectionString">连接字符串</param>
-		public PostgreSqlEntityStorage(StorageType storageType = StorageType.InsertIgnoreDuplicate,
-			string connectionString = null) : base(storageType,
+		public PostgreSqlEntityStorage(StorageMode mode,
+			string connectionString) : base(mode,
 			connectionString)
 		{
 		}
@@ -156,60 +149,60 @@ namespace DotnetSpider.DataFlow.Storage
 			switch (type)
 			{
 				case BoolType:
-					{
-						dataType = "BOOL";
-						break;
-					}
+				{
+					dataType = "BOOL";
+					break;
+				}
 				case DateTimeType:
-					{
-						dataType = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
-						break;
-					}
+				{
+					dataType = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+					break;
+				}
 				case DateTimeOffsetType:
-					{
-						dataType = "TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP";
-						break;
-					}
+				{
+					dataType = "TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP";
+					break;
+				}
 				case DecimalType:
-					{
-						dataType = "NUMERIC";
-						break;
-					}
+				{
+					dataType = "NUMERIC";
+					break;
+				}
 				case DoubleType:
-					{
-						dataType = "FLOAT8";
-						break;
-					}
+				{
+					dataType = "FLOAT8";
+					break;
+				}
 				case FloatType:
-					{
-						dataType = "FLOAT4";
-						break;
-					}
+				{
+					dataType = "FLOAT4";
+					break;
+				}
 				case IntType:
-					{
-						dataType = "INT4";
-						break;
-					}
+				{
+					dataType = "INT4";
+					break;
+				}
 				case LongType:
-					{
-						dataType = "INT8";
-						break;
-					}
+				{
+					dataType = "INT8";
+					break;
+				}
 				case ByteType:
-					{
-						dataType = "INT2";
-						break;
-					}
+				{
+					dataType = "INT2";
+					break;
+				}
 				case ShortType:
-					{
-						dataType = "INT2";
-						break;
-					}
+				{
+					dataType = "INT2";
+					break;
+				}
 				default:
-					{
-						dataType = length <= 0 || length > 8000 ? "TEXT" : $"VARCHAR({length})";
-						break;
-					}
+				{
+					dataType = length <= 0 || length > 8000 ? "TEXT" : $"VARCHAR({length})";
+					break;
+				}
 			}
 
 			return dataType;

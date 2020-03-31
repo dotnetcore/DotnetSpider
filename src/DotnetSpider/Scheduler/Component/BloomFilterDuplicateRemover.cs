@@ -1,85 +1,71 @@
-using DotnetSpider.Common;
-using DotnetSpider.DataFlow;
-using DotnetSpider.Downloader;
+using System.Threading;
+using System.Threading.Tasks;
+using DotnetSpider.Http;
+using DotnetSpider.Infrastructure;
 
 namespace DotnetSpider.Scheduler.Component
 {
-	/// <summary>
-	/// BloomFilterDuplicateRemover for huge number of urls.
-	/// </summary>
-	public class BloomFilterDuplicateRemover : IDuplicateRemover
-	{
-		private readonly int _expectedInsertions;
-		private BloomFilter _bloomFilter;
-		private readonly double _falsePositiveProbability;
-		private AtomicInteger _counter;
+    /// <summary>
+    /// BloomFilterDuplicateRemover for huge number of urls.
+    /// </summary>
+    public class BloomFilterDuplicateRemover : IDuplicateRemover
+    {
+        private BloomFilter _bloomFilter;
+        private long _counter;
+        private readonly BloomFilterOptions _options;
 
-		/// <summary>
-		/// Get TotalRequestsCount.
-		/// </summary>
-		/// <returns>TotalRequestsCount</returns>
-		public int Total => _counter.Value;
+        /// <summary>
+        /// Get TotalRequestsCount.
+        /// </summary>
+        /// <returns>TotalRequestsCount</returns>
+        public long Total => _counter;
 
-		/// <summary>
-		/// 构造方法
-		/// </summary>
-		/// <param name="expectedNumberOfElements">元素个数</param>
-		public BloomFilterDuplicateRemover(int expectedNumberOfElements)
-			: this(0.01, expectedNumberOfElements)
-		{
-		}
+        /// <summary>
+        /// 构造方法
+        /// </summary>
+        public BloomFilterDuplicateRemover(BloomFilterOptions options)
+        {
+            _options = options;
+            _bloomFilter = new BloomFilter(_options.FalsePositiveProbability, _options.ExpectedInsertions);
+            _counter = 0;
+        }
 
-		/// <summary>
-		/// 构造方法
-		/// </summary>
-		/// <param name="falsePositiveProbability">误判机率</param>
-		/// <param name="expectedInsertions">元素个数</param>
-		public BloomFilterDuplicateRemover(double falsePositiveProbability, int expectedInsertions)
-		{
-			_expectedInsertions = expectedInsertions;
-			_falsePositiveProbability = falsePositiveProbability;
-			_bloomFilter = CreateBloomFilter(_falsePositiveProbability, _expectedInsertions);
-		}
+        /// <summary>
+        /// Check whether the request is duplicate.
+        /// </summary>
+        /// <param name="request">Request</param>
+        /// <returns>Whether the request is duplicate.</returns>
+        public Task<bool> IsDuplicateAsync(Request request)
+        {
+            request.NotNull(nameof(request));
+            request.Owner.NotNullOrWhiteSpace(nameof(request.Owner));
+            
+            var isDuplicate = _bloomFilter.Contains(request.Hash);
+            if (!isDuplicate)
+            {
+                _bloomFilter.Add(request.Hash);
+                Interlocked.Increment(ref _counter);
+            }
 
-		/// <summary>
-		/// Check whether the request is duplicate.
-		/// </summary>
-		/// <param name="request">Request</param>
-		/// <returns>Whether the request is duplicate.</returns>
-		public bool IsDuplicate(Request request)
-		{
-			Check.NotNull(request.OwnerId, nameof(request.OwnerId));
-			var hash = request.Hash;
-			var isDuplicate = _bloomFilter.Contains(hash);
-			if (!isDuplicate)
-			{
-				_bloomFilter.Add(hash);
-				_counter.Inc();
-			}
+            return Task.FromResult(isDuplicate);
+        }
 
-			return isDuplicate;
-		}
+        /// <summary>
+        /// Reset duplicate check.
+        /// </summary>
+        public void ResetDuplicateCheck()
+        {
+            _counter = Interlocked.Exchange(ref _counter, 0);
+            _bloomFilter.Clear();
+            _bloomFilter = new BloomFilter(_options.FalsePositiveProbability, _options.ExpectedInsertions);
+        }
 
-		/// <summary>
-		/// Reset duplicate check.
-		/// </summary>
-		public void ResetDuplicateCheck()
-		{
-			_bloomFilter = CreateBloomFilter(_falsePositiveProbability, _expectedInsertions);
-		}
-
-		/// <summary>
-		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-		/// </summary>
-		public void Dispose()
-		{
-			_bloomFilter.Clear();
-		}
-
-		private BloomFilter CreateBloomFilter(double falsePositiveProbability, int expectedNumberOfElements)
-		{
-			_counter = new AtomicInteger(0);
-			return new BloomFilter(falsePositiveProbability, expectedNumberOfElements);
-		}
-	}
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            _bloomFilter.Clear();
+        }
+    }
 }
