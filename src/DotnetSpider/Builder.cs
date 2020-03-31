@@ -30,7 +30,7 @@ namespace DotnetSpider
         }
 
         public static Builder Create<T>(
-            string[] args, Action<SpiderOptions> configureSpiderOptionsDelegate = null) where T : Spider
+            string[] args, Action<SpiderOptions> configureDelegate = null) where T : Spider
         {
             var hostBuilder = new Builder();
             hostBuilder.UseContentRoot(Directory.GetCurrentDirectory());
@@ -95,9 +95,9 @@ namespace DotnetSpider
                     services.Configure<AgentOptions>(configuration);
                 }
 
-                if (configureSpiderOptionsDelegate != null)
+                if (configureDelegate != null)
                 {
-                    services.Configure(configureSpiderOptionsDelegate);
+                    services.Configure(configureDelegate);
                 }
 
                 services.AddSingleton<SpiderServices>();
@@ -115,7 +115,7 @@ namespace DotnetSpider
                 services.AddHostedService<T>();
             }).UseDefaultServiceProvider((context, options) =>
             {
-                bool flag = context.HostingEnvironment.IsDevelopment();
+                var flag = context.HostingEnvironment.IsDevelopment();
                 options.ValidateScopes = flag;
                 options.ValidateOnBuild = flag;
             });

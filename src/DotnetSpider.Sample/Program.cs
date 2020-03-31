@@ -7,6 +7,7 @@ using DotnetSpider.DataFlow.Parser.Formatters;
 using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.HBase;
 using DotnetSpider.Http;
+using DotnetSpider.RabbitMQ;
 using DotnetSpider.Scheduler.Component;
 using DotnetSpider.Selector;
 using Microsoft.Extensions.Hosting;

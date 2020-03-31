@@ -54,7 +54,10 @@ namespace DotnetSpider.RabbitMQ
 			if (_modelDict.TryGetValue(queue, out var channel))
 			{
 				var bytes = message as byte[] ?? MessagePackSerializer.Typeless.Serialize(message);
-				channel.BasicPublish(_options.Exchange, queue, null, bytes);
+				if (channel.IsOpen)
+				{
+					channel.BasicPublish(_options.Exchange, queue, null, bytes);
+				}
 			}
 			else
 			{
@@ -101,8 +104,7 @@ namespace DotnetSpider.RabbitMQ
 				channel.Close();
 			};
 			//7. 启动消费者
-			channel.BasicConsume(queue: consumer.Queue, autoAck: false, consumer: consumer1);
-
+			channel.BasicConsume(queue: queue, autoAck: false, consumer: consumer1);
 			_modelDict.GetOrAdd(consumer.Queue, q => channel);
 			return Task.CompletedTask;
 		}

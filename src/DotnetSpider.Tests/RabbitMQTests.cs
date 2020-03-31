@@ -37,7 +37,7 @@ namespace DotnetSpider.Tests
 			var counter = 0;
 			consumer.Received += async bytes =>
 			{
-				var message = (Message)MessagePack.MessagePackSerializer.Typeless.Deserialize(bytes);
+				var message = (Message)await bytes.DeserializeAsync(default);
 				counter = message.Index;
 				await Task.CompletedTask;
 			};
@@ -75,12 +75,11 @@ namespace DotnetSpider.Tests
 			var counter = 0;
 			consumer.Received += async bytes =>
 			{
-				var message = (Message)MessagePack.MessagePackSerializer.Typeless.Deserialize(bytes);
+				var message = (Message)await bytes.DeserializeAsync(default);
 				counter = message.Index;
 				await Task.CompletedTask;
 			};
 			await messageQueue.ConsumeAsync(consumer, default);
-			Sleep();
 			await messageQueue.PublishAsBytesAsync(queue, new Message {Index = 1000});
 			Sleep();
 			Assert.Equal(1000, counter);
@@ -92,7 +91,7 @@ namespace DotnetSpider.Tests
 		}
 
 		[Fact]
-		public virtual void ConcurrentPublish()
+		public virtual async Task ConcurrentPublish()
 		{
 			var messageQueue = GetMessageQueue();
 			var queue = Guid.NewGuid().ToString("N");
@@ -100,12 +99,16 @@ namespace DotnetSpider.Tests
 			var counter = 0;
 			consumer.Received += async bytes =>
 			{
-				counter += 1;
+				lock (this)
+				{
+					counter += 1;
+				}
+
 				await Task.CompletedTask;
 			};
-
+			await messageQueue.ConsumeAsync(consumer, default);
 			var list = new List<Task>();
-			for (var i = 0; i < 100; ++i)
+			for (var i = 0; i < 20; ++i)
 			{
 				var i1 = i;
 				list.Add(Task.Factory.StartNew(async () =>
@@ -118,7 +121,7 @@ namespace DotnetSpider.Tests
 
 			Sleep();
 
-			Assert.Equal(100, counter);
+			Assert.Equal(20, counter);
 		}
 
 

@@ -2,7 +2,7 @@ namespace DotnetSpider.RabbitMQ
 {
 	public class RabbitMQOptions
 	{
-		public string Exchange { get; set; }
+		public string Exchange { get; set; } = "DOTNET_SPIDER";
 
 		public string HostName { get; set; }
 
