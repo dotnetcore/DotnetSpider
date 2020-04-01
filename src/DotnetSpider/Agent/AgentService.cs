@@ -53,6 +53,11 @@ namespace DotnetSpider.Agent
 		{
 			_logger.LogInformation(_distributed ? $"Agent {_options.AgentId} starting" : "Agent starting");
 
+			if (_distributed)
+			{
+				_logger.LogInformation($"Register agent: {_options.AgentId}, {_options.AgentName}");
+			}
+
 			await _messageQueue.PublishAsBytesAsync(TopicNames.AgentRegister,
 				new Register
 				{
@@ -61,7 +66,6 @@ namespace DotnetSpider.Agent
 					TotalMemory = SystemInformation.TotalMemory,
 					ProcessorCount = Environment.ProcessorCount
 				});
-			await HeartbeatAsync();
 			var topics = new List<string> {string.Format(TopicNames.Agent, _options.AgentId.ToUpper())};
 			if (!string.IsNullOrWhiteSpace(_options.ADSLAccount))
 			{
@@ -158,28 +162,22 @@ namespace DotnetSpider.Agent
 		{
 			if (_distributed)
 			{
-				_logger.LogInformation($"Heartbeart: {_options.AgentId}, {_options.AgentName}");
+				_logger.LogInformation($"Heartbeat: {_options.AgentId}, {_options.AgentName}");
 			}
 
 			await _messageQueue.PublishAsBytesAsync(TopicNames.AgentRegister,
 				new Heartbeat
 				{
-					AgentId = _options.AgentId, AgentName = _options.AgentName, FreeMemory = 8, DownloaderCount = 0
+					AgentId = _options.AgentId, AgentName = _options.AgentName, FreeMemory = 8, CpuLoad = 0
 				});
 		}
 
 		public override async Task StopAsync(CancellationToken cancellationToken)
 		{
 			_logger.LogInformation(_distributed ? $"Agent {_options.AgentId} stopping" : "Agent stopping");
-			if (_messageQueue != null)
+			foreach (var consumer in _consumers)
 			{
-				if (_messageQueue is MessageQueue messageQueue)
-				{
-					foreach (var consumer in _consumers)
-					{
-						consumer.Close();
-					}
-				}
+				consumer.Close();
 			}
 
 			await base.StopAsync(cancellationToken);

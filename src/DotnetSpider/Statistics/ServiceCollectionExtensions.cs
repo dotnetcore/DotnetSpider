@@ -3,13 +3,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DotnetSpider.Statistics
 {
-    public static class ServiceCollectionExtensions
-    {
-        public static IServiceCollection AddStatistics(this IServiceCollection services)
-        {
-            services.AddSingleton<IStatisticsStore, MemoryStatisticsStore>();
-            services.AddHostedService<StatisticsService>();
-            return services;
-        }
-    }
+	public static class ServiceCollectionExtensions
+	{
+		public static IServiceCollection AddStatistics<T>(this IServiceCollection services)
+			where T : class, IStatisticsStore
+		{
+			services.AddSingleton<IStatisticsStore, T>();
+			services.AddHostedService<StatisticsService>();
+			return services;
+		}
+	}
 }

@@ -1,9 +1,9 @@
-using DotnetSpider.Common;
-using DotnetSpider.DownloadAgentRegisterCenter.Entity;
+using DotnetSpider.AgentRegister.Store;
 using DotnetSpider.Portal.Entity;
-using DotnetSpider.Statistics.Entity;
+using DotnetSpider.Statistics.Store;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
 
 namespace DotnetSpider.Portal
 {
@@ -34,10 +34,10 @@ namespace DotnetSpider.Portal
 
 			if (!_isDesignTime)
 			{
-				builder.Model.AddEntityType(typeof(DownloaderAgent));
-				builder.Model.AddEntityType(typeof(DownloaderAgentHeartbeat));
+				builder.Model.AddEntityType(typeof(AgentInfo));
+				builder.Model.AddEntityType(typeof(AgentHeartbeat));
 				builder.Model.AddEntityType(typeof(SpiderStatistics));
-				builder.Model.AddEntityType(typeof(DownloadStatistics));
+				builder.Model.AddEntityType(typeof(AgentStatistics));
 			}
 
 			builder.Entity<DockerRepository>().HasIndex(x => x.Name).IsUnique();
@@ -56,9 +56,11 @@ namespace DotnetSpider.Portal
 		{
 			var builder = new DbContextOptionsBuilder<PortalDbContext>();
 
-			var configuration = Framework.CreateConfiguration(args.Length > 0 ? args[0] : "appsettings.json");
+			var configurationBuilder = new ConfigurationBuilder();
+			configurationBuilder.AddJsonFile("appsettings.json");
+			var configuration = configurationBuilder.Build();
 			var options = new PortalOptions(configuration);
-			switch (options.Database?.ToLower())
+			switch (options.DatabaseType?.ToLower())
 			{
 				case "mysql":
 				{

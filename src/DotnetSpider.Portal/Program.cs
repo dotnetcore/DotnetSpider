@@ -10,6 +10,8 @@ namespace DotnetSpider.Portal
 {
 	public class Program
 	{
+		public static IWebHostBuilder Builder;
+
 		public static async Task Main(string[] args)
 		{
 			var loggerConfiguration = new LoggerConfiguration()
@@ -25,19 +27,11 @@ namespace DotnetSpider.Portal
 
 			Log.Logger = loggerConfiguration.CreateLogger();
 
-			var builder = WebHost.CreateDefaultBuilder(args)
-				.ConfigureAppConfiguration(x =>
-				{
-					if (File.Exists("appsettings.json"))
-					{
-						x.AddJsonFile("appsettings.json");
-					}
-
-					x.AddCommandLine(args);
-					x.AddEnvironmentVariables();
-				})
-				.UseStartup<Startup>().UseSerilog().UseUrls("http://0.0.0.0:7896");
-			await builder.Build().RunAsync();
+			Builder = WebHost.CreateDefaultBuilder(args)
+				.UseStartup<Startup>()
+				.UseSerilog()
+				.UseUrls("http://0.0.0.0:7896");
+			await Builder.Build().RunAsync();
 		}
 	}
 }

@@ -61,7 +61,7 @@ namespace DotnetSpider.AgentRegister
 					}
 
 					await _agentStore.HeartbeatAsync(new AgentHeartbeat(heartbeat.AgentId, heartbeat.AgentName,
-						heartbeat.FreeMemory, heartbeat.DownloaderCount));
+						heartbeat.FreeMemory, heartbeat.CpuLoad));
 				}
 				else
 				{

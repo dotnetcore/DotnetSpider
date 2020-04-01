@@ -1,4 +1,4 @@
-@model List<DotnetSpider.DownloadAgentRegisterCenter.Entity.DownloaderAgent>
+@model List<DotnetSpider.AgentRegister.Store.AgentInfo>
 
 @section breadcrumb{
     <li >
@@ -47,7 +47,7 @@
                     {
                         <tr >
                             <td style="width: 15px;">
-                                @if (item.IsActive())
+                                @if (item.Online)
                                 {
                                     <span style="background-color: green">&ensp;&ensp;&ensp;&ensp;</span>
                                 }
@@ -72,9 +72,9 @@
                                 <span>@item.LastModificationTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</span>
                             </td>
                             <td>
-                                 <button class="btn btn-default btn-sm  btn-flat" onclick="deleteAgent('@item.Id')">Delete</button>
-                                <a class="btn btn-default btn-sm btn-flat" href="/downloader-agent/@item.Id/heartbeat">Heartbeat</a>
-                                <button @(item.IsActive() ? "" : "disabled") class="btn btn-default btn-sm  btn-flat" onclick="exit('@item.Id')">Exit</button>
+                                <button class="btn btn-default btn-sm  btn-flat" onclick="deleteAgent('@item.Id')">Delete</button>
+                                <a class="btn btn-default btn-sm btn-flat" href="/agent/@item.Id/heartbeat">Heartbeat</a>
+                                <button @(item.Online ? "" : "disabled") class="btn btn-default btn-sm  btn-flat" onclick="exit('@item.Id')">Exit</button>
                             </td>
                         </tr>
                     }

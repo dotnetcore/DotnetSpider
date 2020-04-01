@@ -64,3 +64,74 @@
 2020-04-01 15:11:03.449 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
 2020-04-01 15:11:08.454 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
 2020-04-01 15:11:13.456 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:11:16.697 +08:00 [Information] Agent register service starting
+2020-04-01 21:18:43.890 +08:00 [Information] Agent register service starting
+2020-04-01 21:18:43.998 +08:00 [Information] Statistics service starting
+2020-04-01 21:18:44.195 +08:00 [Information] Statistics service started
+2020-04-01 21:18:44.195 +08:00 [Information] Agent register service started
+2020-04-01 21:19:01.310 +08:00 [Information] Register agent: AGENT_001, AGENT_001
+2020-04-01 21:19:01.317 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:19:01.326 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:19:06.330 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:19:11.336 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:19:16.341 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:19:21.345 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:19:26.347 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:19:26.987 +08:00 [Information] Statistics service stopping
+2020-04-01 21:19:26.995 +08:00 [Information] Statistics service stopped
+2020-04-01 21:19:26.996 +08:00 [Information] Agent register service stopping
+2020-04-01 21:19:27.001 +08:00 [Information] Agent register service stopped
+2020-04-01 21:21:43.412 +08:00 [Information] Agent register service starting
+2020-04-01 21:21:43.519 +08:00 [Information] Statistics service starting
+2020-04-01 21:21:43.709 +08:00 [Information] Agent register service started
+2020-04-01 21:21:43.709 +08:00 [Information] Statistics service started
+2020-04-01 21:21:46.611 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:21:50.648 +08:00 [Information] Register agent: AGENT_001, AGENT_001
+2020-04-01 21:21:50.660 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:21:50.799 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:21:55.804 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:22:00.809 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:22:05.814 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:22:10.820 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:22:15.823 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:22:20.827 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:22:25.833 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:22:30.838 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:22:35.843 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:22:40.846 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:22:45.848 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:22:50.851 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:22:55.856 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:23:00.859 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:23:05.862 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:23:10.866 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:23:15.870 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:23:20.876 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:23:25.880 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:23:30.883 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:23:35.885 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:23:40.889 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:23:45.892 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:23:55.234 +08:00 [Information] Register agent: AGENT_001, AGENT_001
+2020-04-01 21:23:55.391 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:24:00.395 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:24:05.401 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:24:10.407 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:24:15.413 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:24:20.418 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:24:25.421 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:24:30.428 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:24:35.433 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:24:40.437 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:24:45.437 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:24:50.443 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:24:55.447 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:25:03.987 +08:00 [Information] Register agent: AGENT_001, AGENT_001
+2020-04-01 21:25:04.148 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:25:09.150 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:25:14.158 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:25:19.159 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 21:25:20.124 +08:00 [Information] Statistics service stopping
+2020-04-01 21:25:20.134 +08:00 [Information] Statistics service stopped
+2020-04-01 21:25:20.134 +08:00 [Information] Agent register service stopping
+2020-04-01 21:25:20.140 +08:00 [Information] Agent register service stopped

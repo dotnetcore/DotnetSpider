@@ -30,6 +30,7 @@ namespace DotnetSpider.Agent
 				if (configuration != null)
 				{
 					x.Configure<AgentOptions>(configuration);
+					x.Configure<SpiderOptions>(configuration);
 				}
 
 				x.AddHttpClient();

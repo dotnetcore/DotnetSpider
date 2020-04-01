@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
-using DotnetSpider.DownloadAgentRegisterCenter.Entity;
+using DotnetSpider.AgentRegister.Store;
 using DotnetSpider.Portal.Models;
-using DotnetSpider.Statistics.Entity;
+using DotnetSpider.Statistics.Store;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,12 +21,14 @@ namespace DotnetSpider.Portal.Controllers
 
 		public async Task<IActionResult> Index()
 		{
-			ViewData["Agent"] = await _dbContext.Set<DownloaderAgent>().CountAsync();
-			ViewData["OnlineAgent"] = await _dbContext.Set<DownloaderAgent>().CountAsync(x => x.IsActive());
+			ViewData["Agent"] = await _dbContext.Set<AgentInfo>().CountAsync();
+			var activeTime = DateTimeOffset.Now.AddSeconds(-60);
+			ViewData["OnlineAgent"] =
+				await (_dbContext.Set<AgentInfo>().CountAsync(x => x.LastModificationTime > activeTime));
 			ViewData["Repository"] = await _dbContext.DockerRepositories.CountAsync();
 			ViewData["Spider"] = await _dbContext.Spiders.CountAsync();
 			ViewData["RunningSpider"] = await _dbContext.Set<SpiderStatistics>()
-				.CountAsync(x => (DateTimeOffset.Now - x.LastModificationTime).TotalSeconds < 60);
+				.CountAsync(x => x.LastModificationTime > activeTime);
 			return View();
 		}
 

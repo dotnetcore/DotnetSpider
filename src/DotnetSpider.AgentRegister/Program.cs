@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using DotnetSpider.Agent;
+using DotnetSpider.Extensions;
+using DotnetSpider.MySql;
 using DotnetSpider.RabbitMQ;
 using DotnetSpider.Statistics;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,9 +29,15 @@ namespace DotnetSpider.AgentRegister
 			var builder = Host.CreateDefaultBuilder(args);
 			builder.ConfigureServices(x =>
 			{
+				var configuration = builder.GetConfiguration();
+				if (configuration != null)
+				{
+					x.Configure<SpiderOptions>(configuration);
+				}
+
 				x.AddHttpClient();
-				x.AddAgentRegister();
-				x.AddStatistics();
+				x.AddAgentRegister<MySqlAgentStore>();
+				x.AddStatistics<MySqlStatisticsStore>();
 			});
 			builder.UseRabbitMQ();
 			builder.UseSerilog();

@@ -12,7 +12,7 @@ namespace DotnetSpider.Portal
 			_configuration = configuration;
 		}
 
-		public string Database => _configuration["Database"];
+		public string DatabaseType => _configuration["DatabaseType"];
 
 		/// <summary>
 		/// 数据库连接字符串

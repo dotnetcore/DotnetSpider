@@ -15,11 +15,11 @@ namespace DotnetSpider.AgentRegister.Message
         /// <summary>
         /// 空闲内存
         /// </summary>
-        public uint FreeMemory { get; set; }
+        public int FreeMemory { get; set; }
 
         /// <summary>
-        /// 已经分配的下载器数量
+        /// CPU 负载
         /// </summary>
-        public uint DownloaderCount { get; set; }
+        public int CpuLoad { get; set; }
     }
 }

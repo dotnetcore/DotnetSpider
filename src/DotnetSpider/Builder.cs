@@ -5,10 +5,12 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using DotnetSpider.Agent;
 using DotnetSpider.AgentRegister;
+using DotnetSpider.AgentRegister.Store;
 using DotnetSpider.Extensions;
 using DotnetSpider.Infrastructure;
 using DotnetSpider.Proxy;
 using DotnetSpider.Statistics;
+using DotnetSpider.Statistics.Store;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -60,8 +62,8 @@ namespace DotnetSpider
 				}
 
 				services.AddSwiftMQ();
-				services.AddStatistics();
-				services.AddAgentRegister();
+				services.AddStatistics<MemoryStatisticsStore>();
+				services.AddAgentRegister<MemoryAgentStore>();
 				services.AddAgent();
 				services.AddHostedService<T>();
 			});

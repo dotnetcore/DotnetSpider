@@ -58,6 +58,14 @@ namespace DotnetSpider.Statistics.Store
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
+        public Task RegisterAgentAsync(string agentId, string agentName)
+        {
+	        var statistics = GetAgentStatistics(agentId);
+	        statistics.SetName(agentName);
+	        return Task.CompletedTask;
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public Task IncreaseAgentSuccessAsync(string agentId, int elapsedMilliseconds)
         {
             var statistics = GetAgentStatistics(agentId);
@@ -84,8 +92,7 @@ namespace DotnetSpider.Statistics.Store
         [MethodImpl(MethodImplOptions.Synchronized)]
         public Task<AgentStatistics> GetAgentStatisticsAsync(string id)
         {
- 
-            return _dict.ContainsKey(id)
+	        return _dict.ContainsKey(id)
                 ?   Task.FromResult(_dict[id])
                 : Task.FromResult<AgentStatistics>(null);
         }

@@ -4,6 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Extensions;
 using DotnetSpider.RabbitMQ;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 using SwiftMQ;
 using Xunit;
 
@@ -13,10 +15,13 @@ namespace DotnetSpider.Tests
 	{
 		protected virtual IMessageQueue GetMessageQueue()
 		{
-			return new RabbitMQMessageQueue(new RabbitMQOptions
+
+			var mq= new RabbitMQMessageQueue(default);
+			mq.Initialize(new RabbitMQOptions
 			{
 				Exchange = "MessageQueue", HostName = "localhost", UserName = "user", Password = "password"
 			});
+			return mq;
 		}
 
 		[Fact]

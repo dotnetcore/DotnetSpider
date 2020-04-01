@@ -1,7 +1,7 @@
-@using X.PagedList.Mvc.Common
 @using X.PagedList.Mvc.Core
 @using X.PagedList.Mvc.Core.Common
-@model X.PagedList.IPagedList<DotnetSpider.DownloadAgentRegisterCenter.Entity.DownloaderAgentHeartbeat>
+@using X.PagedList.Web.Common
+@model X.PagedList.IPagedList<DotnetSpider.AgentRegister.Store.AgentHeartbeat>
 
 @section breadcrumb{
     <li >
@@ -32,7 +32,7 @@
                     <th>ID</th>
                     <th>Name</th>
                     <th>FreeMEM</th>
-                    <th>DownloaderNum</th>
+                    <th>CpuLoad</th>
                     <th>HeartbeatTime</th>
                 </tr>
                 @if (Model == null || !Model.Any())
@@ -61,7 +61,7 @@
                                 <span>@item.FreeMemory</span>
                             </td>
                             <td>
-                                <span>@item.DownloaderCount</span>
+                                <span>@item.CpuLoad</span>
                             </td>
                             <td>
                                 <span>@item.CreationTime.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss")</span>

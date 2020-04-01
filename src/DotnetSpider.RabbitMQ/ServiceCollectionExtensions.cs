@@ -31,5 +31,12 @@ namespace DotnetSpider.RabbitMQ
 			});
 			return builder;
 		}
+
+		public static IServiceCollection AddRabbitMQ(this IServiceCollection services, IConfiguration configuration)
+		{
+			services.Configure<RabbitMQOptions>(configuration);
+			services.AddSingleton<IMessageQueue, RabbitMQMessageQueue>();
+			return services;
+		}
 	}
 }

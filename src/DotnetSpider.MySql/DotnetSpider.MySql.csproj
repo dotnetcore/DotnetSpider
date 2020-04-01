@@ -1,15 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="../../package.props"/>
+  <Import Project="../../package.props" />
   <PropertyGroup>
     <PackageId>DotnetSpider.MySql</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj"/>
+    <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MySqlConnector" Version="0.63.0"/>
+    <PackageReference Include="MySqlConnector" Version="0.63.0" />
   </ItemGroup>
 </Project>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Extensions;
@@ -10,19 +11,25 @@ using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Framing;
 using SwiftMQ;
 
+[assembly: InternalsVisibleTo("DotnetSpider.Tests")]
+
 namespace DotnetSpider.RabbitMQ
 {
 	public class RabbitMQMessageQueue : IMessageQueue
 	{
-		private readonly RabbitMQOptions _options;
-		private readonly IConnection _connection;
-		private readonly ConcurrentDictionary<string, IModel> _modelDict;
+		private RabbitMQOptions _options;
+		private IConnection _connection;
+		private ConcurrentDictionary<string, IModel> _modelDict;
 
-		public RabbitMQMessageQueue(IOptions<RabbitMQOptions> options) : this(options.Value)
+		public RabbitMQMessageQueue(IOptions<RabbitMQOptions> options)
 		{
+			if (options != null)
+			{
+				Initialize(options.Value);
+			}
 		}
 
-		public RabbitMQMessageQueue(RabbitMQOptions options)
+		internal void Initialize(RabbitMQOptions options)
 		{
 			_options = options;
 			var connectionFactory = new ConnectionFactory {HostName = _options.HostName, DispatchConsumersAsync = true};

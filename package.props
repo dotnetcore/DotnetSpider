@@ -12,6 +12,7 @@
     <PackageTags>DotnetSpider;crawler;dotnet core</PackageTags>
     <PackageProjectUrl>https://github.com/dotnetcore/DotnetSpider</PackageProjectUrl>
     <RepositoryUrl>https://github.com/dotnetcore/DotnetSpider</RepositoryUrl>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

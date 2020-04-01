@@ -38,6 +38,8 @@ EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.AgentRegister", "src\DotnetSpider.AgentRegister\DotnetSpider.AgentRegister.csproj", "{05991456-8637-4BBA-ADEB-95A86C528CBA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Portal", "src\DotnetSpider.Portal\DotnetSpider.Portal.csproj", "{4DE3E1D6-43B9-41FA-BF83-76C30B3E6BCC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -84,6 +86,10 @@ Global
 		{05991456-8637-4BBA-ADEB-95A86C528CBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05991456-8637-4BBA-ADEB-95A86C528CBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05991456-8637-4BBA-ADEB-95A86C528CBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DE3E1D6-43B9-41FA-BF83-76C30B3E6BCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DE3E1D6-43B9-41FA-BF83-76C30B3E6BCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DE3E1D6-43B9-41FA-BF83-76C30B3E6BCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DE3E1D6-43B9-41FA-BF83-76C30B3E6BCC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{23813B85-AB02-4A53-B0A0-4DA5B6665425} = {724DCFC7-FA90-4AA7-8A2E-32FACCDEB38C}

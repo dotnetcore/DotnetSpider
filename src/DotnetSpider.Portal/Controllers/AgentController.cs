@@ -2,36 +2,42 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using DotnetSpider.Common;
-using DotnetSpider.DownloadAgentRegisterCenter.Entity;
-using DotnetSpider.MessageQueue;
+using DotnetSpider.Agent.Message;
+using DotnetSpider.AgentRegister.Store;
+using DotnetSpider.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using SwiftMQ;
 using X.PagedList;
 
 namespace DotnetSpider.Portal.Controllers
 {
-	public class DownloaderAgentController : Controller
+	public class AgentController : Controller
 	{
 		private readonly ILogger _logger;
 		private readonly PortalDbContext _dbContext;
-		private readonly IMq _mq;
+		private readonly IMessageQueue _mq;
+		private readonly SpiderOptions _options;
 
-		public DownloaderAgentController(PortalDbContext dbContext, IMq eventBus,
-			ILogger<DownloaderAgentController> logger)
+		public AgentController(PortalDbContext dbContext,
+			IMessageQueue eventBus,
+			IOptions<SpiderOptions> options,
+			ILogger<AgentController> logger)
 		{
 			_logger = logger;
 			_dbContext = dbContext;
 			_mq = eventBus;
+			_options = options.Value;
 		}
 
-		[HttpGet("downloader-agent")]
+		[HttpGet("agent")]
 		public async Task<IActionResult> Retrieve()
 		{
 			try
 			{
-				var agents = await _dbContext.Set<DownloaderAgent>().ToListAsync();
+				var agents = await _dbContext.Set<AgentInfo>().ToListAsync();
 				return View(agents);
 			}
 			catch (Exception e)
@@ -46,7 +52,7 @@ namespace DotnetSpider.Portal.Controllers
 			}
 		}
 
-		[HttpGet("downloader-agent/{id}/heartbeat")]
+		[HttpGet("agent/{id}/heartbeat")]
 		public async Task<IActionResult> Heartbeat(string id, int page, int size)
 		{
 			page = page <= 1 ? 1 : page;
@@ -56,11 +62,7 @@ namespace DotnetSpider.Portal.Controllers
 			{
 				using (var conn = _dbContext.Database.GetDbConnection())
 				{
-//					var heartbeats = conn.QueryAsync<DownloaderAgentHeartbeat>(
-//						$"select * from `dotnetspider`.`downloader_agent_heartbeat` where agent_id = @AgentId limit {(page - 1) * size},{size}",
-//						new {AgentId = id});
-
-					var viewModel = await _dbContext.Set<DownloaderAgentHeartbeat>().Where(x => x.AgentId == id)
+					var viewModel = await _dbContext.Set<AgentHeartbeat>().Where(x => x.AgentId == id)
 						.OrderByDescending(x => x.Id)
 						.ToPagedListAsync(page, size);
 
@@ -79,35 +81,35 @@ namespace DotnetSpider.Portal.Controllers
 			}
 		}
 
-		[HttpDelete("downloader-agent/{id}")]
+		[HttpDelete("agent/{id}")]
 		public async Task<IActionResult> DeleteAsync(string id)
 		{
-			if (!await _dbContext.Set<DownloaderAgent>().AnyAsync(x => x.Id == id))
+			if (!await _dbContext.Set<AgentInfo>().AnyAsync(x => x.Id == id))
 			{
 				return NotFound();
 			}
 
-			await _mq.PublishAsync(id, new MessageData<string> {Type = Framework.ExitCommand, Data = id});
+			await _mq.PublishAsBytesAsync(id, new Exit {Id = id});
 
 			using (var conn = _dbContext.Database.GetDbConnection())
 			{
 				await conn.ExecuteAsync(
-					"DELETE FROM downloader_agent_heartbeat WHERE agent_id = @Id; DELETE FROM downloader_agent WHERE id = @Id;",
+					$"DELETE FROM {_options.Database}.agent_heartbeat WHERE agent_id = @Id; DELETE FROM {_options.Database}.agent_heartbeat WHERE id = @Id;",
 					new {Id = id});
 			}
 
 			return Ok();
 		}
 
-		[HttpPost("downloader-agent/{id}/exit")]
+		[HttpPost("agent/{id}/exit")]
 		public async Task<IActionResult> ExitAsync(string id)
 		{
-			if (!await _dbContext.Set<DownloaderAgent>().AnyAsync(x => x.Id == id))
+			if (!await _dbContext.Set<AgentInfo>().AnyAsync(x => x.Id == id))
 			{
 				return NotFound();
 			}
 
-			await _mq.PublishAsync(id, new MessageData<string> {Type = Framework.ExitCommand, Data = id});
+			await _mq.PublishAsBytesAsync(id, new Exit {Id = id});
 			return Ok();
 		}
 	}

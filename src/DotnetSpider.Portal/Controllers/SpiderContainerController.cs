@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using DotnetSpider.Common;
-using DotnetSpider.MessageQueue;
+using DotnetSpider.Agent.Message;
+using DotnetSpider.Extensions;
 using DotnetSpider.Portal.Models.SpiderContainer;
-using DotnetSpider.Statistics.Entity;
+using DotnetSpider.Statistics.Store;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using SwiftMQ;
 using X.PagedList;
 
 namespace DotnetSpider.Portal.Controllers
@@ -18,10 +19,10 @@ namespace DotnetSpider.Portal.Controllers
 	{
 		private readonly ILogger _logger;
 		private readonly PortalDbContext _dbContext;
-		private readonly IMq _mq;
+		private readonly IMessageQueue _mq;
 
 		public SpiderContainerController(PortalDbContext dbContext,
-			IMq eventBus,
+			IMessageQueue eventBus,
 			ILogger<SpiderController> logger)
 		{
 			_logger = logger;
@@ -40,8 +41,8 @@ namespace DotnetSpider.Portal.Controllers
 				.ToPagedListAsync(page, size);
 
 			var batches = await containers.Select(x => x.Batch).ToListAsync();
-			var dict = await _dbContext.Set<SpiderStatistics>().Where(x => batches.Contains(x.OwnerId))
-				.ToDictionaryAsync(x => x.OwnerId, x => x);
+			var dict = await _dbContext.Set<SpiderStatistics>().Where(x => batches.Contains(x.Id))
+				.ToDictionaryAsync(x => x.Id, x => x);
 
 			var list = new List<ListSpiderContainerViewModel>();
 			foreach (var container in containers)
@@ -57,7 +58,7 @@ namespace DotnetSpider.Portal.Controllers
 				if (dict.ContainsKey(item.Batch))
 				{
 					item.Total = dict[item.Batch].Total;
-					item.Failed = dict[item.Batch].Failed;
+					item.Failed = dict[item.Batch].Failure;
 					item.Success = dict[item.Batch].Success;
 					item.Start = dict[item.Batch].Start;
 					item.Exit = dict[item.Batch].Exit;
@@ -76,7 +77,7 @@ namespace DotnetSpider.Portal.Controllers
 		{
 			try
 			{
-				await _mq.PublishAsync(batch, new MessageData<string> {Type = Framework.ExitCommand, Data = batch});
+				await _mq.PublishAsBytesAsync(batch, new Exit {Id = batch});
 				return Ok();
 			}
 			catch (Exception e)
