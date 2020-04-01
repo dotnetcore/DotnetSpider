@@ -7,6 +7,7 @@ using MessagePack;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using RabbitMQ.Client.Framing;
 using SwiftMQ;
 
 namespace DotnetSpider.RabbitMQ
@@ -51,17 +52,11 @@ namespace DotnetSpider.RabbitMQ
 				throw new ArgumentNullException(nameof(message));
 			}
 
-			if (_modelDict.TryGetValue(queue, out var channel))
+			var channel = _modelDict.GetOrAdd(queue, CreateChannel);
+			var bytes = message as byte[] ?? MessagePackSerializer.Typeless.Serialize(message);
+			if (channel.IsOpen)
 			{
-				var bytes = message as byte[] ?? MessagePackSerializer.Typeless.Serialize(message);
-				if (channel.IsOpen)
-				{
-					channel.BasicPublish(_options.Exchange, queue, null, bytes);
-				}
-			}
-			else
-			{
-				throw new ApplicationException("Get channel failed");
+				channel.BasicPublish(_options.Exchange, queue, null, bytes);
 			}
 
 			await Task.CompletedTask;
@@ -71,16 +66,10 @@ namespace DotnetSpider.RabbitMQ
 			CancellationToken stoppingToken)
 		{
 			var topic = consumer.Queue;
-			var channel = _connection.CreateModel();
-			channel.QueueDeclare(topic, durable: true, exclusive: false, autoDelete: false,
-				arguments: null);
-			channel.ExchangeDeclare(exchange: _options.Exchange, type: "direct", durable: true);
-
+			var channel = _modelDict.GetOrAdd(topic, CreateChannel);
+			var consumer1 = new AsyncEventingBasicConsumer(channel);
 			var queue = channel.QueueDeclare().QueueName;
 			channel.QueueBind(queue: queue, _options.Exchange, routingKey: topic);
-
-			var consumer1 = new AsyncEventingBasicConsumer(channel);
-
 			consumer1.Received += async (model, ea) =>
 			{
 				if (consumer is AsyncMessageConsumer<byte[]> bytesConsumer)
@@ -105,8 +94,17 @@ namespace DotnetSpider.RabbitMQ
 			};
 			//7. 启动消费者
 			channel.BasicConsume(queue: queue, autoAck: false, consumer: consumer1);
-			_modelDict.GetOrAdd(consumer.Queue, q => channel);
+
 			return Task.CompletedTask;
+		}
+
+		private IModel CreateChannel(string topic)
+		{
+			var channel = _connection.CreateModel();
+			channel.QueueDeclare(topic, durable: true, exclusive: false, autoDelete: false,
+				arguments: null);
+			channel.ExchangeDeclare(exchange: _options.Exchange, type: "direct", durable: true);
+			return channel;
 		}
 	}
 }

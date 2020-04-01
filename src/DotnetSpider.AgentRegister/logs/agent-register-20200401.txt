@@ -1,0 +1,66 @@
+2020-04-01 15:06:53.690 +08:00 [Information] Agent register service starting
+2020-04-01 15:06:53.747 +08:00 [Information] Agent register service started
+2020-04-01 15:06:53.748 +08:00 [Information] Statistics service starting
+2020-04-01 15:06:53.757 +08:00 [Information] Statistics service started
+2020-04-01 15:06:58.455 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:07:03.305 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:07:08.306 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:07:13.309 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:07:18.314 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:07:23.316 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:07:28.321 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:07:33.321 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:07:38.326 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:07:43.328 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:07:48.332 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:07:53.335 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:07:58.342 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:08:03.346 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:08:08.350 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:08:13.351 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:08:18.353 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:08:23.352 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:08:28.358 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:08:33.358 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:08:38.363 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:08:43.368 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:08:48.373 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:08:53.379 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:08:58.383 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:09:03.387 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:09:08.389 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:09:13.390 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:09:18.394 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:09:23.394 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:09:28.394 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:09:33.398 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:09:36.841 +08:00 [Information] 38019e4a1e80404e80ba164549028915 total 10, success 1, failed 0, left 9
+2020-04-01 15:09:38.400 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:09:41.842 +08:00 [Information] 38019e4a1e80404e80ba164549028915 total 12, success 7, failed 0, left 5
+2020-04-01 15:09:43.404 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:09:46.907 +08:00 [Information] 38019e4a1e80404e80ba164549028915 total 20, success 12, failed 0, left 8
+2020-04-01 15:09:48.406 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:09:51.926 +08:00 [Information] 38019e4a1e80404e80ba164549028915 total 26, success 16, failed 0, left 10
+2020-04-01 15:09:53.405 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:09:56.941 +08:00 [Information] 38019e4a1e80404e80ba164549028915 total 30, success 22, failed 0, left 8
+2020-04-01 15:09:58.410 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:10:01.956 +08:00 [Information] 38019e4a1e80404e80ba164549028915 total 34, success 25, failed 0, left 9
+2020-04-01 15:10:03.412 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:10:06.969 +08:00 [Information] 38019e4a1e80404e80ba164549028915 total 42, success 32, failed 0, left 10
+2020-04-01 15:10:08.413 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:10:11.990 +08:00 [Information] 38019e4a1e80404e80ba164549028915 total 45, success 37, failed 0, left 8
+2020-04-01 15:10:13.417 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:10:17.010 +08:00 [Information] 38019e4a1e80404e80ba164549028915 total 50, success 41, failed 0, left 9
+2020-04-01 15:10:18.421 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:10:22.028 +08:00 [Information] 38019e4a1e80404e80ba164549028915 total 55, success 47, failed 0, left 8
+2020-04-01 15:10:23.426 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:10:28.428 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:10:33.432 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:10:38.438 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:10:43.437 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:10:48.439 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:10:53.442 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:10:58.446 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:11:03.449 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:11:08.454 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001
+2020-04-01 15:11:13.456 +08:00 [Information] Hearbeat: AGENT_001, AGENT_001

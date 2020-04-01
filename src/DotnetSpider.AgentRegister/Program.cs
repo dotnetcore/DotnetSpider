@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
-using DotnetSpider.Extensions;
+using DotnetSpider.Agent;
 using DotnetSpider.RabbitMQ;
+using DotnetSpider.Statistics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
 
-namespace DotnetSpider.Agent
+namespace DotnetSpider.AgentRegister
 {
 	class Program
 	{
@@ -20,23 +21,18 @@ namespace DotnetSpider.Agent
 				.MinimumLevel.Override("System", LogEventLevel.Warning)
 				.MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Warning)
 				.Enrich.FromLogContext()
-				.WriteTo.Console().WriteTo.RollingFile("logs/agent.txt")
+				.WriteTo.Console().WriteTo.RollingFile("logs/agent-register.txt")
 				.CreateLogger();
 
 			var builder = Host.CreateDefaultBuilder(args);
 			builder.ConfigureServices(x =>
 			{
-				var configuration = builder.GetConfiguration();
-				if (configuration != null)
-				{
-					x.Configure<AgentOptions>(configuration);
-				}
-
 				x.AddHttpClient();
-				x.AddAgent();
+				x.AddAgentRegister();
+				x.AddStatistics();
 			});
-			builder.UseSerilog();
 			builder.UseRabbitMQ();
+			builder.UseSerilog();
 			await builder.Build().RunAsync();
 			Environment.Exit(0);
 		}

@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using DotnetSpider.Agent;
 using DotnetSpider.AgentRegister;
+using DotnetSpider.Extensions;
 using DotnetSpider.Infrastructure;
 using DotnetSpider.Proxy;
 using DotnetSpider.Statistics;
@@ -18,108 +19,142 @@ using SwiftMQ.DependencyInjection;
 
 namespace DotnetSpider
 {
-    public class Builder : HostBuilder
-    {
-        private Builder()
-        {
-        }
+	public class Builder : HostBuilder
+	{
+		private Builder()
+		{
+		}
 
-        public static Builder Create<T>(Action<SpiderOptions> configureDelegate) where T : Spider
-        {
-            return Create<T>(null, configureDelegate);
-        }
+		public static Builder CreateBuilder<T>(Action<SpiderOptions> configureDelegate = null)
+			where T : Spider
+		{
+			var hostBuilder = CreateBuilder(null, configureDelegate);
+			hostBuilder.ConfigureServices(services =>
+			{
+				services.AddHostedService<T>();
+			});
+			return hostBuilder;
+		}
 
-        public static Builder Create<T>(
-            string[] args, Action<SpiderOptions> configureDelegate = null) where T : Spider
-        {
-            var hostBuilder = new Builder();
-            hostBuilder.UseContentRoot(Directory.GetCurrentDirectory());
-            hostBuilder.ConfigureHostConfiguration(config =>
-            {
-                config.AddEnvironmentVariables("DOTNET_");
-                if (args == null)
-                {
-                    return;
-                }
+		public static Builder CreateBuilder<T>(string[] args, Action<SpiderOptions> configureDelegate = null)
+			where T : Spider
+		{
+			var hostBuilder = CreateBuilder(args, configureDelegate);
+			hostBuilder.ConfigureServices(services =>
+			{
+				services.AddHostedService<T>();
+			});
+			return hostBuilder;
+		}
 
-                config.AddCommandLine(args);
-            });
-            hostBuilder.ConfigureAppConfiguration(
-                (hostingContext, config) =>
-                {
-                    IHostEnvironment hostingEnvironment = hostingContext.HostingEnvironment;
-                    config.AddJsonFile("appsettings.json", true, true)
-                        .AddJsonFile("appsettings." + hostingEnvironment.EnvironmentName + ".json", true, true);
-                    if (hostingEnvironment.IsDevelopment() && !string.IsNullOrEmpty(hostingEnvironment.ApplicationName))
-                    {
-                        Assembly assembly = Assembly.Load(new AssemblyName(hostingEnvironment.ApplicationName));
-                        config.AddUserSecrets(assembly, true);
-                    }
+		public static Builder CreateDefaultBuilder<T>(
+			string[] args, Action<SpiderOptions> configureDelegate = null) where T : Spider
+		{
+			var hostBuilder = CreateBuilder(args, configureDelegate);
+			hostBuilder.ConfigureServices(services =>
+			{
+				var configuration = hostBuilder.GetConfiguration();
+				if (configuration != null)
+				{
+					services.Configure<AgentOptions>(configuration);
+				}
 
-                    config.AddEnvironmentVariables();
+				services.AddSwiftMQ();
+				services.AddStatistics();
+				services.AddAgentRegister();
+				services.AddAgent();
+				services.AddHostedService<T>();
+			});
+			return hostBuilder;
+		}
 
-                    var list = new List<string> {"--DOTNET_SPIDER_MODEL", "LOCAL"};
-                    if (args != null)
-                    {
-                        list.AddRange(args);
-                    }
+		public static Builder CreateDefaultBuilder<T>(Action<SpiderOptions> configureDelegate) where T : Spider
+		{
+			return CreateDefaultBuilder<T>(null, configureDelegate);
+		}
 
-                    config.AddCommandLine(list.ToArray());
-                }).ConfigureLogging((hostingContext, logging) =>
-            {
-                int num = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? 1 : 0;
-                if (num != 0)
-                {
-                    logging.AddFilter<EventLogLoggerProvider>(
-                        level => level >= LogLevel.Warning);
-                }
+		private static Builder CreateBuilder(string[] args, Action<SpiderOptions> configureDelegate = null)
+		{
+			var hostBuilder = new Builder();
+			hostBuilder.UseContentRoot(Directory.GetCurrentDirectory());
+			hostBuilder.ConfigureHostConfiguration(config =>
+			{
+				config.AddEnvironmentVariables("DOTNET_");
+				if (args == null)
+				{
+					return;
+				}
 
-                logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
-                logging.AddConsole();
-                logging.AddDebug();
-                logging.AddEventSourceLogger();
-                if (num == 0)
-                {
-                    return;
-                }
+				config.AddCommandLine(args);
+			});
+			hostBuilder.ConfigureAppConfiguration(
+				(hostingContext, config) =>
+				{
+					var hostingEnvironment = hostingContext.HostingEnvironment;
+					config.AddJsonFile("appsettings.json", true, true)
+						.AddJsonFile("appsettings." + hostingEnvironment.EnvironmentName + ".json", true, true);
+					if (hostingEnvironment.IsDevelopment() && !string.IsNullOrEmpty(hostingEnvironment.ApplicationName))
+					{
+						var assembly = Assembly.Load(new AssemblyName(hostingEnvironment.ApplicationName));
+						config.AddUserSecrets(assembly, true);
+					}
 
-                logging.AddEventLog();
-            }).ConfigureServices(services =>
-            {
-                var fields = typeof(HostBuilder).GetField("_appConfiguration",
-                    BindingFlags.NonPublic | BindingFlags.Instance);
-                if (fields != null)
-                {
-                    var configuration = (IConfiguration) fields.GetValue(hostBuilder);
-                    services.Configure<SpiderOptions>(configuration);
-                    services.Configure<AgentOptions>(configuration);
-                }
+					config.AddEnvironmentVariables();
 
-                if (configureDelegate != null)
-                {
-                    services.Configure(configureDelegate);
-                }
+					var list = new List<string> {"--DOTNET_SPIDER_MODEL", "LOCAL"};
+					if (args != null)
+					{
+						list.AddRange(args);
+					}
 
-                services.AddSingleton<SpiderServices>();
-                services.AddSwiftMQ();
-                services.AddHostedService<ArgumentPrintService>();
-                services.AddStatistics();
-                services.AddAgentRegister();
-                services.AddAgent();
-                services.AddHostedService<ProxyService>();
-                services.AddHttpClient();
-                services.AddTransient<HttpMessageHandlerBuilder, ProxyHttpMessageHandlerBuilder>();
-                services.AddSingleton<IProxyValidator, DefaultProxyValidator>();
-                services.AddSingleton<IProxyPool, ProxyPool>();
-                services.AddSingleton<IStatisticsClient, StatisticsClient>();
-                services.AddHostedService<T>();
-            }).UseDefaultServiceProvider((context, options) =>
-            {
-                var flag = context.HostingEnvironment.IsDevelopment();
-                options.ValidateScopes = flag;
-                options.ValidateOnBuild = flag;
-            });
-            return hostBuilder;
-        }
-    }
+					config.AddCommandLine(list.ToArray());
+				}).ConfigureLogging((hostingContext, logging) =>
+			{
+				var num = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? 1 : 0;
+				if (num != 0)
+				{
+					logging.AddFilter<EventLogLoggerProvider>(
+						level => level >= LogLevel.Warning);
+				}
+
+				logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
+				logging.AddConsole();
+				logging.AddDebug();
+				logging.AddEventSourceLogger();
+				if (num == 0)
+				{
+					return;
+				}
+
+				logging.AddEventLog();
+			}).ConfigureServices(services =>
+			{
+				var configuration = hostBuilder.GetConfiguration();
+				if (configuration != null)
+				{
+					services.Configure<SpiderOptions>(configuration);
+				}
+
+				if (configureDelegate != null)
+				{
+					services.Configure(configureDelegate);
+				}
+
+				services.AddSingleton<SpiderServices>();
+				services.AddHostedService<ArgumentPrintService>();
+				services.AddHostedService<ProxyService>();
+				services.AddHttpClient();
+				services.AddTransient<HttpMessageHandlerBuilder, ProxyHttpMessageHandlerBuilder>();
+				services.AddSingleton<IProxyValidator, DefaultProxyValidator>();
+				services.AddSingleton<IProxyPool, ProxyPool>();
+				services.AddSingleton<IStatisticsClient, StatisticsClient>();
+			}).UseDefaultServiceProvider((context, options) =>
+			{
+				var flag = context.HostingEnvironment.IsDevelopment();
+				options.ValidateScopes = flag;
+				options.ValidateOnBuild = flag;
+			});
+			return hostBuilder;
+		}
+	}
 }

@@ -9,7 +9,8 @@ namespace DotnetSpider.RabbitMQ
 {
 	public static class ServiceCollectionExtensions
 	{
-		public static Builder UseRabbitMQ(this Builder builder, Action<SpiderOptions> configureDelegate = null)
+		public static IHostBuilder UseRabbitMQ(this IHostBuilder builder,
+			Action<RabbitMQOptions> configureDelegate = null)
 		{
 			builder.ConfigureServices(services =>
 			{
@@ -18,7 +19,7 @@ namespace DotnetSpider.RabbitMQ
 				if (fields != null)
 				{
 					var configuration = (IConfiguration)fields.GetValue(builder);
-					services.Configure<RabbitMQOptions>(configuration);
+					services.Configure<RabbitMQOptions>(configuration.GetSection("RabbitMQ"));
 				}
 
 				if (configureDelegate != null)
