@@ -77,7 +77,7 @@ namespace DotnetSpider.Portal.Controllers
 		{
 			try
 			{
-				await _mq.PublishAsBytesAsync(batch, new Exit {Id = batch});
+				await _mq.PublishAsBytesAsync(string.Format(TopicNames.Spider, batch.ToUpper()), new Exit {Id = batch});
 				return Ok();
 			}
 			catch (Exception e)

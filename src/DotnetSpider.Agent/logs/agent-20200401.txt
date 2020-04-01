@@ -272,3 +272,26 @@
 2020-04-01 21:28:13.246 +08:00 [Information] Heartbeat: AGENT_001, AGENT_001
 2020-04-01 21:28:13.797 +08:00 [Information] Agent AGENT_001 stopping
 2020-04-01 21:28:13.812 +08:00 [Information] Agent AGENT_001 stopped
+2020-04-01 22:58:21.979 +08:00 [Information] Agent AGENT_001 starting
+2020-04-01 22:58:22.013 +08:00 [Information] Register agent: AGENT_001, AGENT_001
+2020-04-01 22:58:22.330 +08:00 [Information] Heartbeat: AGENT_001, AGENT_001
+2020-04-01 22:58:22.333 +08:00 [Information] Agent AGENT_001 started
+2020-04-01 22:58:27.335 +08:00 [Information] Heartbeat: AGENT_001, AGENT_001
+2020-04-01 22:58:32.342 +08:00 [Information] Heartbeat: AGENT_001, AGENT_001
+2020-04-01 22:58:37.347 +08:00 [Information] Heartbeat: AGENT_001, AGENT_001
+2020-04-01 22:58:42.351 +08:00 [Information] Heartbeat: AGENT_001, AGENT_001
+2020-04-01 22:58:47.357 +08:00 [Information] Heartbeat: AGENT_001, AGENT_001
+2020-04-01 22:58:52.362 +08:00 [Information] Heartbeat: AGENT_001, AGENT_001
+2020-04-01 22:58:57.368 +08:00 [Information] Heartbeat: AGENT_001, AGENT_001
+2020-04-01 22:59:02.373 +08:00 [Information] Heartbeat: AGENT_001, AGENT_001
+2020-04-01 22:59:02.815 +08:00 [Information] Agent AGENT_001 stopping
+2020-04-01 22:59:02.830 +08:00 [Information] Agent AGENT_001 stopped
+2020-04-01 23:04:32.684 +08:00 [Information] Agent AGENT_001 starting
+2020-04-01 23:04:32.718 +08:00 [Information] Register agent: AGENT_001, AGENT_001
+2020-04-01 23:04:33.018 +08:00 [Information] Heartbeat: AGENT_001, AGENT_001
+2020-04-01 23:04:33.021 +08:00 [Information] Agent AGENT_001 started
+2020-04-01 23:04:38.022 +08:00 [Information] Heartbeat: AGENT_001, AGENT_001
+2020-04-01 23:04:43.027 +08:00 [Information] Heartbeat: AGENT_001, AGENT_001
+2020-04-01 23:04:48.030 +08:00 [Information] Heartbeat: AGENT_001, AGENT_001
+2020-04-01 23:04:50.520 +08:00 [Information] Agent AGENT_001 stopping
+2020-04-01 23:04:50.534 +08:00 [Information] Agent AGENT_001 stopped

@@ -89,7 +89,7 @@ namespace DotnetSpider.Portal.Controllers
 				return NotFound();
 			}
 
-			await _mq.PublishAsBytesAsync(id, new Exit {Id = id});
+			await _mq.PublishAsBytesAsync(string.Format(TopicNames.Agent, id.ToUpper()), new Exit {Id = id});
 
 			using (var conn = _dbContext.Database.GetDbConnection())
 			{
@@ -109,7 +109,7 @@ namespace DotnetSpider.Portal.Controllers
 				return NotFound();
 			}
 
-			await _mq.PublishAsBytesAsync(id, new Exit {Id = id});
+			await _mq.PublishAsBytesAsync(string.Format(TopicNames.Agent, id.ToUpper()), new Exit {Id = id});
 			return Ok();
 		}
 	}
