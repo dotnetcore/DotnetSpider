@@ -1,37 +1,28 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using DotnetSpider.Common;
 using Newtonsoft.Json;
 
 namespace DotnetSpider.DataFlow.Storage
 {
-	/// <summary>
-	/// 控制台打印(实体)解析结果
-	/// </summary>
-	public class ConsoleEntityStorage : EntityStorageBase
-	{
-		/// <summary>
-		/// 根据配置返回存储器
-		/// </summary>
-		/// <param name="options"></param>
-		/// <returns></returns>
-		public static ConsoleEntityStorage CreateFromOptions(SpiderOptions options)
-		{
-			return new ConsoleEntityStorage();
-		}
+    /// <summary>
+    /// 控制台打印(实体)解析结果
+    /// </summary>
+    public class ConsoleEntityStorage : EntityStorageBase
+    {
+        public static IDataFlow CreateFromOptions(SpiderOptions options)
+        {
+            return new ConsoleEntityStorage();
+        }
+        
+        protected override Task StoreAsync(DataContext context, Dictionary<Type, List<dynamic>> dict)
+        {
+            foreach (var kv in dict)
+            {
+                Console.WriteLine(JsonConvert.SerializeObject(kv.Value));
+            }
 
-		protected override Task<DataFlowResult> Store(DataFlowContext context)
-		{
-			var items = context.GetParseData();
-			foreach (var item in items)
-			{
-				foreach (var data in item.Value)
-				{
-					Console.WriteLine(JsonConvert.SerializeObject(data));
-				}
-			}
-
-			return Task.FromResult(DataFlowResult.Success);
-		}
-	}
+            return Task.CompletedTask;
+        }
+    }
 }

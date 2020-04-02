@@ -1,6 +1,6 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
-using DotnetSpider.Common;
 using Newtonsoft.Json;
 
 namespace DotnetSpider.DataFlow.Storage
@@ -10,21 +10,17 @@ namespace DotnetSpider.DataFlow.Storage
 	/// </summary>
 	public class ConsoleStorage : StorageBase
 	{
-		/// <summary>
-		/// 根据配置返回存储器
-		/// </summary>
-		/// <param name="options">配置</param>
-		/// <returns></returns>
-		public static ConsoleStorage CreateFromOptions(SpiderOptions options)
+		public static IDataFlow CreateFromOptions(SpiderOptions options)
 		{
 			return new ConsoleStorage();
 		}
 
-		protected override Task<DataFlowResult> Store(DataFlowContext context)
+		protected override Task StoreAsync(DataContext context)
 		{
-			var items = context.GetData();
+			var items = context.GetData().Where(x => !ReferenceEquals(x.Key, Consts.ResponseBytes));
+
 			Console.WriteLine(JsonConvert.SerializeObject(items));
-			return Task.FromResult(DataFlowResult.Success);
+			return Task.CompletedTask;
 		}
 	}
 }

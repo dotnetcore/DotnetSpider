@@ -13,13 +13,13 @@ namespace DotnetSpider.Selector
 		/// </summary>
 		/// <param name="text">需要查询的文本</param>
 		/// <returns>查询结果</returns>
-		dynamic Select(dynamic text);
+		ISelectable Select(string text);
 
 		/// <summary>
 		/// 从文本中查询所有结果
 		/// </summary>
 		/// <param name="text">需要查询的文本</param>
 		/// <returns>查询结果</returns>
-		IEnumerable<dynamic> SelectList(dynamic text);
+		IEnumerable<ISelectable> SelectList(string text);
 	}
 }

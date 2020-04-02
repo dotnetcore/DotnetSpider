@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using DotnetSpider.Portal.BackgroundService;
 using DotnetSpider.Portal.Common;
+using DotnetSpider.Portal.Data;
 using DotnetSpider.Portal.Models.Spider;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -220,7 +222,7 @@ namespace DotnetSpider.Portal.Controllers
 					var transaction = await _dbContext.Database.BeginTransactionAsync();
 					try
 					{
-						var spider = new Entity.Spider
+						var spider = new Data.Spider
 						{
 							Name = viewModel.Name,
 							Cron = viewModel.Cron,
@@ -271,7 +273,7 @@ namespace DotnetSpider.Portal.Controllers
 		{
 			page = page <= 1 ? 1 : page;
 			size = size <= 20 ? 20 : size;
-			IPagedList<Entity.Spider> viewModel;
+			IPagedList<Data.Spider> viewModel;
 			if (string.IsNullOrWhiteSpace(q))
 			{
 				viewModel = await _dbContext.Spiders.OrderByDescending(x => x.Id)
@@ -388,7 +390,7 @@ namespace DotnetSpider.Portal.Controllers
 		{
 			var trigger = TriggerBuilder.Create().WithCronSchedule(cron).WithIdentity(id)
 				.Build();
-			var qzJob = JobBuilder.Create<TriggerJob>().WithIdentity(id).WithDescription(name)
+			var qzJob = JobBuilder.Create<QuartzJob>().WithIdentity(id).WithDescription(name)
 				.RequestRecovery(true).Build();
 			await _sched.ScheduleJob(qzJob, trigger);
 		}

@@ -1,16 +1,8 @@
-﻿using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-
-namespace DotnetSpider.Selector
+﻿namespace DotnetSpider.Selector
 {
     /// <summary>
     /// 查询器类型
     /// </summary>
-    [Flags]
-#if !NET451
-	[JsonConverter(typeof(StringEnumConverter))]
-#endif
     public enum SelectorType
     {
         /// <summary>
@@ -34,8 +26,8 @@ namespace DotnetSpider.Selector
         JsonPath,
 
         /// <summary>
-        /// Enviroment
+        /// Environment
         /// </summary>
-        Enviroment
+        Environment
     }
 }

@@ -8,7 +8,7 @@ function exit(id) {
         type: "warning",
         showCancelButton: true
     }, function () {
-        app.post('/downloader-agent/' + id + '/exit', null, function () {
+        app.post('/agent/' + id + '/exit', null, function () {
             swal('Success', 'Send signal success', "success");
         }, function () {
             swal('Error', 'Stop agent failed', "error");
@@ -22,7 +22,7 @@ function deleteAgent(id) {
         type: "warning",
         showCancelButton: true
     }, function () {
-        app.delete('/downloader-agent/' + id, function () {
+        app.delete('/agent/' + id, function () {
             window.location.reload();
         }, function () {
             swal('Error', 'Delete agent failed', "error");

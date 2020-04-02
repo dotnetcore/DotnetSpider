@@ -1,59 +1,75 @@
-﻿using System.Collections.Generic;
+﻿using System.Threading;
 using System.Threading.Tasks;
+using Dapper;
 using DotnetSpider.DataFlow;
-using DotnetSpider.DataFlow.Parser;
-using DotnetSpider.Downloader;
-using DotnetSpider.Scheduler;
+using DotnetSpider.DataFlow.Storage;
+using DotnetSpider.Http;
+using DotnetSpider.Scheduler.Component;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using MySql.Data.MySqlClient;
+using Serilog;
 
 namespace DotnetSpider.Sample.samples
 {
-	public class DatabaseSpider : Spider
+	public class DatabaseSpider : CnblogsSpider
 	{
-		protected override async Task Initialize()
+		public static new async Task RunAsync()
 		{
-			NewGuidId();
-			Scheduler = new QueueDistinctBfsScheduler();
-			Speed = 1;
-			Depth = 3;
-			AddDataFlow(new DatabaseSpiderDataParser()).AddDataFlow(GetDefaultStorage());
-			await AddRequests(
-				new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}}),
-				new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}}));
+			var builder = Builder.CreateDefaultBuilder<DatabaseSpider>();
+			builder.UseSerilog();
+			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
+			await builder.Build().RunAsync();
 		}
 
-		class DatabaseSpiderDataParser : DataParser
+		public DatabaseSpider(IOptions<SpiderOptions> options, SpiderServices services, ILogger<Spider> logger) : base(
+			options, services, logger)
 		{
-			//public DatabaseSpiderDataParser()
-			//{
-			//	CanParse = DataParserHelper.CanParseByRegex("cnblogs\\.com");
-			//	QueryFollowRequests = DataParserHelper.QueryFollowRequestsByXPath(".");
-			//}
+		}
 
-			protected override Task<DataFlowResult> Parse(DataFlowContext context)
+		protected override async Task InitializeAsync(CancellationToken stoppingToken)
+		{
+			AddDataFlow(new ListNewsParser());
+			AddDataFlow(new NewsParser());
+			AddDataFlow(new MyStorage());
+			await AddRequestsAsync(new Request("https://news.cnblogs.com/n/page/1/"));
+		}
+
+		class MyStorage : StorageBase
+		{
+			public override async Task InitAsync()
 			{
-				context.AddData("URL", context.Response.Request.Url);
-				context.AddData("Title", context.Selectable.XPath(".//title").GetValue());
-
-				#region add mysql database
-
-				var typeName = typeof(EntitySpider.CnblogsEntry).FullName;
-				var entity = new EntitySpider.CnblogsEntry();
-				context.Add(typeName, entity.GetTableMetadata());
-				var items = new ParseResult<EntitySpider.CnblogsEntry>();
-				entity.WebSite = context.Response.Request.Url;
-				entity.Url = context.Response.Request.Url;
-				entity.Title = context.Selectable.XPath(".//title").GetValue();
-				items.Add(entity);
-				context.AddParseData(typeName, items);
-
-				#endregion
-
-				return Task.FromResult(DataFlowResult.Success);
+				await using var conn = new MySqlConnection("Database='mysql';Data Source=localhost;password=1qazZAQ!;User ID=root;Port=3306;");
+				await conn.ExecuteAsync("create database if not exists cnblogs2;");
+				await conn.ExecuteAsync($@"
+create table if not exists cnblogs2.news2
+(
+    id       int auto_increment
+    primary key,
+    title    varchar(500)      not null,
+    url      varchar(500)      not null,
+    summary  varchar(1000)     null,
+    views    int               null,
+    content  varchar(2000)     null
+);
+");
 			}
-		}
 
-		public DatabaseSpider(SpiderParameters parameters) : base(parameters)
-		{
+			protected override async Task StoreAsync(DataContext context)
+			{
+				var typeName = typeof(News).FullName;
+				var data = (News)context.GetData(typeName);
+				if (data != null)
+				{
+					await using var conn =
+						new MySqlConnection(
+							"Database='mysql';Data Source=localhost;password=1qazZAQ!;User ID=root;Port=3306;");
+					await conn.ExecuteAsync(
+						$"INSERT IGNORE INTO cnblogs2.news2 (title, url, summary, views, content) VALUES (@Title, @Url, @Summary, @Views, @Content);",
+						data);
+				}
+			}
 		}
 	}
 }

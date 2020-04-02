@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
-cd src/Dotnetspider.DownloaderAgent
-sh publish_to_hub.sh
-cd ../..
+cd src/DotnetSpider.Agent
+docker build -t dotnetspider/agent:latest .
+rm -rf src/DotnetSpider.Agent/out
+docker push dotnetspider/downloader-agent:latest

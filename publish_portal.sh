@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
 cd src/DotnetSpider.Portal
-sh publish_to_hub.sh
-cd ../..
+docker build -t dotnetspider/portal:latest .
+rm -rf src/DotnetSpider.Portal/out
+docker push dotnetspider/portal:latest

@@ -27,12 +27,12 @@ steps:
     displayName: 'UninstallDefaultMysql'
 
   - task: DockerInstaller@0
- 
+
   - script: sudo docker run -p 3306:3306 -e MYSQL_ROOT_PASSWORD=1qazZAQ! -d mysql
     displayName: 'DeployMysql'
 
   - script: sudo docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=1qazZAQ!' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-latest
-    displayName: 'DeploySqlserver' 
+    displayName: 'DeploySqlServer'
 
   - task: DotNetCoreInstaller@0
     inputs:

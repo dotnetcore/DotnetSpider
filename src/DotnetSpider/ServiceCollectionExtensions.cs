@@ -1,15 +1,7 @@
-using System;
-using DotnetSpider.Common;
-using DotnetSpider.DataFlow;
-using DotnetSpider.DownloadAgent;
-using DotnetSpider.DownloadAgentRegisterCenter;
-using DotnetSpider.DownloadAgentRegisterCenter.Store;
-using DotnetSpider.MessageQueue;
-using DotnetSpider.Network;
-using DotnetSpider.Network.InternetDetector;
-using DotnetSpider.Statistics;
-using DotnetSpider.Statistics.Store;
-using Microsoft.Extensions.Configuration;
+using DotnetSpider.Agent;
+using DotnetSpider.Proxy;
+using DotnetSpider.Scheduler;
+using DotnetSpider.Scheduler.Component;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -17,130 +9,48 @@ namespace DotnetSpider
 {
 	public static class ServiceCollectionExtensions
 	{
-		public static IServiceCollection ConfigureAppConfiguration(this IServiceCollection services,
-			string config = null)
+		public static Builder UseQueueBfsScheduler(this Builder builder)
 		{
-			Check.NotNull(services, nameof(services));
-
-			var configurationBuilder = Framework.CreateConfigurationBuilder(config);
-			var configurationRoot = configurationBuilder.Build();
-			services.AddSingleton<IConfiguration>(configurationRoot);
-
-			return services;
-		}
-
-		#region DownloadCenter
-
-		public static IServiceCollection AddDownloadCenter(this IServiceCollection services,
-			Action<DownloadAgentRegisterCenterBuilder> configure = null)
-		{
-			services.AddHostedService<DefaultDownloadAgentRegisterCenter>();
-
-			var downloadCenterBuilder = new DownloadAgentRegisterCenterBuilder(services);
-			configure?.Invoke(downloadCenterBuilder);
-
-			return services;
-		}
-
-		public static IServiceCollection AddLocalDownloadCenter(this IServiceCollection services)
-		{
-			services.AddDownloadCenter(x => x.UseLocalDownloaderAgentStore());
-			return services;
-		}
-
-		public static DownloadAgentRegisterCenterBuilder UseLocalDownloaderAgentStore(
-			this DownloadAgentRegisterCenterBuilder builder)
-		{
-			Check.NotNull(builder, nameof(builder));
-			builder.Services.AddSingleton<IDownloaderAgentStore, LocalDownloaderAgentStore>();
+			builder.ConfigureServices(x => { x.AddSingleton<IScheduler, QueueBfsScheduler>(); });
 			return builder;
 		}
 
-		#endregion
-
-		#region  MessageQueue
-
-		public static IServiceCollection AddThroughMessageQueue(this IServiceCollection services)
+		public static Builder RegisterDownloader<T>(this Builder builder) where T : class, IDownloader
 		{
-			services.AddSingleton<IMq, ThroughMessageQueue>();
-			return services;
-		}
-
-		#endregion
-
-		#region DownloaderAgent
-
-		public static IServiceCollection AddDownloaderAgent(this IServiceCollection services,
-			Action<DownloaderAgentBuilder> configure = null)
-		{
-			services.AddSingleton<IHostedService, DefaultDownloaderAgent>();
-			services.AddSingleton<NetworkCenter>();
-			services.AddSingleton<DownloaderAgentOptions>();
-
-			var spiderAgentBuilder = new DownloaderAgentBuilder(services);
-			configure?.Invoke(spiderAgentBuilder);
-
-			return services;
-		}
-
-		public static DownloaderAgentBuilder UseFileLocker(this DownloaderAgentBuilder builder)
-		{
-			Check.NotNull(builder, nameof(builder));
-
-			builder.Services.AddSingleton<ILockerFactory, FileLockerFactory>();
-
+			builder.ConfigureServices(x =>
+			{
+				x.AddSingleton<IDownloader, T>();
+			});
 			return builder;
 		}
 
-		public static DownloaderAgentBuilder UseDefaultAdslRedialer(this DownloaderAgentBuilder builder)
+		public static Builder UseKuaidaili(this Builder builder)
 		{
-			Check.NotNull(builder, nameof(builder));
-
-			builder.Services.AddSingleton<IAdslRedialer, DefaultAdslRedialer>();
-
+			builder.ConfigureServices(x => { x.AddSingleton<IProxySupplier, KuaidailiProxySupplier>(); });
 			return builder;
 		}
 
-		public static DownloaderAgentBuilder UseDefaultInternetDetector(this DownloaderAgentBuilder builder)
+		public static Builder UseQueueDistinctBfsScheduler<T>(this Builder builder)
+			where T : class, IDuplicateRemover
 		{
-			Check.NotNull(builder, nameof(builder));
-
-			builder.Services.AddSingleton<IInternetDetector, DefaultInternetDetector>();
-
+			builder.ConfigureServices(x =>
+			{
+				x.AddSingleton<IDuplicateRemover, T>();
+				x.AddSingleton<IScheduler, QueueDistinctBfsScheduler>();
+			});
 			return builder;
 		}
 
-		public static DownloaderAgentBuilder UseVpsInternetDetector(this DownloaderAgentBuilder builder)
+		public static Builder UseQueueDistinctBfsScheduler(this Builder builder)
 		{
-			Check.NotNull(builder, nameof(builder));
-
-			builder.Services.AddSingleton<IInternetDetector, VpsInternetDetector>();
-
+			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
 			return builder;
 		}
 
-		#endregion
-
-		#region  Statistics
-
-		public static IServiceCollection AddStatisticsCenter(this IServiceCollection services,
-			Action<StatisticsBuilder> configure)
+		public static Builder UseDockerLifetime(this Builder builder)
 		{
-			services.AddSingleton<IHostedService, StatisticsCenter>();
-
-			var spiderStatisticsBuilder = new StatisticsBuilder(services);
-			configure?.Invoke(spiderStatisticsBuilder);
-
-			return services;
-		}
-
-		public static StatisticsBuilder UseMemory(this StatisticsBuilder builder)
-		{
-			Check.NotNull(builder, nameof(builder));
-			builder.Services.AddSingleton<IStatisticsStore, MemoryStatisticsStore>();
+			builder.ConfigureServices(x => { x.AddSingleton<IHostLifetime, DockerLifeTime>(); });
 			return builder;
 		}
-
-		#endregion
 	}
 }

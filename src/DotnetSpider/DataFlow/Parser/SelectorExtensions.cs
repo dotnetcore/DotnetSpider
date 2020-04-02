@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 using DotnetSpider.Selector;
 
 namespace DotnetSpider.DataFlow.Parser
@@ -10,7 +11,7 @@ namespace DotnetSpider.DataFlow.Parser
         /// </summary>
         /// <param name="selector">BaseSelector</param>
         /// <returns>查询器</returns>
-        public static ISelector ToSelector(this Attribute.Selector selector)
+        public static ISelector ToSelector(this Selector selector)
         {
             if (selector != null)
             {
@@ -36,11 +37,10 @@ namespace DotnetSpider.DataFlow.Parser
                             return Selectors.Regex(expression);
                         }
 
-                        if (int.TryParse(selector.Arguments, out var group))
-                        {
-                            return Selectors.Regex(expression, group);
-                        }
-                        throw new ArgumentException($"Regex argument should be a number set to group: {selector}");
+                        var arguments = selector.Arguments.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+                        var options = (RegexOptions) Enum.Parse(typeof(RegexOptions), arguments[0]);
+                        var group = int.Parse(arguments[1]);
+                        return Selectors.Regex(expression, options, group);
                     }
                     case SelectorType.XPath:
                     {
@@ -57,7 +57,7 @@ namespace DotnetSpider.DataFlow.Parser
             return null;
         }
 
-        private static void NotNullExpression(Attribute.Selector selector)
+        private static void NotNullExpression(Selector selector)
         {
             if (string.IsNullOrWhiteSpace(selector.Expression))
             {

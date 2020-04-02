@@ -1,103 +1,101 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using DotnetSpider.Statistics.Entity;
+using DotnetSpider.Infrastructure;
 
 namespace DotnetSpider.Statistics.Store
 {
-    /// <summary>
-    /// 统计存储接口
-    /// </summary>
-    public interface IStatisticsStore
-    {
-	    /// <summary>
-	    /// 创建数据库和表
-	    /// </summary>
-	    /// <returns></returns>
-	    Task EnsureDatabaseAndTableCreatedAsync();
-	    
-        /// <summary>
-        /// 增加成功次数 1
-        /// </summary>
-        /// <param name="ownerId">爬虫标识</param>
-        /// <returns></returns>
-        Task IncrementSuccessAsync(string ownerId);
+	public interface IStatisticsStore
+	{
+		/// <summary>
+		/// 创建数据库和表
+		/// </summary>
+		/// <returns></returns>
+		Task EnsureDatabaseAndTableCreatedAsync();
 
-        /// <summary>
-        /// 添加指定失败次数
-        /// </summary>
-        /// <param name="ownerId">爬虫标识</param>
-        /// <param name="count">失败次数</param>
-        /// <returns></returns>
-        Task IncrementFailedAsync(string ownerId, int count = 1);
+		/// <summary>
+		/// 总请求数加 1
+		/// </summary>
+		/// <param name="id">爬虫标识</param>
+		/// <param name="count"></param>
+		/// <returns></returns>
+		Task IncreaseTotalAsync(string id, long count);
 
-        /// <summary>
-        /// 设置爬虫启动时间
-        /// </summary>
-        /// <param name="ownerId">爬虫标识</param>
-        /// <returns></returns>
-        Task StartAsync(string ownerId);
-        
-        /// <summary>
-        /// 设置爬虫退出时间
-        /// </summary>
-        /// <param name="ownerId">爬虫标识</param>
-        /// <returns></returns>
-        Task ExitAsync(string ownerId);
+		/// <summary>
+		/// 成功次数加 1
+		/// </summary>
+		/// <param name="id">爬虫标识</param>
+		/// <returns></returns>
+		Task IncreaseSuccessAsync(string id);
 
-        /// <summary>
-        /// 添加指定下载代理器的下载成功次数
-        /// </summary>
-        /// <param name="agentId">下载代理器标识</param>
-        /// <param name="count">下载成功次数</param>
-        /// <param name="elapsedMilliseconds">下载总消耗的时间</param>
-        /// <returns></returns>
-        Task IncrementDownloadSuccessAsync(string agentId, int count, long elapsedMilliseconds);
+		/// <summary>
+		/// 失败次数加 1
+		/// </summary>
+		/// <param name="id">爬虫标识</param>
+		/// <returns></returns>
+		Task IncreaseFailureAsync(string id);
 
-        /// <summary>
-        /// 添加指定下载代理器的下载失败次数
-        /// </summary>
-        /// <param name="agentId">下载代理器标识</param>
-        /// <param name="count">下载失败次数</param>
-        /// <param name="elapsedMilliseconds">下载总消耗的时间</param>
-        /// <returns></returns>
-        Task IncrementDownloadFailedAsync(string agentId, int count, long elapsedMilliseconds);
+		/// <summary>
+		/// 爬虫启动
+		/// </summary>
+		/// <param name="id">爬虫标识</param>
+		/// <param name="name">爬虫名称</param>
+		/// <returns></returns>
+		Task StartAsync(string id, string name);
 
-        /// <summary>
-        /// 分页查询下载代理器的统计信息
-        /// </summary>
-        /// <param name="page"></param>
-        /// <param name="size"></param>
-        /// <returns></returns>
-        Task<List<DownloadStatistics>> GetDownloadStatisticsListAsync(int page, int size);
+		/// <summary>
+		/// 爬虫退出
+		/// </summary>
+		/// <param name="id">爬虫标识</param>
+		/// <returns></returns>
+		Task ExitAsync(string id);
 
-        /// <summary>
-        /// 查询指定下载代理器的统计信息
-        /// </summary>
-        /// <param name="agentId">下载代理器标识</param>
-        /// <returns></returns>
-        Task<DownloadStatistics> GetDownloadStatisticsAsync(string agentId);
+		Task RegisterAgentAsync(string agentId, string agentName);
 
-        /// <summary>
-        /// 查询指定爬虫的统计信息
-        /// </summary>
-        /// <param name="ownerId">爬虫标识</param>
-        /// <returns></returns>
-        Task<SpiderStatistics> GetSpiderStatisticsAsync(string ownerId);
+		/// <summary>
+		/// 下载成功次数加 1
+		/// </summary>
+		/// <param name="agentId">下载代理器标识</param>
+		/// <param name="elapsedMilliseconds">下载总消耗的时间</param>
+		/// <returns></returns>
+		Task IncreaseAgentSuccessAsync(string agentId, int elapsedMilliseconds);
 
-        /// <summary>
-        /// 分页查询爬虫的统计信息
-        /// </summary>
-        /// <param name="page"></param>
-        /// <param name="size"></param>
-        /// <returns></returns>
-        Task<List<SpiderStatistics>> GetSpiderStatisticsListAsync(int page, int size);
+		/// <summary>
+		/// 下载失败次数加 1
+		/// </summary>
+		/// <param name="agentId">下载代理器标识</param>
+		/// <param name="elapsedMilliseconds">下载总消耗的时间</param>
+		/// <returns></returns>
+		Task IncreaseAgentFailureAsync(string agentId, int elapsedMilliseconds);
 
-        /// <summary>
-        /// 添加总请求数
-        /// </summary>
-        /// <param name="ownerId">爬虫标识</param>
-        /// <param name="count">请求数</param>
-        /// <returns></returns>
-        Task IncrementTotalAsync(string ownerId, int count);
-    }
+		/// <summary>
+		/// 分页查询下载代理器的统计信息
+		/// </summary>
+		/// <param name="agentId"></param>
+		/// <param name="page"></param>
+		/// <param name="limit"></param>
+		/// <returns></returns>
+		Task<PagedQueryResult<AgentStatistics>> PagedQueryAgentStatisticsAsync(string agentId, int page, int limit);
+
+		/// <summary>
+		/// 查询指定下载代理器的统计信息
+		/// </summary>
+		/// <param name="agentId">下载代理器标识</param>
+		/// <returns></returns>
+		Task<AgentStatistics> GetAgentStatisticsAsync(string agentId);
+
+		/// <summary>
+		/// 查询指定爬虫的统计信息
+		/// </summary>
+		/// <param name="id">爬虫标识</param>
+		/// <returns></returns>
+		Task<SpiderStatistics> GetSpiderStatisticsAsync(string id);
+
+		/// <summary>
+		/// 分页查询爬虫的统计信息
+		/// </summary>
+		/// <param name="keyword"></param>
+		/// <param name="page"></param>
+		/// <param name="size"></param>
+		/// <returns></returns>
+		Task<PagedQueryResult<SpiderStatistics>> PagedQuerySpiderStatisticsAsync(string keyword, int page, int size);
+	}
 }

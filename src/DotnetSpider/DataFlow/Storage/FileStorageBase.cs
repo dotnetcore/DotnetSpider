@@ -4,24 +4,21 @@ using System.Text;
 
 namespace DotnetSpider.DataFlow.Storage
 {
-	/// <summary>
-	/// 解析结果的文件存储器
-	/// </summary>
+    /// <summary>
+    /// 解析结果的文件存储器
+    /// </summary>
     public abstract class FileStorageBase : StorageBase
     {
-	    /// <summary>
-	    /// 文件的写入器
-	    /// </summary>
-        protected StreamWriter Writer { get; private set; }
+        private readonly object _locker = new object();
 
-	    /// <summary>
-	    /// 存储的根文件夹
-	    /// </summary>
+        /// <summary>
+        /// 存储的根文件夹
+        /// </summary>
         protected string Folder { get; }
 
-	    /// <summary>
-	    /// 构造方法
-	    /// </summary>
+        /// <summary>
+        /// 构造方法
+        /// </summary>
         protected FileStorageBase()
         {
             Folder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "files");
@@ -31,14 +28,14 @@ namespace DotnetSpider.DataFlow.Storage
             }
         }
 
-	    /// <summary>
-	    /// 获取存储文件夹
-	    /// </summary>
-	    /// <param name="ownerId">任务标识</param>
-	    /// <returns></returns>
-        protected string GetDataFolder(string ownerId)
+        /// <summary>
+        /// 获取存储文件夹
+        /// </summary>
+        /// <param name="owner">任务标识</param>
+        /// <returns></returns>
+        protected string GetDataFolder(string owner)
         {
-            var path = Path.Combine(Folder, ownerId);
+            var path = Path.Combine(Folder, owner);
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
@@ -47,24 +44,16 @@ namespace DotnetSpider.DataFlow.Storage
             return path;
         }
 
-	    /// <summary>
-	    /// 创建文件写入器
-	    /// </summary>
-	    /// <param name="file"></param>
-        protected void CreateFile(string file)
+        /// <summary>
+        /// 创建文件写入器
+        /// </summary>
+        /// <param name="file"></param>
+        protected StreamWriter OpenWrite(string file)
         {
-            lock (this)
+            lock (_locker)
             {
-                if (Writer == null)
-                {
-                    Writer = new StreamWriter(File.OpenWrite(file), Encoding.UTF8);
-                }
+                return new StreamWriter(File.OpenWrite(file), Encoding.UTF8);
             }
-        }
-
-        public override void Dispose()
-        {
-            Writer?.Dispose();
         }
     }
 }

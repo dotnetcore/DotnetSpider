@@ -1,6 +1,6 @@
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
-using DotnetSpider.Common;
 using Newtonsoft.Json;
 
 namespace DotnetSpider.DataFlow.Storage
@@ -9,28 +9,21 @@ namespace DotnetSpider.DataFlow.Storage
 	/// 文件保存解析结果(所有解析结果)
 	/// 保存路径: [当前程序运行目录]/files/[任务标识]/[request.hash].data
 	/// </summary>
-    public class FileStorage : FileStorageBase
-    {
-	    /// <summary>
-	    /// 根据配置返回存储器
-	    /// </summary>
-	    /// <param name="options">配置</param>
-	    /// <returns></returns>
-        public static FileStorage CreateFromOptions(SpiderOptions options)
-        {
-            return new FileStorage();
-        }
-        
-        protected override async Task<DataFlowResult> Store(DataFlowContext context)
-        {
-            var file = Path.Combine(GetDataFolder(context.Response.Request.OwnerId), $"{context.Response.Request.Hash}.data");
-            CreateFile(file);
+	public class FileStorage : FileStorageBase
+	{
+		public static IDataFlow CreateFromOptions(SpiderOptions options)
+		{
+			return new FileStorage();
+		}
 
-            await Writer.WriteLineAsync("URL:\t" + context.Response.Request.Url);
-            var items = context.GetData();
-            await Writer.WriteLineAsync("DATA:\t" + JsonConvert.SerializeObject(items));
-
-            return DataFlowResult.Success;
-        }
-    }
+		protected override async Task StoreAsync(DataContext context)
+		{
+			var file = Path.Combine(GetDataFolder(context.Request.Owner),
+				$"{context.Request.Hash}.dat");
+			using var writer = OpenWrite(file);
+			await writer.WriteLineAsync("RequestUri:\t" + context.Request.RequestUri);
+			var items = context.GetData().Where(x => !ReferenceEquals(x.Key, Consts.ResponseBytes));
+			await writer.WriteLineAsync("Data:\t" + JsonConvert.SerializeObject(items));
+		}
+	}
 }

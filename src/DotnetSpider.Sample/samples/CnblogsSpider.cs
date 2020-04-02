@@ -1,89 +1,129 @@
+using System;
+using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Storage;
+using DotnetSpider.Http;
+using DotnetSpider.Scheduler.Component;
 using DotnetSpider.Selector;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Serilog;
 
 namespace DotnetSpider.Sample.samples
 {
 	public class CnblogsSpider : Spider
 	{
-		protected override async Task Initialize()
+		public static async Task RunAsync()
 		{
-			NewGuidId();
-			Depth = 3;
-			AddDataFlow(new ListNewsParser()).AddDataFlow(new NewsParser()).AddDataFlow(new ConsoleStorage());
-			await AddRequests("https://news.cnblogs.com/n/page/1/");
+			var builder = Builder.CreateDefaultBuilder<CnblogsSpider>();
+			builder.UseSerilog();
+			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
+			await builder.Build().RunAsync();
 		}
 
-		class ListNewsParser : DataParser
+		public CnblogsSpider(IOptions<SpiderOptions> options,
+			SpiderServices services,
+			ILogger<Spider> logger) : base(
+			options, services, logger)
+		{
+		}
+
+		protected override async Task InitializeAsync(CancellationToken stoppingToken)
+		{
+			AddDataFlow(new ListNewsParser());
+			AddDataFlow(new NewsParser());
+			AddDataFlow(new MyConsoleStorage());
+			await AddRequestsAsync(new Request("https://news.cnblogs.com/n/page/1/"));
+		}
+
+		protected override (string Id, string Name) GetIdAndName()
+		{
+			return (Guid.NewGuid().ToString(), "cnblogs");
+		}
+
+		protected class MyConsoleStorage : StorageBase
+		{
+			protected override Task StoreAsync(DataContext context)
+			{
+				var typeName = typeof(News).FullName;
+				var data = context.GetData(typeName);
+				if (data is News news)
+				{
+					Console.WriteLine($"URL: {news.Url}, TITLE: {news.Title}, VIEWS: {news.Views}");
+				}
+
+				return Task.CompletedTask;
+			}
+		}
+
+		protected class ListNewsParser : DataParser
 		{
 			public ListNewsParser()
 			{
-				Required = DataParserHelper.CheckIfRequiredByRegex("news\\.cnblogs\\.com/n/page");
-				// 如果你还想翻页则可以去掉注释
-				//FollowRequestQuerier =
-				//	BuildFollowRequestQuerier(DataParserHelper.QueryFollowRequestsByXPath(".//div[@class='pager']"));
+				AddRequiredValidator("news\\.cnblogs\\.com/n/page");
+				// if you want to collect every pages
+				// AddFollowRequestQuerier(Selectors.XPath(".//div[@class='pager']"));
 			}
 
-			protected override Task<DataFlowResult> Parse(DataFlowContext context)
+			protected override Task Parse(DataContext context)
 			{
-				var news = context.Selectable.XPath(".//div[@class='news_block']").Nodes();
-				foreach (var item in news)
+				var newsList = context.Selectable.SelectList(Selectors.XPath(".//div[@class='news_block']"));
+				foreach (var news in newsList)
 				{
-					var title = item.Select(Selectors.XPath(".//h2[@class='news_entry']"))
-						.GetValue(ValueOption.InnerText);
-					var url = item.Select(Selectors.XPath(".//h2[@class='news_entry']/a/@href")).GetValue();
-					var summary = item.Select(Selectors.XPath(".//div[@class='entry_summary']"))
-						.GetValue(ValueOption.InnerText);
-					var views = item.Select(Selectors.XPath(".//span[@class='view']")).GetValue(ValueOption.InnerText)
-						.Replace(" 人浏览", "");
-					var request = CreateFromRequest(context.Response.Request, url);
-					request.AddProperty("title", title);
-					request.AddProperty("summary", summary);
-					request.AddProperty("views", views);
+					var title = news.Select(Selectors.XPath(".//h2[@class='news_entry']"))?.Value;
+					var url = news.Select(Selectors.XPath(".//h2[@class='news_entry']/a/@href"))?.Value;
+					var summary = news.Select(Selectors.XPath(".//div[@class='entry_summary']"))?.Value;
+					var views = news.Select(Selectors.XPath(".//span[@class='view']"))?.Value.Replace(" 人浏览", "");
 
-					context.AddExtraRequests(request);
+					if (!string.IsNullOrWhiteSpace(url))
+					{
+						var request = context.Request.CreateNew(url);
+						request.SetProperty("title", title);
+						request.SetProperty("url", url);
+						request.SetProperty("summary", summary);
+						request.SetProperty("views", views);
+
+						context.AddFollowRequests(request);
+					}
 				}
 
-				return Task.FromResult(DataFlowResult.Success);
+				return Task.CompletedTask;
 			}
 		}
 
-		class NewsParser : DataParser
+		protected class NewsParser : DataParser
 		{
 			public NewsParser()
 			{
-				Required = DataParserHelper.CheckIfRequiredByRegex("news\\.cnblogs\\.com/n/\\d+");
+				AddRequiredValidator("news\\.cnblogs\\.com/n/\\d+");
 			}
 
-			protected override Task<DataFlowResult> Parse(DataFlowContext context)
+			protected override Task Parse(DataContext context)
 			{
 				var typeName = typeof(News).FullName;
 				context.AddData(typeName,
 					new News
 					{
-						Url = context.Response.Request.Url,
-						Title = context.Response.Request.Properties["title"],
-						Summary = context.Response.Request.Properties["summary"],
-						Views = int.Parse(context.Response.Request.Properties["views"]),
-						Content = context.Selectable.Select(Selectors.XPath(".//div[@id='news_body']")).GetValue()
+						Url = context.Request.RequestUri.ToString(),
+						Title = context.Request.Properties["title"]?.Trim(),
+						Summary = context.Request.Properties["summary"]?.Trim(),
+						Views = int.Parse(context.Request.Properties["views"]),
+						Content = context.Selectable.Select(Selectors.XPath(".//div[@id='news_body']")).Value
+							?.Trim()
 					});
-				return Task.FromResult(DataFlowResult.Success);
+				return Task.CompletedTask;
 			}
 		}
 
-		public CnblogsSpider(SpiderParameters parameters) : base(parameters)
-		{
-		}
-
-		class News
+		protected class News
 		{
 			public string Title { get; set; }
 			public string Url { get; set; }
 			public string Summary { get; set; }
 			public int Views { get; set; }
-
 			public string Content { get; set; }
 		}
 	}

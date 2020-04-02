@@ -1,50 +1,54 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading;
 using System.Threading.Tasks;
-using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
-using DotnetSpider.DataFlow.Parser.Attribute;
-using DotnetSpider.DataFlow.Parser.Formatter;
+using DotnetSpider.DataFlow.Parser.Formatters;
 using DotnetSpider.DataFlow.Storage;
-using DotnetSpider.DataFlow.Storage.Model;
-using DotnetSpider.Downloader;
-using DotnetSpider.Scheduler;
+using DotnetSpider.Http;
+using DotnetSpider.Scheduler.Component;
 using DotnetSpider.Selector;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Serilog;
 
 namespace DotnetSpider.Sample.samples
 {
 	public class EntitySpider : Spider
 	{
-		public EntitySpider(SpiderParameters parameters) : base(parameters)
+		public static async Task RunAsync()
+		{
+			var builder = Builder.CreateDefaultBuilder<EntitySpider>();
+			builder.UseSerilog();
+			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
+			await builder.Build().RunAsync();
+		}
+
+		public EntitySpider(IOptions<SpiderOptions> options, SpiderServices services, ILogger<Spider> logger) : base(
+			options, services, logger)
 		{
 		}
 
-		protected override async Task Initialize()
+		protected override async Task InitializeAsync(CancellationToken stoppingToken)
 		{
-			NewGuidId();
-			Scheduler = new QueueDistinctBfsScheduler();
-			Speed = 1;
-			Depth = 3;
-			AddDataFlow(new DataParser<CnblogsEntry>())
-				.AddDataFlow(GetDefaultStorage());
-			await AddRequests(
+			AddDataFlow(new DataParser<CnblogsEntry>());
+			AddDataFlow(GetDefaultStorage());
+			await AddRequestsAsync(
 				new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}}),
 				new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}}));
 		}
 
-		class MyClass : DataParser<CnblogsEntry>
+		protected override (string Id, string Name) GetIdAndName()
 		{
-			protected override Task<DataFlowResult> Parse(DataFlowContext context)
-			{
-				return base.Parse(context);
-			}
+			return (Guid.NewGuid().ToString(), "博客园");
 		}
 
 		[Schema("cnblogs", "news")]
 		[EntitySelector(Expression = ".//div[@class='news_block']", Type = SelectorType.XPath)]
 		[GlobalValueSelector(Expression = ".//a[@class='current']", Name = "类别", Type = SelectorType.XPath)]
-		[FollowSelector(XPaths = new[] {"//div[@class='pager']"})]
+		[FollowRequestSelector(XPaths = new[] {"//div[@class='pager']"})]
 		public class CnblogsEntry : EntityBase<CnblogsEntry>
 		{
 			protected override void Configure()
@@ -57,12 +61,12 @@ namespace DotnetSpider.Sample.samples
 
 			[Required]
 			[StringLength(200)]
-			[ValueSelector(Expression = "类别", Type = SelectorType.Enviroment)]
+			[ValueSelector(Expression = "类别", Type = SelectorType.Environment)]
 			public string Category { get; set; }
 
 			[Required]
 			[StringLength(200)]
-			[ValueSelector(Expression = "网站", Type = SelectorType.Enviroment)]
+			[ValueSelector(Expression = "网站", Type = SelectorType.Environment)]
 			public string WebSite { get; set; }
 
 			[StringLength(200)]
@@ -71,7 +75,7 @@ namespace DotnetSpider.Sample.samples
 			public string Title { get; set; }
 
 			[StringLength(40)]
-			[ValueSelector(Expression = "GUID", Type = SelectorType.Enviroment)]
+			[ValueSelector(Expression = "GUID", Type = SelectorType.Environment)]
 			public string Guid { get; set; }
 
 			[ValueSelector(Expression = ".//h2[@class='news_entry']/a")]
@@ -80,10 +84,10 @@ namespace DotnetSpider.Sample.samples
 			[ValueSelector(Expression = ".//h2[@class='news_entry']/a/@href")]
 			public string Url { get; set; }
 
-			[ValueSelector(Expression = ".//div[@class='entry_summary']", ValueOption = ValueOption.InnerText)]
+			[ValueSelector(Expression = ".//div[@class='entry_summary']")]
 			public string PlainText { get; set; }
 
-			[ValueSelector(Expression = "DATETIME", Type = SelectorType.Enviroment)]
+			[ValueSelector(Expression = "DATETIME", Type = SelectorType.Environment)]
 			public DateTime CreationTime { get; set; }
 		}
 	}

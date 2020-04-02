@@ -1,4 +1,10 @@
-FROM registry.cn-shanghai.aliyuncs.com/cndotnet/dotnet:2.2-aspnetcore-runtime
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1  AS build-env
 WORKDIR /portal
-COPY ./bin/Release/netcoreapp2.2/publish/ .
+COPY . ./
+RUN dotnet publish -c Release -o out
+
+FROM mcr.microsoft.com/dotnet/core/runtime:3.1
+WORKDIR /portal
+COPY --from=build-env /portal/out/ .
+
 ENTRYPOINT ["dotnet", "DotnetSpider.Portal.dll"]

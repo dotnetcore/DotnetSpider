@@ -1,52 +1,47 @@
 using System.Collections.Concurrent;
-using System.Runtime.CompilerServices;
-using DotnetSpider.DataFlow;
-using DotnetSpider.Downloader;
+using System.Threading.Tasks;
+using DotnetSpider.Http;
+using DotnetSpider.Infrastructure;
 
 namespace DotnetSpider.Scheduler.Component
 {
-	/// <summary>
-	/// 通过哈希去重
-	/// </summary>
-	public class HashSetDuplicateRemover : IDuplicateRemover
-	{
-		private readonly ConcurrentDictionary<string, Request> _hashes = new ConcurrentDictionary<string, Request>();
+    /// <summary>
+    /// 通过哈希去重
+    /// </summary>
+    public class HashSetDuplicateRemover : IDuplicateRemover
+    {
+        private readonly ConcurrentDictionary<string, object> _hashes = new ConcurrentDictionary<string, object>();
 
-		/// <summary>
-		/// Check whether the request is duplicate.
-		/// </summary>
-		/// <param name="request">Request</param>
-		/// <returns>Whether the request is duplicate.</returns>
-		public bool IsDuplicate(Request request)
-		{
-			Check.NotNull(request.OwnerId, nameof(request.OwnerId));
-			var hash = request.Hash;
-			var isDuplicate = _hashes.ContainsKey(hash);
-			if (!isDuplicate)
-			{
-				_hashes.TryAdd(hash, request);
-			}
+        /// <summary>
+        /// Check whether the request is duplicate.
+        /// </summary>
+        /// <param name="request">Request</param>
+        /// <returns>Whether the request is duplicate.</returns>
+        public Task<bool> IsDuplicateAsync(Request request)
+        {
+            request.NotNull(nameof(request));
+            request.Owner.NotNullOrWhiteSpace(nameof(request.Owner));
 
-			return isDuplicate;
-		}
+            var isDuplicate = _hashes.TryAdd(request.Hash, null);
+            return Task.FromResult(!isDuplicate);
+        }
 
-		public int Total => _hashes.Count;
+        public long Total => _hashes.Count;
 
-		/// <summary>
-		/// 重置去重器
-		/// </summary>
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		public void ResetDuplicateCheck()
-		{
-			_hashes.Clear();
-		}
+        /// <summary>
+        /// 重置去重器
+        /// </summary>
+        public void ResetDuplicateCheck()
+        {
+            _hashes.Clear();
+        }
 
-		/// <summary>
-		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-		/// </summary>
-		public void Dispose()
-		{
-			_hashes.Clear();
-		}
-	}
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            _hashes.Clear();
+        }
+    }
 }

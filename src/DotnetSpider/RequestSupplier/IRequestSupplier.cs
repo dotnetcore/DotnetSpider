@@ -1,5 +1,7 @@
-using System;
-using DotnetSpider.Downloader;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using DotnetSpider.Http;
 
 namespace DotnetSpider.RequestSupplier
 {
@@ -11,7 +13,6 @@ namespace DotnetSpider.RequestSupplier
         /// <summary>
         /// 运行请求供应
         /// </summary>
-        /// <param name="enqueueDelegate">请求入队的方法</param>
-        void Execute(Action<Request> enqueueDelegate);
+        Task<IEnumerable<Request>> GetAllListAsync(CancellationToken cancellationToken);
     }
 }
