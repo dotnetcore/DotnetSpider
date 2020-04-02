@@ -129,7 +129,7 @@ namespace DotnetSpider.Agent
 			}
 			else if (message is Request request)
 			{
-				var downloader = _downloaderFactory.Create(request.AgentType);
+				var downloader = _downloaderFactory.Create(request.DownloaderType);
 				var response = await downloader.DownloadAsync(request);
 				response.Agent = _options.AgentId;
 				await _messageQueue.PublishAsBytesAsync(string.Format(TopicNames.Spider, request.Owner.ToUpper()),

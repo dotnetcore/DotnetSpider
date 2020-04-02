@@ -169,14 +169,11 @@ namespace DotnetSpider
 
 			foreach (var request in requests)
 			{
-				if (request.AgentType == AgentTypeNames.PuppeteerWithADSL ||
-				    request.AgentType == AgentTypeNames.HttpClientWithADSL)
+				if (request.DownloaderType.Contains("ADSL") &&
+				    string.IsNullOrWhiteSpace(request.GetHeader(Consts.RedialRegExp)))
 				{
-					if (string.IsNullOrWhiteSpace(request.GetHeader(Consts.RedialRegExp)))
-					{
-						throw new ArgumentException(
-							$"Request {request.RequestUri} set to use ADSL but RedialEgeExp is empty");
-					}
+					throw new ArgumentException(
+						$"Request {request.RequestUri} set to use ADSL but RedialEgeExp is empty");
 				}
 
 				request.RequestedTimes += 1;
@@ -435,9 +432,9 @@ namespace DotnetSpider
 					request.Timestamp = DateTimeOffset.Now.ToTimestamp();
 					if (string.IsNullOrWhiteSpace(request.Agent))
 					{
-						topic = string.IsNullOrEmpty(request.AgentType)
-							? AgentTypeNames.HttpClient
-							: request.AgentType;
+						topic = string.IsNullOrEmpty(request.DownloaderType)
+							? DownloaderTypeNames.HttpClient
+							: request.DownloaderType;
 					}
 					else
 					{
@@ -451,9 +448,9 @@ namespace DotnetSpider
 							}
 							case RequestPolicy.Random:
 							{
-								topic = string.IsNullOrEmpty(request.AgentType)
-									? AgentTypeNames.HttpClient
-									: request.AgentType;
+								topic = string.IsNullOrEmpty(request.DownloaderType)
+									? DownloaderTypeNames.HttpClient
+									: request.DownloaderType;
 								break;
 							}
 							default:

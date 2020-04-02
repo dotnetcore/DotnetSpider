@@ -42,7 +42,7 @@ namespace DotnetSpider.Http
 		/// <summary>
 		/// 下载代理类型
 		/// </summary>
-		public string AgentType { get; set; } = "HttpClient";
+		public string DownloaderType { get; set; } = "HttpClient";
 
 		/// <summary>
 		/// 链接的深度
@@ -276,7 +276,7 @@ namespace DotnetSpider.Http
 			{
 				Owner = Owner,
 				Agent = Agent,
-				AgentType = AgentType,
+				DownloaderType = DownloaderType,
 				Depth = Depth,
 				RequestUri = new Uri(RequestUri.ToString(), UriKind.RelativeOrAbsolute),
 				AutoRedirect = AutoRedirect,
