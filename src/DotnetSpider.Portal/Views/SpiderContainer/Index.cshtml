@@ -1,0 +1,110 @@
+@using X.PagedList.Mvc.Core
+@using X.PagedList.Mvc.Core.Common
+@using X.PagedList.Web.Common
+@model X.PagedList.IPagedList<DotnetSpider.Portal.Models.SpiderContainer.ListSpiderContainerViewModel>
+
+<div class="col-xs-12">
+    <div class="box">
+        <div class="box-header">
+            <div class="box-title">
+                &ensp;
+            </div>
+            <div class="box-tools">
+                &ensp;
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body table-responsive no-padding">
+            <table class="table table-bordered">
+                <tbody>
+                <tr>
+                    <th style="width: 245px;">Batch</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                    <th>Success</th>
+                    <th>Failed</th>
+                    <th>Left</th>
+                    <th>StartTime</th>
+                    <th>ExitTime</th>
+                    <th>Action</th>
+                </tr>
+                @if (Model == null || !Model.Any())
+                {
+                    <tr>
+                        <td colspan="9">
+                            None
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr >
+                            <td>
+                                <span>@item.Batch</span>
+                            </td>
+                            <td>
+                                <span>@item.Status</span>
+                            </td>
+                            <td>
+                                <span>@item.Total</span>
+                            </td>
+                            <td>
+                                <span>@item.Success</span>
+                            </td>
+                            <td>
+                                <span>@item.Failed</span>
+                            </td>
+                            <td>
+                                <span>@item.Left</span>
+                            </td>
+                            <td>
+                                <span>@item.Start?.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</span>
+                            </td>
+                            <td>
+                                <span>@item.Exit?.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</span>
+                            </td>
+                            <td>
+                                <button @(item.Exit == null ? "" : "disabled") class="btn btn-default btn-sm btn-flat" onclick="exit('@item.Batch')">Exit</button>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+        <!-- /.box-body -->
+        <div class="box-footer clearfix no-border">
+            @if (Model != null && Model.PageCount > 1)
+            {
+                @Html.PagedListPager(Model, page => Url.Action("Retrieve", new {page}),
+                    new PagedListRenderOptions
+                    {
+                        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+                        DisplayLinkToLastPage = PagedListDisplayMode.Always,
+                        DisplayLinkToNextPage = PagedListDisplayMode.Always,
+                        ContainerDivClasses = new string[0],
+                        UlElementClasses = new[] {"pagination pagination-sm no-margin pull-left"},
+                        LiElementClasses = new[] {"page-item"},
+                        PageClasses = new[] {"page-link"}
+                    })
+            }
+        </div>
+    </div>
+    <!-- /.box -->
+</div>
+
+@section scripts{
+    <environment names="Development">
+        <script src="~/js/spider-container.js" asp-append-version="true"></script>
+    </environment>
+    <environment names="Staging,Production">
+        <script src="~/js/spider-container.min.js" asp-append-version="true"></script>
+    </environment>
+    <script>
+        $(function() {
+            app.activeMenu('Spider');
+        })
+    </script>
+}

@@ -1,0 +1,93 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider", "src\DotnetSpider\DotnetSpider.csproj", "{2507B5E1-6C6D-434D-BCBE-C97377CC6E34}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Tests", "src\DotnetSpider.Tests\DotnetSpider.Tests.csproj", "{6D08F565-0FCE-4399-9E41-950626469BB4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Mongo", "src\DotnetSpider.Mongo\DotnetSpider.Mongo.csproj", "{BFE64BD9-9B6D-4184-A600-8C9CC3E8C688}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Sample", "src\DotnetSpider.Sample\DotnetSpider.Sample.csproj", "{0CB1AE15-1B6D-40C8-9650-02BD0372F82E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.MySql", "src\DotnetSpider.MySql\DotnetSpider.MySql.csproj", "{FB3CE090-4DAF-4F7F-B5A7-C9A1D02DE7B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.HBase", "src\DotnetSpider.HBase\DotnetSpider.HBase.csproj", "{B0744AC5-3057-4C99-A02F-BF490EFE68DA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{724DCFC7-FA90-4AA7-8A2E-32FACCDEB38C}"
+ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		azure-pipelines.yml = azure-pipelines.yml
+		Directory.Build.props = Directory.Build.props
+		LICENSE.txt = LICENSE.txt
+		package.props = package.props
+		README.md = README.md
+		runtests.sh = runtests.sh
+								publish_agent.sh = publish_agent.sh
+								publish_portal.sh = publish_portal.sh
+EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Agent", "src\DotnetSpider.Agent\DotnetSpider.Agent.csproj", "{FCCA37B0-FF8F-4C32-9286-26A39EFA94E5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.PostgreSql", "src\DotnetSpider.PostgreSql\DotnetSpider.PostgreSql.csproj", "{0BFD04A4-A078-46D2-95F3-BCECB942A4A1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.RabbitMQ", "src\DotnetSpider.RabbitMQ\DotnetSpider.RabbitMQ.csproj", "{CF38ACFC-847A-424A-9476-78DE750BE8A1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker-compose", "docker-compose", "{23813B85-AB02-4A53-B0A0-4DA5B6665425}"
+ProjectSection(SolutionItems) = preProject
+	docker-compose\hbase.yml = docker-compose\hbase.yml
+	docker-compose\rabbitmq.yml = docker-compose\rabbitmq.yml
+EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.AgentRegister", "src\DotnetSpider.AgentRegister\DotnetSpider.AgentRegister.csproj", "{05991456-8637-4BBA-ADEB-95A86C528CBA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2507B5E1-6C6D-434D-BCBE-C97377CC6E34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2507B5E1-6C6D-434D-BCBE-C97377CC6E34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2507B5E1-6C6D-434D-BCBE-C97377CC6E34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2507B5E1-6C6D-434D-BCBE-C97377CC6E34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D08F565-0FCE-4399-9E41-950626469BB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D08F565-0FCE-4399-9E41-950626469BB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D08F565-0FCE-4399-9E41-950626469BB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D08F565-0FCE-4399-9E41-950626469BB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BFE64BD9-9B6D-4184-A600-8C9CC3E8C688}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFE64BD9-9B6D-4184-A600-8C9CC3E8C688}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFE64BD9-9B6D-4184-A600-8C9CC3E8C688}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BFE64BD9-9B6D-4184-A600-8C9CC3E8C688}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CB1AE15-1B6D-40C8-9650-02BD0372F82E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CB1AE15-1B6D-40C8-9650-02BD0372F82E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CB1AE15-1B6D-40C8-9650-02BD0372F82E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CB1AE15-1B6D-40C8-9650-02BD0372F82E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB3CE090-4DAF-4F7F-B5A7-C9A1D02DE7B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB3CE090-4DAF-4F7F-B5A7-C9A1D02DE7B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB3CE090-4DAF-4F7F-B5A7-C9A1D02DE7B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB3CE090-4DAF-4F7F-B5A7-C9A1D02DE7B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0744AC5-3057-4C99-A02F-BF490EFE68DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0744AC5-3057-4C99-A02F-BF490EFE68DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0744AC5-3057-4C99-A02F-BF490EFE68DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0744AC5-3057-4C99-A02F-BF490EFE68DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCCA37B0-FF8F-4C32-9286-26A39EFA94E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCCA37B0-FF8F-4C32-9286-26A39EFA94E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCCA37B0-FF8F-4C32-9286-26A39EFA94E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCCA37B0-FF8F-4C32-9286-26A39EFA94E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BFD04A4-A078-46D2-95F3-BCECB942A4A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BFD04A4-A078-46D2-95F3-BCECB942A4A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BFD04A4-A078-46D2-95F3-BCECB942A4A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BFD04A4-A078-46D2-95F3-BCECB942A4A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF38ACFC-847A-424A-9476-78DE750BE8A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF38ACFC-847A-424A-9476-78DE750BE8A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF38ACFC-847A-424A-9476-78DE750BE8A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF38ACFC-847A-424A-9476-78DE750BE8A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05991456-8637-4BBA-ADEB-95A86C528CBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05991456-8637-4BBA-ADEB-95A86C528CBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05991456-8637-4BBA-ADEB-95A86C528CBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05991456-8637-4BBA-ADEB-95A86C528CBA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{23813B85-AB02-4A53-B0A0-4DA5B6665425} = {724DCFC7-FA90-4AA7-8A2E-32FACCDEB38C}
+	EndGlobalSection
+EndGlobal

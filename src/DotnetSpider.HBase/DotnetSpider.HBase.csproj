@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../../package.props" />
+  <PropertyGroup>
+    <PackageId>DotnetSpider.HBase</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj" />
+  </ItemGroup>
+
+</Project>

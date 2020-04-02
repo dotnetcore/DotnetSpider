@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\DotnetSpider.HBase\DotnetSpider.HBase.csproj" />
+      <ProjectReference Include="..\DotnetSpider.Mongo\DotnetSpider.Mongo.csproj" />
+      <ProjectReference Include="..\DotnetSpider.MySql\DotnetSpider.MySql.csproj" />
+      <ProjectReference Include="..\DotnetSpider.RabbitMQ\DotnetSpider.RabbitMQ.csproj" />
+      <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+        <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
+        <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="2.3.0" />
+        <PackageReference Include="System.Text.Json" Version="4.7.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="appsettings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+</Project>

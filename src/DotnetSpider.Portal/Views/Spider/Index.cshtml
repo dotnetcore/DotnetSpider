@@ -1,0 +1,118 @@
+@using X.PagedList.Mvc.Core
+@using X.PagedList.Mvc.Core.Common
+@using X.PagedList.Web.Common
+@model X.PagedList.IPagedList<DotnetSpider.Portal.Data.Spider>
+
+
+<div class="col-xs-12">
+    <div class="box">
+        <div class="box-header">
+            <div class="box-title">
+            </div>
+            <div class="box-tools">
+
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body table-responsive no-padding">
+            <table class="table table-bordered">
+                <tbody>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Registry</th>
+                    <th>Repostory</th>
+                    <th>Tag</th>
+                    <th>Cron</th>
+                    <th>Environment</th>
+                    <th>ModificationTime</th>
+                    <th>Action</th>
+                </tr>
+                @if (Model == null || !Model.Any())
+                {
+                    <tr>
+                        <td colspan="9">
+                            None
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr >
+                            <td>
+                                <span>@item.Id</span>
+                            </td>
+                            <td>
+                                <span>@item.Name</span>
+                            </td>
+                            <td>
+                                <span>@item.Registry</span>
+                            </td>
+                            <td>
+                                <span>@item.Repository</span>
+                            </td>
+                            <td>
+                                <span>@item.Tag</span>
+                            </td>
+                            <td>
+                                <span>@item.Cron</span>
+                            </td>
+                            <td>
+                                <span>@item.Environment</span>
+                            </td>
+
+                            <td>
+                                <span>@item.LastModificationTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</span>
+                            </td>
+                            <td>
+                                <a class="btn btn-default btn-sm  btn-flat" href="spider/@item.Id">Edit</a>
+                                <button class="btn btn-default btn-sm  btn-flat" onclick="remove('@item.Id')">Delete</button>
+                                @if (item.Enable)
+                                {
+                                    <button class="btn btn-default btn-sm  btn-flat" onclick="disable('@item.Id')">Disable</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-default btn-sm  btn-flat" onclick="enable('@item.Id')">Enable</button>
+                                }
+                                <button class="btn btn-default btn-sm  btn-flat" onclick="run('@item.Id')">Execute</button>
+                                <a class="btn btn-default btn-sm  btn-flat" href="spider/create?registry=@(item.Registry)&repository=@(item.Repository)">Copy</a>
+                                <a class="btn btn-default btn-sm  btn-flat" href="spider/@item.Id/containers">History</a>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+        <!-- /.box-body -->
+        <div class="box-footer clearfix no-border">
+            @if (Model != null && Model.PageCount > 1)
+            {
+                @Html.PagedListPager(Model, page => Url.Action("Retrieve", new {page}),
+                    new PagedListRenderOptions
+                    {
+                        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+                        DisplayLinkToLastPage = PagedListDisplayMode.Always,
+                        DisplayLinkToNextPage = PagedListDisplayMode.Always,
+                        ContainerDivClasses = new string[0],
+                        UlElementClasses = new[] {"pagination pagination-sm no-margin pull-left"},
+                        LiElementClasses = new[] {"page-item"},
+                        PageClasses = new[] {"page-link"}
+                    })
+            }
+        </div>
+    </div>
+    <!-- /.box -->
+</div>
+
+@section scripts{
+    <environment names="Development">
+        <script src="~/js/spider.js" asp-append-version="true"></script>
+    </environment>
+    <environment names="Staging,Production">
+        <script src="~/js/spider.min.js" asp-append-version="true"></script>
+    </environment>
+}

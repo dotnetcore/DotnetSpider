@@ -1,0 +1,12 @@
+<script type="text/x-template" id="select2-template">
+    <select>
+        <slot></slot>
+  </select>
+</script>
+
+<environment names="Development">
+    <script src="~/js/select2.js" asp-append-version="true"></script>
+</environment>
+<environment names="Staging,Production">
+    <script src="~/js/select2.min.js" asp-append-version="true"></script>
+</environment>

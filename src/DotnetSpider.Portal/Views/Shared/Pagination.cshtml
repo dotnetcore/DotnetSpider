@@ -1,0 +1,41 @@
+<script type="text/x-template" id="pagination-template">
+    <ul class="pagination">
+        <!-- prev -->
+        <li
+            :class="['page-item', {'disabled' : disablePre}]"
+            v-on:click="prev">
+            <a class="page-link" href="#">Previous</a>
+        </li>
+        <!-- first -->
+        <li
+            :class="['page-item', {'disabled' : disableFirst}]"
+            v-on:click="first">
+            <a class="page-link" href="#">First</a>
+        </li>
+        <li
+            v-for="pager in pagers"
+            :class="['page-item', {'active' : page == pager}]"
+            v-on:click="go(pager)">
+            <a class="page-link" href="#">{{ pager }}</a>
+        </li>
+        <!-- last -->
+        <li
+            :class="['page-item', {'disabled' : disableLast}]"
+            v-on:click="last">
+            <a class="page-link" href="#">Last</a>
+        </li>
+        <!-- next -->
+        <li
+            :class="['page-item', {'disabled' : disableNext}]"
+            v-on:click="next">
+            <a class="page-link" href="#">Next</a>
+        </li>
+    </ul>
+</script>
+
+<environment names="Development">
+    <script src="~/js/pagination.js" asp-append-version="true"></script>
+</environment>
+<environment names="Staging,Production">
+    <script src="~/js/pagination.min.js" asp-append-version="true"></script>
+</environment>
