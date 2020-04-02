@@ -5,7 +5,8 @@ using System.Reflection;
 using Dapper;
 using DotnetSpider.AgentRegister;
 using DotnetSpider.MySql;
-using DotnetSpider.Portal.Entity;
+using DotnetSpider.Portal.BackgroundService;
+using DotnetSpider.Portal.Data;
 using DotnetSpider.RabbitMQ;
 using DotnetSpider.Statistics;
 using Microsoft.AspNetCore.Builder;
@@ -18,6 +19,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Quartz;
+using Quartz.AspNetCore;
+using Quartz.AspNetCore.MySqlConnector;
 using SwiftMQ;
 using ServiceProvider = DotnetSpider.Portal.Common.ServiceProvider;
 
@@ -69,9 +72,13 @@ namespace DotnetSpider.Portal
 				}
 			}
 
+			var options = new PortalOptions(Configuration);
 			services.AddRabbitMQ(Configuration.GetSection("RabbitMQ"));
 			services.AddDbContext<PortalDbContext>(dbContextOptionsBuilder);
-			services.AddQuartz();
+			services.AddQuartz(x =>
+			{
+				x.UseMySqlConnector(options.ConnectionString);
+			});
 			services.AddHttpClient();
 			services.AddAgentRegister<MySqlAgentStore>();
 			services.AddStatistics<MySqlStatisticsStore>();
@@ -84,7 +91,7 @@ namespace DotnetSpider.Portal
 		{
 			ServiceProvider.Instance = app.ApplicationServices;
 
-			PrintEnvironment(app.ApplicationServices.GetRequiredService<ILogger<Startup>>());
+			PrintEnvironment(app.ApplicationServices);
 
 			if (env.IsDevelopment())
 			{
@@ -113,110 +120,16 @@ namespace DotnetSpider.Portal
 					pattern: "{controller=Home}/{action=Index}/{id?}");
 			});
 
-			using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
-				.CreateScope())
-			{
-				var context = scope.ServiceProvider.GetRequiredService<PortalDbContext>();
-				context.Database.Migrate();
-				context.Database.EnsureCreated();
+			SeedData.InitializeAsync(new PortalOptions(Configuration), app.ApplicationServices).GetAwaiter()
+				.GetResult();
 
-				string sql;
-				var conn = context.Database.GetDbConnection();
-				switch (_options.DatabaseType?.ToLower())
-				{
-					case "mysql":
-					{
-						if (conn.QuerySingle<int>(
-							    $"SELECT count(*)  FROM information_schema.TABLES WHERE table_name ='QRTZ_FIRED_TRIGGERS';") ==
-						    0
-						)
-						{
-							var sqlStream = GetType().Assembly
-								.GetManifestResourceStream("DotnetSpider.Portal.DDL.MySql.sql");
-							if (sqlStream == null)
-							{
-								throw new SpiderException("Can't find quartz.net MySql sql");
-							}
-
-							using (var reader = new StreamReader(sqlStream))
-							{
-								sql = reader.ReadToEnd();
-								conn.Execute(sql);
-							}
-						}
-
-						break;
-					}
-
-					default:
-					{
-						if (conn.QuerySingle<int>(
-							    $"SELECT COUNT(*) from sysobjects WHERE id = object_id(N'[dbo].[QRTZ_FIRED_TRIGGERS]') AND OBJECTPROPERTY(id, N'') = IsUserTable") ==
-						    0
-						)
-						{
-							var sqlStream = GetType().Assembly
-								.GetManifestResourceStream("DotnetSpider.Portal.DDL.SqlServer.sql");
-							if (sqlStream == null)
-							{
-								throw new SpiderException("Can't find quartz.net SqlServer sql");
-							}
-
-							using (var reader = new StreamReader(sqlStream))
-							{
-								sql = reader.ReadToEnd();
-								conn.Execute(sql);
-							}
-						}
-
-						break;
-					}
-				}
-
-				var sched = app.ApplicationServices.GetRequiredService<IScheduler>();
-				InitializedData(context, sched);
-			}
+			app.UseQuartz(true);
 		}
 
-		private void InitializedData(PortalDbContext context, IScheduler sched)
+
+		private void PrintEnvironment(IServiceProvider serviceProvider)
 		{
-			if (!context.DockerRepositories.Any())
-			{
-				var repo = new DockerRepository
-				{
-					Name = "DockerHub",
-					Schema = null,
-					Registry = null,
-					Repository = "dotnetspider/spiders.startup",
-					CreationTime = DateTimeOffset.Now,
-					UserName = "",
-					Password = ""
-				};
-				context.DockerRepositories.Add(repo);
-
-				var spider = new Entity.Spider
-				{
-					Name = "cnblogs",
-					Cron = "0 1 */1 * * ?",
-					Repository = "dotnetspider/spiders.startup",
-					Type = "DotnetSpider.Spiders.CnblogsSpider",
-					Tag = "latest",
-					CreationTime = DateTimeOffset.Now
-				};
-				context.Spiders.Add(spider);
-				context.SaveChanges();
-
-				var trigger = TriggerBuilder.Create().WithCronSchedule(spider.Cron).WithIdentity(spider.Id.ToString())
-					.Build();
-				var qzJob = JobBuilder.Create<TriggerJob>().WithIdentity(spider.Id.ToString())
-					.WithDescription(spider.Name)
-					.RequestRecovery(true).Build();
-				sched.ScheduleJob(qzJob, trigger).GetAwaiter().GetResult();
-			}
-		}
-
-		private void PrintEnvironment(ILogger logger)
-		{
+			var logger = serviceProvider.GetRequiredService<ILogger<Startup>>();
 			logger.LogInformation("Arg   : VERSION = 20190725", 0, ConsoleColor.DarkYellow);
 			foreach (var kv in Configuration.GetChildren())
 			{

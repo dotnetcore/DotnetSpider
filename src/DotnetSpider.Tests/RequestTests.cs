@@ -28,7 +28,7 @@ namespace DotnetSpider.Tests
                 Accept = "Accept",
                 Agent = "Agent",
                 AutoRedirect = true,
-                AgentType = AgentType.HttpClient,
+                AgentType = AgentTypeNames.HttpClient,
                 UserAgent = "UserAgent",
                 Timestamp = 1000,
                 RedialRegExp = "RedialRegExp"
@@ -47,7 +47,7 @@ namespace DotnetSpider.Tests
             Assert.Equal("Accept", r1.Accept);
             // Assert.Equal("Agent", r1.Agent);
             Assert.True(r1.AutoRedirect);
-            Assert.Equal(AgentType.HttpClient, r1.AgentType);
+            Assert.Equal(AgentTypeNames.HttpClient, r1.AgentType);
             Assert.Equal("UserAgent", r1.UserAgent);
             Assert.Equal(1000, r1.Timestamp);
             Assert.Equal("RedialRegExp", r1.RedialRegExp);
@@ -63,7 +63,7 @@ namespace DotnetSpider.Tests
                 Accept = "Accept",
                 Agent = "Agent",
                 AutoRedirect = true,
-                AgentType = AgentType.HttpClient,
+                AgentType = AgentTypeNames.HttpClient,
                 UserAgent = "UserAgent",
                 Timestamp = 1000,
                 RedialRegExp = "RedialRegExp"
@@ -78,7 +78,7 @@ namespace DotnetSpider.Tests
             Assert.Equal("Accept", r1.Accept);
             // Assert.Equal("Agent", r1.Agent);
             Assert.True(r1.AutoRedirect);
-            Assert.Equal(AgentType.HttpClient, r1.AgentType);
+            Assert.Equal(AgentTypeNames.HttpClient, r1.AgentType);
             Assert.Equal("UserAgent", r1.UserAgent);
             Assert.Equal(1000, r1.Timestamp);
             Assert.Equal("RedialRegExp", r1.RedialRegExp);
@@ -98,7 +98,7 @@ namespace DotnetSpider.Tests
                 Accept = "Accept",
                 Agent = "Agent",
                 AutoRedirect = true,
-                AgentType = AgentType.HttpClient,
+                AgentType = AgentTypeNames.HttpClient,
                 UserAgent = "UserAgent",
                 Timestamp = 1000,
                 RedialRegExp = "RedialRegExp"
@@ -117,7 +117,7 @@ namespace DotnetSpider.Tests
             Assert.Equal("Accept", r1.Accept);
             // Assert.Equal("Agent", r1.Agent);
             Assert.True(r1.AutoRedirect);
-            Assert.Equal(AgentType.HttpClient, r1.AgentType);
+            Assert.Equal(AgentTypeNames.HttpClient, r1.AgentType);
             Assert.Equal("UserAgent", r1.UserAgent);
             Assert.Equal(1000, r1.Timestamp);
             Assert.Equal("RedialRegExp", r1.RedialRegExp);
@@ -133,7 +133,7 @@ namespace DotnetSpider.Tests
                 Accept = "Accept",
                 Agent = "Agent",
                 AutoRedirect = true,
-                AgentType = AgentType.HttpClient,
+                AgentType = AgentTypeNames.HttpClient,
                 UserAgent = "UserAgent",
                 Timestamp = 1000,
                 RedialRegExp = "RedialRegExp"
@@ -147,7 +147,7 @@ namespace DotnetSpider.Tests
             Assert.Equal("Accept", r1.Accept);
             // Assert.Equal("Agent", r1.Agent);
             Assert.True(r1.AutoRedirect);
-            Assert.Equal(AgentType.HttpClient, r1.AgentType);
+            Assert.Equal(AgentTypeNames.HttpClient, r1.AgentType);
             Assert.Equal("UserAgent", r1.UserAgent);
             Assert.Equal(1000, r1.Timestamp);
             Assert.Equal("RedialRegExp", r1.RedialRegExp);

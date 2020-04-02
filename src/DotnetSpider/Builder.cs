@@ -27,6 +27,12 @@ namespace DotnetSpider
 		{
 		}
 
+		/// <summary>
+		/// Create a spider builder only contains spider background service
+		/// </summary>
+		/// <param name="configureDelegate"></param>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
 		public static Builder CreateBuilder<T>(Action<SpiderOptions> configureDelegate = null)
 			where T : Spider
 		{
@@ -38,6 +44,13 @@ namespace DotnetSpider
 			return hostBuilder;
 		}
 
+		/// <summary>
+		/// Create a spider builder only contains spider background service
+		/// </summary>
+		/// <param name="args"></param>
+		/// <param name="configureDelegate"></param>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
 		public static Builder CreateBuilder<T>(string[] args, Action<SpiderOptions> configureDelegate = null)
 			where T : Spider
 		{
@@ -49,6 +62,13 @@ namespace DotnetSpider
 			return hostBuilder;
 		}
 
+		/// <summary>
+		/// Create a default local spider builder
+		/// </summary>
+		/// <param name="args"></param>
+		/// <param name="configureDelegate"></param>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
 		public static Builder CreateDefaultBuilder<T>(
 			string[] args, Action<SpiderOptions> configureDelegate = null) where T : Spider
 		{
@@ -70,7 +90,13 @@ namespace DotnetSpider
 			return hostBuilder;
 		}
 
-		public static Builder CreateDefaultBuilder<T>(Action<SpiderOptions> configureDelegate) where T : Spider
+		/// <summary>
+		/// Create a default local spider builder
+		/// </summary>
+		/// <param name="configureDelegate"></param>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
+		public static Builder CreateDefaultBuilder<T>(Action<SpiderOptions> configureDelegate = null) where T : Spider
 		{
 			return CreateDefaultBuilder<T>(null, configureDelegate);
 		}

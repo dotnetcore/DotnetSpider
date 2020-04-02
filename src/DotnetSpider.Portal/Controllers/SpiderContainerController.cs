@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using DotnetSpider.Agent.Message;
 using DotnetSpider.Extensions;
+using DotnetSpider.Portal.Data;
 using DotnetSpider.Portal.Models.SpiderContainer;
 using DotnetSpider.Statistics.Store;
 using Microsoft.AspNetCore.Mvc;

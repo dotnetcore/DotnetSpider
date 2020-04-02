@@ -12,6 +12,7 @@
     <PackageReference Include="BuildBundlerMinifier" Version="3.2.435" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.1" />
     <PackageReference Include="Quartz" Version="3.0.7" />
+    <PackageReference Include="Quartz.AspNetCore.MySqlConnector" Version="1.0.4" />
     <PackageReference Include="X.PagedList.Mvc.Core" Version="8.0.5" />
     <PackageReference Include="MySqlConnector" Version="0.63.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />

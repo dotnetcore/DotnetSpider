@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using DotnetSpider.Portal.Entity;
+using DotnetSpider.Portal.Data;
 using DotnetSpider.Portal.Models.DockerRepository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

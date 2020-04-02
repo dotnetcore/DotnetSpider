@@ -5,6 +5,7 @@ using Dapper;
 using DotnetSpider.Agent.Message;
 using DotnetSpider.AgentRegister.Store;
 using DotnetSpider.Extensions;
+using DotnetSpider.Portal.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

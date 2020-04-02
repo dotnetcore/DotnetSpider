@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using DotnetSpider.AgentRegister.Store;
+using DotnetSpider.Portal.Data;
 using DotnetSpider.Portal.Models;
 using DotnetSpider.Statistics.Store;
 using Microsoft.AspNetCore.Mvc;

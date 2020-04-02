@@ -8,6 +8,7 @@ using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.HBase;
 using DotnetSpider.Http;
 using DotnetSpider.RabbitMQ;
+using DotnetSpider.Sample.samples;
 using DotnetSpider.Scheduler.Component;
 using DotnetSpider.Selector;
 using Microsoft.Extensions.Hosting;
@@ -32,15 +33,7 @@ namespace DotnetSpider.Sample
 				.WriteTo.Console().WriteTo.RollingFile("logs/spider.txt")
 				.CreateLogger();
 
-			var builder = Builder.CreateDefaultBuilder<TestSpider2>(options =>
-			{
-				options.Speed = 1;
-				options.UseProxy = false;
-			});
-			// builder.UseRabbitMQ();
-			builder.UseSerilog();
-			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
-			await builder.Build().RunAsync();
+			await EntitySpider.RunAsync();
 
 			Console.WriteLine("Bye!");
 			Environment.Exit(0);

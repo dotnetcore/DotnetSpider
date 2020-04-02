@@ -131,10 +131,21 @@ namespace DotnetSpider
 			_requestSuppliers.Add(requestSupplier);
 		}
 
-		protected virtual void AddDataFlow(IDataFlow dataFlow)
+		protected virtual Spider AddDataFlow(IDataFlow dataFlow)
 		{
 			dataFlow.NotNull(nameof(dataFlow));
 			_dataFlows.Add(dataFlow);
+			return this;
+		}
+
+		protected async Task<int> AddRequestsAsync(params string[] requests)
+		{
+			if (requests == null || requests.Length == 0)
+			{
+				return 0;
+			}
+
+			return await AddRequestsAsync(requests.Select(x => new Request(x)));
 		}
 
 		protected async Task<int> AddRequestsAsync(params Request[] requests)
@@ -158,8 +169,8 @@ namespace DotnetSpider
 
 			foreach (var request in requests)
 			{
-				if (request.AgentType == AgentType.PuppeteerWithADSL ||
-				    request.AgentType == AgentType.HttpClientWithADSL)
+				if (request.AgentType == AgentTypeNames.PuppeteerWithADSL ||
+				    request.AgentType == AgentTypeNames.HttpClientWithADSL)
 				{
 					if (string.IsNullOrWhiteSpace(request.GetHeader(Consts.RedialRegExp)))
 					{
@@ -424,7 +435,9 @@ namespace DotnetSpider
 					request.Timestamp = DateTimeOffset.Now.ToTimestamp();
 					if (string.IsNullOrWhiteSpace(request.Agent))
 					{
-						topic = GetAgentTopic(request.AgentType);
+						topic = string.IsNullOrEmpty(request.AgentType)
+							? AgentTypeNames.HttpClient
+							: request.AgentType;
 					}
 					else
 					{
@@ -438,7 +451,9 @@ namespace DotnetSpider
 							}
 							case RequestPolicy.Random:
 							{
-								topic = GetAgentTopic(request.AgentType);
+								topic = string.IsNullOrEmpty(request.AgentType)
+									? AgentTypeNames.HttpClient
+									: request.AgentType;
 								break;
 							}
 							default:
@@ -460,41 +475,6 @@ namespace DotnetSpider
 			}
 
 			return true;
-		}
-
-		private string GetAgentTopic(AgentType agentType)
-		{
-			string topic;
-			switch (agentType)
-			{
-				case AgentType.Puppeteer:
-				{
-					topic = TopicNames.PuppeteerAgent;
-					break;
-				}
-				case AgentType.HttpClient:
-				{
-					topic = TopicNames.HttpClientAgent;
-					break;
-				}
-				case AgentType.PuppeteerWithADSL:
-				{
-					topic = TopicNames.PuppeteerWithADSLAgent;
-					break;
-				}
-				case AgentType.HttpClientWithADSL:
-				{
-					topic = TopicNames.HttpClientWithADSLAgent;
-					break;
-				}
-				default:
-				{
-					topic = TopicNames.HttpClientAgent;
-					break;
-				}
-			}
-
-			return topic;
 		}
 
 		private async Task LoadRequestsFromSuppliers(CancellationToken stoppingToken)
@@ -525,7 +505,15 @@ namespace DotnetSpider
 				foreach (var dataFlow in _dataFlows)
 				{
 					dataFlow.SetLogger(Logger);
-					await dataFlow.InitAsync();
+					try
+					{
+						await dataFlow.InitAsync();
+					}
+					catch (Exception e)
+					{
+						Logger.LogError($"Init dataFlow {dataFlow.GetType().Name} failed: {e}");
+						_services.ApplicationLifetime.StopApplication();
+					}
 				}
 			}
 		}

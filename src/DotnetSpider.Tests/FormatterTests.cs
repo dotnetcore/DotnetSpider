@@ -6,7 +6,7 @@ namespace DotnetSpider.Tests
 {
     public class FormatterTests
     {
-        [Fact()]
+        [Fact]
         public void RegexFormatter()
         {
             try
@@ -84,7 +84,7 @@ namespace DotnetSpider.Tests
             Assert.Equal("收货100人", formatter5.Format(str7));
         }
 
-        [Fact()]
+        [Fact]
         public void CharacterCaseFormatter()
         {
             var formatter1 = new CharacterCaseFormatter();
@@ -107,7 +107,7 @@ namespace DotnetSpider.Tests
             Assert.Equal("", formatter3.Format(""));
         }
 
-        [Fact()]
+        [Fact]
         public void DisplaceFormatter()
         {
             var formatter1 = new DisplaceFormatter {Displacement = "d", EqualValue = "a"};

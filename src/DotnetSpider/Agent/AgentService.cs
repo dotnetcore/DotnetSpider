@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -23,23 +24,20 @@ namespace DotnetSpider.Agent
 		private readonly List<AsyncMessageConsumer<byte[]>> _consumers;
 		private readonly IHostApplicationLifetime _applicationLifetime;
 		private readonly bool _distributed;
-		private readonly HttpClientDownloader _httpClientDownloader;
+		private readonly DownloaderFactory _downloaderFactory;
 		private readonly AgentOptions _options;
-		private readonly PuppeteerDownloader _puppeteerDownloader;
 
 		public AgentService(ILogger<AgentService> logger,
 			IMessageQueue messageQueue,
 			IOptions<AgentOptions> options,
 			IHostApplicationLifetime applicationLifetime,
-			PuppeteerDownloader puppeteerDownloader,
-			HttpClientDownloader httpClientDownloader)
+			DownloaderFactory downloaderFactory)
 		{
 			_options = options.Value;
 			_logger = logger;
 			_messageQueue = messageQueue;
 			_applicationLifetime = applicationLifetime;
-			_httpClientDownloader = httpClientDownloader;
-			_puppeteerDownloader = puppeteerDownloader;
+			_downloaderFactory = downloaderFactory;
 			_consumers = new List<AsyncMessageConsumer<byte[]>>();
 			_distributed = !(messageQueue is MessageQueue);
 			if (!_distributed)
@@ -66,23 +64,8 @@ namespace DotnetSpider.Agent
 					TotalMemory = SystemInformation.TotalMemory,
 					ProcessorCount = Environment.ProcessorCount
 				});
-			var topics = new List<string> {string.Format(TopicNames.Agent, _options.AgentId.ToUpper())};
-			if (!string.IsNullOrWhiteSpace(_options.ADSLAccount))
-			{
-				topics.Add(TopicNames.HttpClientWithADSLAgent);
-				if (_options.SupportPuppeteer)
-				{
-					topics.Add(TopicNames.PuppeteerWithADSLAgent);
-				}
-			}
-			else
-			{
-				topics.Add(TopicNames.HttpClientAgent);
-				if (_options.SupportPuppeteer)
-				{
-					topics.Add(TopicNames.PuppeteerAgent);
-				}
-			}
+
+			var topics = GetDownloaderTopics();
 
 			await RegisterAgentAsync(topics, stoppingToken);
 
@@ -96,6 +79,25 @@ namespace DotnetSpider.Agent
 			}, stoppingToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
 			_logger.LogInformation(_distributed ? $"Agent {_options.AgentId} started" : "Agent started");
+		}
+
+		private List<string> GetDownloaderTopics()
+		{
+			var topics = new HashSet<string> {string.Format(TopicNames.Agent, _options.AgentId.ToUpper())};
+			var downloaderNames = _downloaderFactory.GetAllDownloaderNames().ToList();
+			if (!_options.SupportPuppeteer)
+			{
+				downloaderNames.Remove("Puppeteer");
+			}
+
+			foreach (var downloaderName in downloaderNames)
+			{
+				topics.Add(!string.IsNullOrWhiteSpace(_options.ADSLAccount)
+					? $"{downloaderName}WithADSL"
+					: downloaderName);
+			}
+
+			return topics.ToList();
 		}
 
 		private async Task RegisterAgentAsync(List<string> topics, CancellationToken stoppingToken)
@@ -127,25 +129,8 @@ namespace DotnetSpider.Agent
 			}
 			else if (message is Request request)
 			{
-				Response response;
-				switch (request.AgentType)
-				{
-					case AgentType.Puppeteer:
-					{
-						response = await _puppeteerDownloader.DownloadAsync(request);
-						break;
-					}
-					case AgentType.HttpClient:
-					{
-						response = await _httpClientDownloader.DownloadAsync(request);
-						break;
-					}
-					default:
-					{
-						throw new ArgumentException($"Not supported agent type: {request.AgentType}");
-					}
-				}
-
+				var downloader = _downloaderFactory.Create(request.AgentType);
+				var response = await downloader.DownloadAsync(request);
 				response.Agent = _options.AgentId;
 				await _messageQueue.PublishAsBytesAsync(string.Format(TopicNames.Spider, request.Owner.ToUpper()),
 					response);
