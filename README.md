@@ -74,87 +74,90 @@ https://github.com/dotnetcore/DotnetSpider/wiki
 
 [View complete Codes](https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Sample/samples/EntitySpider.cs)
 
-	public class EntitySpider : Spider
-	{
-		public EntitySpider(SpiderParameters parameters) : base(parameters)
+		public class EntitySpider : Spider
 		{
-		}
-		
-		protected override void Initialize()
-		{
-			NewGuidId();
-			Scheduler = new QueueDistinctBfsScheduler();
-			Speed = 1;
-			Depth = 3;
-			AddDataFlow(new DataParser<CnblogsEntry>()).AddDataFlow(GetDefaultStorage());
-			AddRequests(
-				new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}}),
-				new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}}));
-		}
-	
-		[Schema("cnblogs", "news")]
-		[EntitySelector(Expression = ".//div[@class='news_block']", Type = SelectorType.XPath)]
-		[GlobalValueSelector(Expression = ".//a[@class='current']", Name = "类别", Type = SelectorType.XPath)]
-		[FollowSelector(XPaths = new[] {"//div[@class='pager']"})]
-		public class CnblogsEntry : EntityBase<CnblogsEntry>
-		{
-			protected override void Configure()
+			public static async Task RunAsync()
 			{
-				HasIndex(x => x.Title);
-				HasIndex(x => new {x.WebSite, x.Guid}, true);
+				var builder = Builder.CreateDefaultBuilder<EntitySpider>();
+				builder.UseSerilog();
+				builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
+				await builder.Build().RunAsync();
 			}
 	
-			public int Id { get; set; }
+			public EntitySpider(IOptions<SpiderOptions> options, SpiderServices services, ILogger<Spider> logger) : base(
+				options, services, logger)
+			{
+			}
 	
-			[Required]
-			[StringLength(200)]
-			[ValueSelector(Expression = "类别", Type = SelectorType.Enviroment)]
-			public string Category { get; set; }
+			protected override async Task InitializeAsync(CancellationToken stoppingToken)
+			{
+				AddDataFlow(new DataParser<CnblogsEntry>());
+				AddDataFlow(GetDefaultStorage());
+				await AddRequestsAsync(
+					new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}}),
+					new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}}));
+			}
 	
-			[Required]
-			[StringLength(200)]
-			[ValueSelector(Expression = "网站", Type = SelectorType.Enviroment)]
-			public string WebSite { get; set; }
+			protected override (string Id, string Name) GetIdAndName()
+			{
+				return (Guid.NewGuid().ToString(), "博客园");
+			}
 	
-			[StringLength(200)]
-			[ValueSelector(Expression = "//title")]
-			[ReplaceFormatter(NewValue = "", OldValue = " - 博客园")]
-			public string Title { get; set; }
+			[Schema("cnblogs", "news")]
+			[EntitySelector(Expression = ".//div[@class='news_block']", Type = SelectorType.XPath)]
+			[GlobalValueSelector(Expression = ".//a[@class='current']", Name = "类别", Type = SelectorType.XPath)]
+			[FollowRequestSelector(XPaths = new[] {"//div[@class='pager']"})]
+			public class CnblogsEntry : EntityBase<CnblogsEntry>
+			{
+				protected override void Configure()
+				{
+					HasIndex(x => x.Title);
+					HasIndex(x => new {x.WebSite, x.Guid}, true);
+				}
 	
-			[StringLength(40)]
-			[ValueSelector(Expression = "GUID", Type = SelectorType.Enviroment)]
-			public string Guid { get; set; }
+				public int Id { get; set; }
 	
-			[ValueSelector(Expression = ".//h2[@class='news_entry']/a")]
-			public string News { get; set; }
+				[Required]
+				[StringLength(200)]
+				[ValueSelector(Expression = "类别", Type = SelectorType.Environment)]
+				public string Category { get; set; }
 	
-			[ValueSelector(Expression = ".//h2[@class='news_entry']/a/@href")]
-			public string Url { get; set; }
+				[Required]
+				[StringLength(200)]
+				[ValueSelector(Expression = "网站", Type = SelectorType.Environment)]
+				public string WebSite { get; set; }
 	
-			[ValueSelector(Expression = ".//div[@class='entry_summary']", ValueOption = ValueOption.InnerText)]
-			public string PlainText { get; set; }
+				[StringLength(200)]
+				[ValueSelector(Expression = "//title")]
+				[ReplaceFormatter(NewValue = "", OldValue = " - 博客园")]
+				public string Title { get; set; }
 	
-			[ValueSelector(Expression = "DATETIME", Type = SelectorType.Enviroment)]
-			public DateTime CreationTime { get; set; }
+				[StringLength(40)]
+				[ValueSelector(Expression = "GUID", Type = SelectorType.Environment)]
+				public string Guid { get; set; }
+	
+				[ValueSelector(Expression = ".//h2[@class='news_entry']/a")]
+				public string News { get; set; }
+	
+				[ValueSelector(Expression = ".//h2[@class='news_entry']/a/@href")]
+				public string Url { get; set; }
+	
+				[ValueSelector(Expression = ".//div[@class='entry_summary']")]
+				public string PlainText { get; set; }
+	
+				[ValueSelector(Expression = "DATETIME", Type = SelectorType.Environment)]
+				public DateTime CreationTime { get; set; }
+			}
 		}
-	}
 
 #### Distributed spider
 
 
 [Read this document](https://github.com/dotnetcore/DotnetSpider/wiki/3-Distributed-Spider)
 
-#### WebDriver Support
+#### Puppeteer downloader
 
-When you want to collect a page JS loaded, there is only one thing to do, set the downloader to WebDriverDownloader.
-
-    Downloader = new WebDriverDownloader(Browser.Chrome);
-
-NOTE:
-
-1.  Make sure the ChromeDriver.exe is in bin folder when use Chrome, install it to your project from NUGET: Chromium.ChromeDriver
-2.  Make sure you already add a \*.webdriver Firefox profile when use Firefox: https://support.mozilla.org/en-US/kb/profile-manager-create-and-remove-firefox-profiles
-3.  Make sure the PhantomJS.exe is in bin folder when use PhantomJS, install it to your project from NUGET: PhantomJS
+Coming soon
 
 ### NOTICE
 
