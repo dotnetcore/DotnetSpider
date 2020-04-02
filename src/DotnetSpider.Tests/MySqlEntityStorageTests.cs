@@ -166,7 +166,7 @@ namespace DotnetSpider.Tests
 			}
 		}
 
-		[Fact(DisplayName = "MultiPrimary")]
+		[Fact(DisplayName = "MultiPrimary", Skip = "")]
 		public async Task MultiPrimary()
 		{
 			using (var conn = CreateConnection())
