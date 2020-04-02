@@ -34,6 +34,9 @@ steps:
   - script: sudo docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=1qazZAQ!' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-latest
     displayName: 'DeploySqlServer'
 
+  - script: sudo docker run -d --restart always --name rabbimq -p 4369:4369 -p 5671-5672:5671-5672 -p 25672:25672 -p 15671-15672:15671-15672 -e RABBITMQ_DEFAULT_USER=user -e RABBITMQ_DEFAULT_PASS=password rabbitmq:3-management
+    displayName: 'DeployRabbitMQ'
+
   - task: DotNetCoreInstaller@0
     inputs:
       version: '3.1.102'
