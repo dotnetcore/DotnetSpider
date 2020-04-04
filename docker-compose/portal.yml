@@ -4,14 +4,6 @@ services:
   dotnetspider.portal:
     image: 'dotnetspider/portal:latest'
     restart: always
-    hostname: dotnetspider.portal
     container_name: dotnetspider.portal
     ports:
       - '7896:7896'
-    environment:
-      - ConnectionString=Database='dotnetspider';Data Source=my.com;password=1qazZAQ!;User ID=root;Port=3306;
-      - Docker=http://my.com:2376
-      - DockerVolumes=/storage/var/lib/dotnetspider/logs:/logs;/etc/hosts:/etc/hosts
-      - quartz.dataSource.myDs.connectionString=Database='dotnetspider';Data Source=my.com;password=1qazZAQ!;User ID=root;Port=3306;
-    volumes:
-      - /storage/var/lib/dotnetspider/portal/logs:/logs

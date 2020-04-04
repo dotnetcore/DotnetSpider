@@ -12,6 +12,7 @@ selenium-debug.log
 **/wwwroot/lib
 
 *.min.js
+*.min.css
 
 yarn.lock
 

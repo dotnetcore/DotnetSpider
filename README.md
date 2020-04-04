@@ -6,10 +6,11 @@
 [![NuGet](https://img.shields.io/nuget/vpre/DotnetSpider.svg)](https://www.nuget.org/packages/DotnetSpider)
 [![Member project of .NET Core Community](https://img.shields.io/badge/member%20project%20of-NCC-9e20c9.svg)](https://github.com/dotnetcore)
 [![GitHub license](https://img.shields.io/github/license/dotnetcore/DotnetSpider.svg)](https://github.com/dotnetcore/DotnetSpider/blob/master/LICENSE.txt)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fdotnetcore%2FDotnetSpider.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fdotnetcore%2FDotnetSpider?ref=badge_shield)
 
 DotnetSpider, a .NET Standard web crawling library. It is lightweight, efficient and fast high-level web crawling & scraping framework.
 
-If you want get latest beta packages, you should add the myget feed: 
+If you want get latest beta packages, you should add the myget feed:
 
 ```
 <add key="myget.org" value="https://www.myget.org/F/zlzforever/api/v3/index.json" protocolVersion="3" />
@@ -43,21 +44,21 @@ If you want get latest beta packages, you should add the myget feed:
 9. MongoDb  (option)
 
         docker run --name mongo -d -p 27017:27017 --restart always mongo
-    
+
 10. RabbitMQ
 
         docker run -d --restart always --name rabbimq -p 4369:4369 -p 5671-5672:5671-5672 -p 25672:25672 -p 15671-15672:15671-15672 \
                -e RABBITMQ_DEFAULT_USER=user -e RABBITMQ_DEFAULT_PASS=password \
                rabbitmq:3-management
-    
+
 11. Docker remote api for mac
 
         docker run -d  --restart always --name socat -v /var/run/docker.sock:/var/run/docker.sock -p 2376:2375 bobrik/socat TCP4-LISTEN:2375,fork,reuseaddr UNIX-CONNECT:/var/run/docker.sock
 
 12. HBase
 
-        docker run -d --restart always --name hbase -p 20550:8080 -p 8085:8085 -p 9090:9090 -p 9095:9095 -p 16010:16010 dajobe/hbase                           
-    
+        docker run -d --restart always --name hbase -p 20550:8080 -p 8085:8085 -p 9090:9090 -p 9095:9095 -p 16010:16010 dajobe/hbase
+
 ### MORE DOCUMENTS
 
 https://github.com/dotnetcore/DotnetSpider/wiki
@@ -83,12 +84,12 @@ https://github.com/dotnetcore/DotnetSpider/wiki
 				builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
 				await builder.Build().RunAsync();
 			}
-	
+
 			public EntitySpider(IOptions<SpiderOptions> options, SpiderServices services, ILogger<Spider> logger) : base(
 				options, services, logger)
 			{
 			}
-	
+
 			protected override async Task InitializeAsync(CancellationToken stoppingToken)
 			{
 				AddDataFlow(new DataParser<CnblogsEntry>());
@@ -97,12 +98,12 @@ https://github.com/dotnetcore/DotnetSpider/wiki
 					new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}}),
 					new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}}));
 			}
-	
+
 			protected override (string Id, string Name) GetIdAndName()
 			{
 				return (Guid.NewGuid().ToString(), "博客园");
 			}
-	
+
 			[Schema("cnblogs", "news")]
 			[EntitySelector(Expression = ".//div[@class='news_block']", Type = SelectorType.XPath)]
 			[GlobalValueSelector(Expression = ".//a[@class='current']", Name = "类别", Type = SelectorType.XPath)]
@@ -114,37 +115,37 @@ https://github.com/dotnetcore/DotnetSpider/wiki
 					HasIndex(x => x.Title);
 					HasIndex(x => new {x.WebSite, x.Guid}, true);
 				}
-	
+
 				public int Id { get; set; }
-	
+
 				[Required]
 				[StringLength(200)]
 				[ValueSelector(Expression = "类别", Type = SelectorType.Environment)]
 				public string Category { get; set; }
-	
+
 				[Required]
 				[StringLength(200)]
 				[ValueSelector(Expression = "网站", Type = SelectorType.Environment)]
 				public string WebSite { get; set; }
-	
+
 				[StringLength(200)]
 				[ValueSelector(Expression = "//title")]
 				[ReplaceFormatter(NewValue = "", OldValue = " - 博客园")]
 				public string Title { get; set; }
-	
+
 				[StringLength(40)]
 				[ValueSelector(Expression = "GUID", Type = SelectorType.Environment)]
 				public string Guid { get; set; }
-	
+
 				[ValueSelector(Expression = ".//h2[@class='news_entry']/a")]
 				public string News { get; set; }
-	
+
 				[ValueSelector(Expression = ".//h2[@class='news_entry']/a/@href")]
 				public string Url { get; set; }
-	
+
 				[ValueSelector(Expression = ".//div[@class='entry_summary']")]
 				public string PlainText { get; set; }
-	
+
 				[ValueSelector(Expression = "DATETIME", Type = SelectorType.Environment)]
 				public DateTime CreationTime { get; set; }
 			}
