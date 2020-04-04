@@ -166,7 +166,7 @@ namespace DotnetSpider.Tests
 			}
 		}
 
-		[Fact(DisplayName = "MultiPrimary", Skip = "")]
+		[Fact(DisplayName = "MultiPrimary")]
 		public async Task MultiPrimary()
 		{
 			using (var conn = CreateConnection())
@@ -200,9 +200,10 @@ namespace DotnetSpider.Tests
 						$"SELECT t.CONSTRAINT_TYPE, c.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS t, INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c WHERE t.TABLE_NAME = c.TABLE_NAME AND t.TABLE_SCHEMA = 'test' AND t.CONSTRAINT_TYPE = 'PRIMARY KEY' AND t.TABLE_NAME='createtablemultiprimay';")
 					).ToList();
 				_testOutputHelper.WriteLine(JsonConvert.SerializeObject(primaries));
+				var columnNames = primaries.Select(x => x.COLUMN_NAME).ToList();
 				Assert.Equal(2, primaries.Count);
-				Assert.Equal("str2", primaries[0].COLUMN_NAME);
-				Assert.Equal("decimal", primaries[1].COLUMN_NAME);
+				Assert.Contains("str2", columnNames);
+				Assert.Contains("decimal", columnNames);
 				await conn.ExecuteAsync(
 					$"drop table if exists {Escape}test{Escape}.{Escape}createtablemultiprimay{Escape};");
 			}
