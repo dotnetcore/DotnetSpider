@@ -72,8 +72,10 @@ namespace DotnetSpider
 		/// <returns></returns>
 		protected virtual (string Id, string Name) GetIdAndName()
 		{
-			return (Environment.GetEnvironmentVariable("DOTNET_SPIDER_ID"),
-				Environment.GetEnvironmentVariable("DOTNET_SPIDER_NAME"));
+			var id = Environment.GetEnvironmentVariable("DOTNET_SPIDER_ID");
+			id = string.IsNullOrWhiteSpace(id) ? Guid.NewGuid().ToString("N") : id;
+			var name = Environment.GetEnvironmentVariable("DOTNET_SPIDER_NAME");
+			return (id, name);
 		}
 
 		protected IDataFlow GetDefaultStorage()

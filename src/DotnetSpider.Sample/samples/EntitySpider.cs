@@ -20,8 +20,12 @@ namespace DotnetSpider.Sample.samples
 	{
 		public static async Task RunAsync()
 		{
-			var builder = Builder.CreateDefaultBuilder<EntitySpider>();
+			var builder = Builder.CreateDefaultBuilder<EntitySpider>(options =>
+			{
+				options.UseProxy = true;
+			});
 			builder.UseSerilog();
+			builder.UseKuaidaili();
 			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
 			await builder.Build().RunAsync();
 		}
@@ -48,6 +52,7 @@ namespace DotnetSpider.Sample.samples
 		[Schema("cnblogs", "news")]
 		[EntitySelector(Expression = ".//div[@class='news_block']", Type = SelectorType.XPath)]
 		[GlobalValueSelector(Expression = ".//a[@class='current']", Name = "类别", Type = SelectorType.XPath)]
+		[GlobalValueSelector(Expression = "//title", Name = "Title", Type = SelectorType.XPath)]
 		[FollowRequestSelector(XPaths = new[] {"//div[@class='pager']"})]
 		public class CnblogsEntry : EntityBase<CnblogsEntry>
 		{
@@ -70,7 +75,7 @@ namespace DotnetSpider.Sample.samples
 			public string WebSite { get; set; }
 
 			[StringLength(200)]
-			[ValueSelector(Expression = "//title")]
+			[ValueSelector(Expression = "Title", Type = SelectorType.Environment)]
 			[ReplaceFormatter(NewValue = "", OldValue = " - 博客园")]
 			public string Title { get; set; }
 
@@ -85,6 +90,7 @@ namespace DotnetSpider.Sample.samples
 			public string Url { get; set; }
 
 			[ValueSelector(Expression = ".//div[@class='entry_summary']")]
+			[TrimFormatter]
 			public string PlainText { get; set; }
 
 			[ValueSelector(Expression = "DATETIME", Type = SelectorType.Environment)]

@@ -80,7 +80,7 @@ namespace DotnetSpider.Sample.samples
 
 					if (!string.IsNullOrWhiteSpace(url))
 					{
-						var request = context.Request.CreateNew(url);
+						var request = context.CreateNewRequest(url);
 						request.SetProperty("title", title);
 						request.SetProperty("url", url);
 						request.SetProperty("summary", summary);

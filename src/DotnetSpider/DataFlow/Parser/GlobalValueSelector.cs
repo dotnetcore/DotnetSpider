@@ -2,7 +2,7 @@ using System;
 
 namespace DotnetSpider.DataFlow.Parser
 {
-	[AttributeUsage(AttributeTargets.Class)]
+	[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
 	public class GlobalValueSelector : ValueSelector
 	{
 		/// <summary>

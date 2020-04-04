@@ -9,7 +9,7 @@ namespace DotnetSpider
 		public int Depth { get; set; }
 		public int RequestTimeout { get; set; } = 10;
 		public int RetriedTimes { get; set; } = 3;
-		public int EmptySleepTime { get; set; } = 10;
+		public int EmptySleepTime { get; set; } = 30;
 		public double Speed { get; set; } = 1;
 		public string ProxyTestUri { get; set; } = "http://www.baidu.com";
 		public string ProxySupplierUri { get; set; }

@@ -19,7 +19,7 @@ namespace DotnetSpider.Spiders
 				.MinimumLevel.Override("System", LogEventLevel.Warning)
 				.MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Warning)
 				.Enrich.FromLogContext()
-				.WriteTo.Console().WriteTo.RollingFile("logs/spider.txt")
+				.WriteTo.Console().WriteTo.RollingFile("logs/spiders.log")
 				.CreateLogger();
 
 			var typeName = Environment.GetEnvironmentVariable("DOTNET_SPIDER_TYPE");
