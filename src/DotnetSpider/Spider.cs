@@ -70,7 +70,11 @@ namespace DotnetSpider
 		/// 获取爬虫标识和名称
 		/// </summary>
 		/// <returns></returns>
-		protected abstract (string Id, string Name) GetIdAndName();
+		protected virtual (string Id, string Name) GetIdAndName()
+		{
+			return (Environment.GetEnvironmentVariable("DOTNET_SPIDER_ID"),
+				Environment.GetEnvironmentVariable("DOTNET_SPIDER_NAME"));
+		}
 
 		protected IDataFlow GetDefaultStorage()
 		{
@@ -226,6 +230,8 @@ namespace DotnetSpider
 		private async Task RegisterConsumerAsync(CancellationToken stoppingToken)
 		{
 			var topic = string.Format(TopicNames.Spider, Id.ToUpper());
+
+			Logger.LogInformation($"Register topic {topic}");
 			_consumer = new AsyncMessageConsumer<byte[]>(topic);
 			_consumer.Received += async (bytes) =>
 			{
@@ -238,9 +244,10 @@ namespace DotnetSpider
 
 				if (message is Exit exit)
 				{
-					if (exit.Id == Id)
+					Logger.LogInformation($"Receive exit message {JsonConvert.SerializeObject(exit)}");
+					if (exit.Id == Id.ToUpper())
 					{
-						_services.ApplicationLifetime.StopApplication();
+						await ExitAsync();
 					}
 				}
 				else if (message is Response response)
@@ -249,6 +256,11 @@ namespace DotnetSpider
 					var request = _requestedQueue.Dequeue(response.RequestHash);
 					if (response.StatusCode == HttpStatusCode.OK)
 					{
+						if (_services.IsDistributed)
+						{
+							Logger.LogInformation($"download {request.RequestUri} success");
+						}
+
 						request.Agent = response.Agent;
 						await _services.StatisticsClient.IncreaseAgentSuccessAsync(response.Agent,
 							response.ElapsedMilliseconds);
@@ -261,12 +273,16 @@ namespace DotnetSpider
 						var exception = Encoding.UTF8.GetString(response.Content.Data);
 						if (_services.IsDistributed)
 						{
-							Logger.LogError($"Agent request {request.RequestUri} failed: {exception}");
+							Logger.LogError($"download {request.RequestUri} failed: {exception}");
 						}
 
 						// 每次调用添加会导致 Requested + 1, 因此失败多次的请求最终会被过滤不再加到调度队列
 						await AddRequestsAsync(request);
 					}
+				}
+				else
+				{
+					Logger.LogError($"Receive error message {JsonConvert.SerializeObject(message)}");
 				}
 			};
 			await _services.MessageQueue.ConsumeAsync(_consumer, stoppingToken);
@@ -463,10 +479,6 @@ namespace DotnetSpider
 					if (_requestedQueue.Enqueue(request))
 					{
 						await _services.MessageQueue.PublishAsBytesAsync(topic, request);
-						if (_services.IsDistributed)
-						{
-							Logger.LogInformation($"{request.RequestUri} publish request success");
-						}
 					}
 				}
 			}

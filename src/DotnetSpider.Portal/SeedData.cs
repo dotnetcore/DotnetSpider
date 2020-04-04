@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using DotnetSpider.Portal.BackgroundService;
@@ -56,15 +55,13 @@ namespace DotnetSpider.Portal
 					}
 				}
 
-				if (sqlStream == null)
+				if (sqlStream != null)
 				{
-					throw new SpiderException("Can't find quartz.net MySql sql");
-				}
-
-				using (var reader = new StreamReader(sqlStream))
-				{
-					sql = await reader.ReadToEndAsync();
-					await conn.ExecuteAsync(sql);
+					using (var reader = new StreamReader(sqlStream))
+					{
+						sql = await reader.ReadToEndAsync();
+						await conn.ExecuteAsync(sql);
+					}
 				}
 
 				var sched = serviceProvider.GetRequiredService<IScheduler>();
@@ -74,28 +71,17 @@ namespace DotnetSpider.Portal
 
 		private static async Task InitializeSeedDataAsync(PortalDbContext context, IScheduler sched)
 		{
-			if (!await context.DockerRepositories.AnyAsync())
+			if (!await context.Spiders.AnyAsync())
 			{
-				var repo = new DockerRepository
-				{
-					Name = "DockerHub",
-					Schema = null,
-					Registry = null,
-					Repository = "dotnetspider/spiders.startup",
-					CreationTime = DateTimeOffset.Now,
-					UserName = "",
-					Password = ""
-				};
-				await context.DockerRepositories.AddAsync(repo);
-
 				var spider = new Data.Spider
 				{
 					Name = "cnblogs",
 					Cron = "0 1 */1 * * ?",
-					Repository = "dotnetspider/spiders.startup",
 					Type = "DotnetSpider.Spiders.CnblogsSpider",
-					Tag = "latest",
-					CreationTime = DateTimeOffset.Now
+					Image = "dotnetspider/spiders.startup:latest",
+					CreationTime = DateTimeOffset.Now,
+					Enabled = true,
+					LastModificationTime = DateTimeOffset.Now
 				};
 				await context.Spiders.AddAsync(spider);
 				await context.SaveChangesAsync();

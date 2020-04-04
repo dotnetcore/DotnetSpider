@@ -1,0 +1,10 @@
+﻿{
+  "profiles": {
+    "DotnetSpider.AgentRegister": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

@@ -1,92 +1,55 @@
-@using X.PagedList.Mvc.Core
-@using X.PagedList.Mvc.Core.Common
-@using X.PagedList.Web.Common
-@model X.PagedList.IPagedList<DotnetSpider.AgentRegister.Store.AgentHeartbeat>
-
-<div class="col-xs-12">
-    <div class="box">
-        <div class="box-header">
-            <div class="box-title">
-                &ensp;
-            </div>
-            <div class="box-tools">
-                &ensp;
-            </div>
-        </div>
-        <!-- /.box-header -->
-        <div class="box-body table-responsive no-padding">
-            <table class="table table-bordered">
-                <tbody>
-                <tr>
-                    <th>#</th>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>FreeMEM</th>
-                    <th>CpuLoad</th>
-                    <th>HeartbeatTime</th>
-                </tr>
-                @if (Model == null || !Model.Any())
-                {
-                    <tr>
-                        <td colspan="6">
-                            None
-                        </td>
-                    </tr>
-                }
-                else
-                {
-                    foreach (var item in Model)
-                    {
-                        <tr >
-                            <td>
-                                <span>@item.Id</span>
-                            </td>
-                            <td>
-                                <span>@item.AgentId</span>
-                            </td>
-                            <td>
-                                <span>@item.AgentName</span>
-                            </td>
-                            <td>
-                                <span>@item.FreeMemory</span>
-                            </td>
-                            <td>
-                                <span>@item.CpuLoad</span>
-                            </td>
-                            <td>
-                                <span>@item.CreationTime.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss")</span>
-                            </td>
-                        </tr>
-                    }
-                }
-                </tbody>
-            </table>
-        </div>
-        <!-- /.box-body -->
-        <div class="box-footer clearfix no-border">
-            @if (Model != null && Model.PageCount > 1)
-            {
-                @Html.PagedListPager(Model, page => Url.Action("Heartbeat", new {page}),
-                    new PagedListRenderOptions
-                    {
-                        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
-                        DisplayLinkToLastPage = PagedListDisplayMode.Always,
-                        DisplayLinkToNextPage = PagedListDisplayMode.Always,
-                        ContainerDivClasses = new string[0],
-                        UlElementClasses = new[] {"pagination pagination-sm no-margin pull-left"},
-                        LiElementClasses = new[] {"page-item"},
-                        PageClasses = new[] {"page-link"}
-                    })
-            }
-        </div>
+@{
+    ViewData["Title"] = "Agent Heartbeat";
+}
+<div class="row">
+    <div class="col-sm-8">
+        <h5>
+            Agent Heartbeat
+            <small></small>
+        </h5>
     </div>
-    <!-- /.box -->
+</div>
+<br/>
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-bordered" style="width: 100%">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>AGENT ID</th>
+                <th>AGENT NAME</th>
+                <th>FREE MEM</th>
+                <th>CPU LOAD</th>
+                <th>CREATIONTIME</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-if="items.length===0">
+                <td colspan="7">None</td>
+            </tr>
+            <tr :id="item.id" v-else v-for="item in items">
+                <td v-text="item.id"></td>
+                <td v-text="item.agentId"></td>
+                <td v-text="item.agentName"></td>
+                <td v-text="item.freeMemory"></td>
+                <td v-text="item.cpuLoad"></td>
+                <td v-text="item.creationTime"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row" v-if="count > limit">
+    <div class="col-md-12">
+        <pagination :page="page" :count="count" :limit="limit"></pagination>
+    </div>
 </div>
 
 @section scripts{
-    <script>
-        $(function() {
-            app.activeMenu('DownloaderAgent');
-        })
-    </script>
+    <environment names="Development">
+        <script src="~/js/agentHeartbeat.js" asp-append-version="true"></script>
+    </environment>
+    <environment names="Staging,Production">
+        <script src="~/js/agentHeartbeat.min.js" asp-append-version="true"></script>
+    </environment>
 }

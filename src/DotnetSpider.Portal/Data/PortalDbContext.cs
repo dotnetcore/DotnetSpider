@@ -10,11 +10,9 @@ namespace DotnetSpider.Portal.Data
 	{
 		private readonly bool _isDesignTime;
 
-		public DbSet<DockerRepository> DockerRepositories { get; set; }
-
 		public DbSet<Spider> Spiders { get; set; }
 
-		public DbSet<SpiderContainer> SpiderContainers { get; set; }
+		public DbSet<SpiderHistory> SpiderHistories { get; set; }
 
 		public PortalDbContext()
 		{
@@ -39,16 +37,12 @@ namespace DotnetSpider.Portal.Data
 				builder.Model.AddEntityType(typeof(AgentStatistics));
 			}
 
-			builder.Entity<DockerRepository>().HasIndex(x => x.Name).IsUnique();
-			builder.Entity<DockerRepository>().HasIndex(x => new {x.Repository, x.Registry}).IsUnique();
-			builder.Entity<DockerRepository>().HasIndex(x => x.CreationTime);
-
 			builder.Entity<Spider>().HasIndex(x => x.Name);
 			builder.Entity<Spider>().HasIndex(x => x.CreationTime);
 
-			builder.Entity<SpiderContainer>().HasIndex(x => x.Batch);
-			builder.Entity<SpiderContainer>().HasIndex(x => x.SpiderId);
-			builder.Entity<SpiderContainer>().HasIndex(x => x.CreationTime);
+			builder.Entity<SpiderHistory>().HasIndex(x => x.Batch);
+			builder.Entity<SpiderHistory>().HasIndex(x => x.SpiderId);
+			builder.Entity<SpiderHistory>().HasIndex(x => x.CreationTime);
 		}
 
 		public PortalDbContext CreateDbContext(string[] args)

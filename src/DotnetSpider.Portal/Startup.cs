@@ -1,13 +1,12 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using Dapper;
+using AutoMapper;
 using DotnetSpider.AgentRegister;
 using DotnetSpider.MySql;
 using DotnetSpider.Portal.BackgroundService;
 using DotnetSpider.Portal.Common;
 using DotnetSpider.Portal.Data;
+using DotnetSpider.Portal.ViewObject;
 using DotnetSpider.RabbitMQ;
 using DotnetSpider.Statistics;
 using Microsoft.AspNetCore.Builder;
@@ -19,11 +18,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Quartz;
 using Quartz.AspNetCore;
 using Quartz.AspNetCore.MySqlConnector;
-using SwiftMQ;
 using ServiceProvider = DotnetSpider.Portal.Common.ServiceProvider;
 
 namespace DotnetSpider.Portal
@@ -87,6 +83,11 @@ namespace DotnetSpider.Portal
 			services.AddHostedService<QuartzService>();
 			services.AddHostedService<CleanDockerContainerService>();
 			services.AddSingleton<IActionResultTypeMapper, ActionResultTypeMapper>();
+			services.AddRouting(x =>
+			{
+				x.LowercaseUrls = true;
+			});
+			services.AddAutoMapper(typeof(AutoMapperProfile));
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

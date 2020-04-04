@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DotnetSpider.Portal.Controllers
 {
-	public class AgentController: Controller
+	[Route("agents")]
+	public class AgentController : Controller
 	{
 		[HttpGet]
 		public IActionResult Index()
@@ -10,7 +11,7 @@ namespace DotnetSpider.Portal.Controllers
 			return View();
 		}
 
-		[HttpGet]
+		[HttpGet("{id}/heartbeats")]
 		public IActionResult Heartbeat()
 		{
 			return View();

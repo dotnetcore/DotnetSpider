@@ -8,6 +8,7 @@
 
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="Docker.DotNet" Version="3.125.2" />
     <PackageReference Include="BuildBundlerMinifier" Version="3.2.435" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.1" />
@@ -23,6 +24,7 @@
     <PackageReference Include="System.Text.Json" Version="4.7.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.3" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.2" />
   </ItemGroup>
 
 
@@ -46,6 +48,12 @@
     <EmbeddedResource Include="DDL\SqlServer.sql" />
     <None Remove="DDL\MySql.sql" />
     <EmbeddedResource Include="DDL\MySql.sql" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\DockerRepository\Add.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\DockerRepository\Index.cshtml" />
   </ItemGroup>
 
 </Project>

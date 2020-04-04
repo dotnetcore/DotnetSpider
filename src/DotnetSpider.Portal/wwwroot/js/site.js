@@ -152,3 +152,17 @@ function getPagedQuery() {
     keyword = keyword === null ? '' : keyword;
     return `page=${page}&limit=${limit}&keyword=${keyword}`;
 }
+
+function getQueryParam() {
+    let page = getQueryArgument('page');
+    page = page === null ? 1 : page;
+    let limit = getQueryArgument('limit');
+    limit = limit === null ? 15 : limit;
+    let keyword = getQueryArgument('keyword');
+    keyword = keyword === null ? '' : keyword;
+    return {
+        page: page,
+        limit: limit,
+        keyword: keyword,
+    };
+}

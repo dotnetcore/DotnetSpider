@@ -17,17 +17,6 @@
     "sourceMap": false
   },
   {
-    "outputFileName": "wwwroot/js/repository.min.js",
-    "inputFiles": [
-      "wwwroot/js/repository.js"
-    ],
-    "minify": {
-      "enabled": true,
-      "renameLocals": true
-    },
-    "sourceMap": false
-  },
-  {
     "outputFileName": "wwwroot/css/sweetalert.min.css",
     "inputFiles": [
       "wwwroot/css/sweetalert.css"
@@ -78,9 +67,20 @@
     "sourceMap": false
   },
   {
-    "outputFileName": "wwwroot/js/spider-container.min.js",
+    "outputFileName": "wwwroot/js/agentHeartbeat.min.js",
     "inputFiles": [
-      "wwwroot/js/spider-container.js"
+      "wwwroot/js/agentHeartbeat.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    "sourceMap": false
+  },
+  {
+    "outputFileName": "wwwroot/js/spiderHistory.min.js",
+    "inputFiles": [
+      "wwwroot/js/spiderHistory.js"
     ],
     "minify": {
       "enabled": true,

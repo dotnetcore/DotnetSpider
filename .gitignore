@@ -11,6 +11,8 @@ selenium-debug.log
 
 **/wwwroot/lib
 
+*.min.js
+
 yarn.lock
 
 # Editor directories and files

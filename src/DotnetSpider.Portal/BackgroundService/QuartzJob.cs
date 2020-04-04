@@ -17,10 +17,12 @@ namespace DotnetSpider.Portal.BackgroundService
 		public async Task Execute(IJobExecutionContext context)
 		{
 			var jobId = context.JobDetail.Key.Name;
+
 			using (var scope = ServiceProvider.Instance.CreateScope())
 			{
 				var services = scope.ServiceProvider;
 				var logger = services.GetRequiredService<ILogger<QuartzJob>>();
+				logger.LogInformation($"触发任务 {jobId}");
 				try
 				{
 					var options = services.GetRequiredService<PortalOptions>();
@@ -33,7 +35,7 @@ namespace DotnetSpider.Portal.BackgroundService
 						return;
 					}
 
-					if (!spider.Enable)
+					if (!spider.Enabled)
 					{
 						logger.LogError($"任务 {jobId} 被禁用");
 						return;
@@ -50,14 +52,11 @@ namespace DotnetSpider.Portal.BackgroundService
 						$"DOTNET_SPIDER_TYPE={spider.Type}",
 						$"DOTNET_SPIDER_NAME={spider.Name}"
 					};
-					var image = string.IsNullOrWhiteSpace(spider.Registry)
-						? $"{spider.Repository}:{spider.Tag}"
-						: $"{spider.Registry}/{spider.Repository}:{spider.Tag}";
 
 					var name = $"dotnetspider-{spider.Id}-{batch}";
 					var parameters = new CreateContainerParameters
 					{
-						Image = image,
+						Image = spider.Image,
 						Name = name,
 						Labels = new Dictionary<string, string>
 						{
@@ -77,16 +76,17 @@ namespace DotnetSpider.Portal.BackgroundService
 						logger.LogError($"创建任务 {jobId} 实例失败: {string.Join(", ", result.Warnings)}");
 					}
 
-					var spiderContainer = new SpiderContainer
+					var spiderContainer = new SpiderHistory
 					{
 						ContainerId = result.ID,
 						Batch = batch,
 						SpiderId = spider.Id,
+						SpiderName = spider.Name,
 						Status = "Created",
 						CreationTime = DateTimeOffset.Now
 					};
 
-					dbContext.SpiderContainers.Add(spiderContainer);
+					dbContext.SpiderHistories.Add(spiderContainer);
 					await dbContext.SaveChangesAsync();
 
 					var startResult =

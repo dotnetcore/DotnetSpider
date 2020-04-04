@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Extensions;
 using MessagePack;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -20,9 +21,11 @@ namespace DotnetSpider.RabbitMQ
 		private RabbitMQOptions _options;
 		private IConnection _connection;
 		private ConcurrentDictionary<string, IModel> _modelDict;
+		private readonly ILogger<RabbitMQMessageQueue> _logger;
 
-		public RabbitMQMessageQueue(IOptions<RabbitMQOptions> options)
+		public RabbitMQMessageQueue(IOptions<RabbitMQOptions> options, ILogger<RabbitMQMessageQueue> logger)
 		{
+			_logger = logger;
 			if (options != null)
 			{
 				Initialize(options.Value);
@@ -32,7 +35,8 @@ namespace DotnetSpider.RabbitMQ
 		internal void Initialize(RabbitMQOptions options)
 		{
 			_options = options;
-			var connectionFactory = new ConnectionFactory {HostName = _options.HostName, DispatchConsumersAsync = true};
+			_logger.LogInformation($"RabbitMQ Host: {_options.Host}, Port: {_options.Port}");
+			var connectionFactory = new ConnectionFactory {HostName = _options.Host, DispatchConsumersAsync = true};
 			if (_options.Port > 0)
 			{
 				connectionFactory.Port = _options.Port;

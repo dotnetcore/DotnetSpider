@@ -4,7 +4,7 @@ namespace DotnetSpider.RabbitMQ
 	{
 		public string Exchange { get; set; } = "DOTNET_SPIDER";
 
-		public string HostName { get; set; } = "localhost";
+		public string Host { get; set; }
 
 		public int Port { get; set; }
 

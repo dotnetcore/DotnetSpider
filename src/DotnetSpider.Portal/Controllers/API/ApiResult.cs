@@ -1,32 +1,46 @@
-using Microsoft.AspNetCore.Mvc;
-
 namespace DotnetSpider.Portal.Controllers.API
 {
 	public interface IApiResult
 	{
+		bool Success { get; }
+		int Code { get; }
+		string Msg { get; }
 	}
 
-	public class ApiResult : JsonResult, IApiResult
+	public class ApiResult : ApiResult<object>
 	{
-		public ApiResult(object value) : base(new {code = 0, success = true, data = value})
-		{
-		}
-
-		public ApiResult(object value, object serializerSettings) : base(new {code = 0, success = true, data = value},
-			serializerSettings)
+		public ApiResult(object data, string msg = null) : base(data, msg)
 		{
 		}
 	}
 
-	public class FailedResult : JsonResult, IApiResult
+	public class ApiResult<T> : IApiResult
 	{
-		public FailedResult(string msg) : base(new {code = 1, success = false, msg})
-		{
-		}
+		public bool Success { get; }
+		public int Code { get; }
+		public string Msg { get; }
+		public T Data { get; }
 
-		public FailedResult(string msg, object serializerSettings) : base(new {code = 1, success = false, msg},
-			serializerSettings)
+		public ApiResult(T data, string msg = null)
 		{
+			Success = true;
+			Code = 0;
+			Msg = msg;
+			Data = data;
+		}
+	}
+
+	public class FailedResult : IApiResult
+	{
+		public bool Success { get; }
+		public int Code { get; }
+		public string Msg { get; }
+
+		public FailedResult(string msg, int code = 1)
+		{
+			Success = false;
+			Code = code;
+			Msg = msg;
 		}
 	}
 }

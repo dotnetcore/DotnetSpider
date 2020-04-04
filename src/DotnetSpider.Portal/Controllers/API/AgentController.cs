@@ -1,6 +1,6 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Dapper;
 using DotnetSpider.Agent.Message;
 using DotnetSpider.AgentRegister.Store;
@@ -8,12 +8,11 @@ using DotnetSpider.Extensions;
 using DotnetSpider.Infrastructure;
 using DotnetSpider.Portal.Common;
 using DotnetSpider.Portal.Data;
+using DotnetSpider.Portal.ViewObject;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SwiftMQ;
-using X.PagedList;
 
 namespace DotnetSpider.Portal.Controllers.API
 {
@@ -24,44 +23,49 @@ namespace DotnetSpider.Portal.Controllers.API
 		private readonly PortalDbContext _dbContext;
 		private readonly IMessageQueue _mq;
 		private readonly SpiderOptions _options;
+		private readonly IMapper _mapper;
 
 		public AgentController(PortalDbContext dbContext,
 			IMessageQueue eventBus,
-			IOptions<SpiderOptions> options)
+			IOptions<SpiderOptions> options, IMapper mapper)
 		{
 			_dbContext = dbContext;
 			_mq = eventBus;
+			_mapper = mapper;
 			_options = options.Value;
 		}
 
-		public async Task<PagedQueryResult<AgentInfo>> PagedQueryAsync(string keyword, int page, int limit)
+		[HttpGet]
+		public async Task<PagedQueryResult<AgentViewObject>> PagedQueryAsync(string keyword, int page, int limit)
 		{
+			PagedQueryResult<AgentInfo> @out;
 			if (!string.IsNullOrWhiteSpace(keyword))
 			{
-				var agents = await _dbContext
+				@out = await _dbContext
 					.Set<AgentInfo>()
 					.PagedQueryAsync(page, limit, x => x.Name.Contains(keyword) || x.Id.Contains(keyword),
 						new OrderCondition<AgentInfo, DateTimeOffset>(x => x.CreationTime));
-				return agents;
 			}
 			else
 			{
-				var agents = await _dbContext
+				@out = await _dbContext
 					.Set<AgentInfo>()
 					.PagedQueryAsync(page, limit, null,
 						new OrderCondition<AgentInfo, DateTimeOffset>(x => x.CreationTime));
-				return agents;
 			}
+
+			return _mapper.ToPagedQueryResult<AgentInfo, AgentViewObject>(@out);
 		}
 
 		[HttpGet("{id}/heartbeats")]
-		public async Task<PagedQueryResult<AgentHeartbeat>> Heartbeat(string id, int page, int size)
+		public async Task<PagedQueryResult<AgentHeartbeatViewObject>> PagedQueryHeartbeatAsync(string id, int page, int limit)
 		{
 			page = page <= 1 ? 1 : page;
-			size = size <= 20 ? 20 : size;
+			limit = limit <= 5 ? 5 : limit;
 
-			return await _dbContext.Set<AgentHeartbeat>().PagedQueryAsync(page, size, x => x.AgentId == id,
+			var @out = await _dbContext.Set<AgentHeartbeat>().PagedQueryAsync(page, limit, x => x.AgentId == id,
 				new OrderCondition<AgentHeartbeat, int>(x => x.Id));
+			return _mapper.ToPagedQueryResult<AgentHeartbeat, AgentHeartbeatViewObject>(@out);
 		}
 
 		[HttpDelete("{id}")]
@@ -77,7 +81,7 @@ namespace DotnetSpider.Portal.Controllers.API
 			using (var conn = _dbContext.Database.GetDbConnection())
 			{
 				await conn.ExecuteAsync(
-					$"DELETE FROM {_options.Database}.agent_heartbeat WHERE agent_id = @Id; DELETE FROM {_options.Database}.agent_heartbeat WHERE id = @Id;",
+					$"DELETE FROM {_options.Database}.agent_heartbeat WHERE agent_id = @Id; DELETE FROM {_options.Database}.agent WHERE id = @Id;",
 					new {Id = id});
 			}
 

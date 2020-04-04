@@ -35,6 +35,17 @@ html {
         font-size: 16px;
     }
 }
+@media (min-width: 1440px) {
+    .container, .container-sm, .container-md, .container-lg, .container-xl {
+        max-width: 1200px;
+    }
+}
+
+@media (min-width: 1900px) {
+    .container, .container-sm, .container-md, .container-lg, .container-xl {
+        max-width: 1400px;
+    }
+}
 
 .border-top {
     border-top: 1px solid #e5e5e5;

@@ -22,8 +22,11 @@ ProjectSection(SolutionItems) = preProject
 		package.props = package.props
 		README.md = README.md
 		runtests.sh = runtests.sh
-								publish_agent.sh = publish_agent.sh
-								publish_portal.sh = publish_portal.sh
+		publish_agent.sh = publish_agent.sh
+		publish_portal.sh = publish_portal.sh
+	build_spiders.sh = build_spiders.sh
+	build_agent.sh = build_agent.sh
+	build_portal.sh = build_portal.sh
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Agent", "src\DotnetSpider.Agent\DotnetSpider.Agent.csproj", "{FCCA37B0-FF8F-4C32-9286-26A39EFA94E5}"
@@ -36,9 +39,32 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker-compose", "docker-co
 ProjectSection(SolutionItems) = preProject
 	docker-compose\hbase.yml = docker-compose\hbase.yml
 	docker-compose\rabbitmq.yml = docker-compose\rabbitmq.yml
+	docker-compose\portal.yml = docker-compose\portal.yml
+	docker-compose\agent.yml = docker-compose\agent.yml
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.AgentRegister", "src\DotnetSpider.AgentRegister\DotnetSpider.AgentRegister.csproj", "{05991456-8637-4BBA-ADEB-95A86C528CBA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Portal", "src\DotnetSpider.Portal\DotnetSpider.Portal.csproj", "{303543D4-1883-424F-89B9-5BA1B9F1B38A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Spiders", "src\DotnetSpider.Spiders\DotnetSpider.Spiders.csproj", "{F0A12ACB-F4AE-4527-891F-F316DDDE92CA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dockerfile", "dockerfile", "{95BE9DB1-2FAC-4419-B5FB-89B5A613B36F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "agent", "agent", "{24533133-A99D-4299-A497-CC36CB6016FD}"
+ProjectSection(SolutionItems) = preProject
+	dockerfile\agent\Dockerfile = dockerfile\agent\Dockerfile
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "portal", "portal", "{28864CA0-BE79-4E63-B079-0E7A1A6B3F8B}"
+ProjectSection(SolutionItems) = preProject
+	dockerfile\portal\Dockerfile = dockerfile\portal\Dockerfile
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "spiders", "spiders", "{F5DDA7EC-EF76-4085-86A2-D0F780809FF0}"
+ProjectSection(SolutionItems) = preProject
+	dockerfile\spiders\Dockerfile = dockerfile\spiders\Dockerfile
+EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -86,8 +112,20 @@ Global
 		{05991456-8637-4BBA-ADEB-95A86C528CBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05991456-8637-4BBA-ADEB-95A86C528CBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05991456-8637-4BBA-ADEB-95A86C528CBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{303543D4-1883-424F-89B9-5BA1B9F1B38A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{303543D4-1883-424F-89B9-5BA1B9F1B38A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{303543D4-1883-424F-89B9-5BA1B9F1B38A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{303543D4-1883-424F-89B9-5BA1B9F1B38A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0A12ACB-F4AE-4527-891F-F316DDDE92CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0A12ACB-F4AE-4527-891F-F316DDDE92CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0A12ACB-F4AE-4527-891F-F316DDDE92CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0A12ACB-F4AE-4527-891F-F316DDDE92CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{23813B85-AB02-4A53-B0A0-4DA5B6665425} = {724DCFC7-FA90-4AA7-8A2E-32FACCDEB38C}
+		{95BE9DB1-2FAC-4419-B5FB-89B5A613B36F} = {724DCFC7-FA90-4AA7-8A2E-32FACCDEB38C}
+		{24533133-A99D-4299-A497-CC36CB6016FD} = {95BE9DB1-2FAC-4419-B5FB-89B5A613B36F}
+		{28864CA0-BE79-4E63-B079-0E7A1A6B3F8B} = {95BE9DB1-2FAC-4419-B5FB-89B5A613B36F}
+		{F5DDA7EC-EF76-4085-86A2-D0F780809FF0} = {95BE9DB1-2FAC-4419-B5FB-89B5A613B36F}
 	EndGlobalSection
 EndGlobal

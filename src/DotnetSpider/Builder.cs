@@ -36,12 +36,7 @@ namespace DotnetSpider
 		public static Builder CreateBuilder<T>(Action<SpiderOptions> configureDelegate = null)
 			where T : Spider
 		{
-			var hostBuilder = CreateBuilder(null, configureDelegate);
-			hostBuilder.ConfigureServices(services =>
-			{
-				services.AddHostedService<T>();
-			});
-			return hostBuilder;
+			return CreateBuilder(typeof(T), null, configureDelegate);
 		}
 
 		/// <summary>
@@ -54,12 +49,29 @@ namespace DotnetSpider
 		public static Builder CreateBuilder<T>(string[] args, Action<SpiderOptions> configureDelegate = null)
 			where T : Spider
 		{
+			return CreateBuilder(typeof(T), args, configureDelegate);
+		}
+
+		public static Builder CreateBuilder(Type type, string[] args = null,
+			Action<SpiderOptions> configureDelegate = null)
+		{
 			var hostBuilder = CreateBuilder(args, configureDelegate);
 			hostBuilder.ConfigureServices(services =>
 			{
-				services.AddHostedService<T>();
+				services.AddSingleton(typeof(IHostedService), type);
 			});
 			return hostBuilder;
+		}
+
+		/// <summary>
+		/// Create a default local spider builder
+		/// </summary>
+		/// <param name="configureDelegate"></param>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
+		public static Builder CreateDefaultBuilder<T>(Action<SpiderOptions> configureDelegate = null) where T : Spider
+		{
+			return CreateDefaultBuilder<T>(null, configureDelegate);
 		}
 
 		/// <summary>
@@ -71,6 +83,12 @@ namespace DotnetSpider
 		/// <returns></returns>
 		public static Builder CreateDefaultBuilder<T>(
 			string[] args, Action<SpiderOptions> configureDelegate = null) where T : Spider
+		{
+			return CreateDefaultBuilder(typeof(T), args, configureDelegate);
+		}
+
+		public static Builder CreateDefaultBuilder(Type type,
+			string[] args, Action<SpiderOptions> configureDelegate = null)
 		{
 			var hostBuilder = CreateBuilder(args, configureDelegate);
 			hostBuilder.ConfigureServices(services =>
@@ -85,20 +103,9 @@ namespace DotnetSpider
 				services.AddStatistics<MemoryStatisticsStore>();
 				services.AddAgentRegister<MemoryAgentStore>();
 				services.AddAgent();
-				services.AddHostedService<T>();
+				services.AddSingleton(typeof(IHostedService), type);
 			});
 			return hostBuilder;
-		}
-
-		/// <summary>
-		/// Create a default local spider builder
-		/// </summary>
-		/// <param name="configureDelegate"></param>
-		/// <typeparam name="T"></typeparam>
-		/// <returns></returns>
-		public static Builder CreateDefaultBuilder<T>(Action<SpiderOptions> configureDelegate = null) where T : Spider
-		{
-			return CreateDefaultBuilder<T>(null, configureDelegate);
 		}
 
 		private static Builder CreateBuilder(string[] args, Action<SpiderOptions> configureDelegate = null)
