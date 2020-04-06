@@ -29,10 +29,14 @@ namespace DotnetSpider.Infrastructure
 
         private struct MemoryStatus
         {
-            /// <summary>
-            /// 总的物理内存大小
-            /// </summary>
-            public ulong DwTotalPhys { get; set; }
+	        public uint DwLength { get; set; }
+	        public uint DwMemoryLoad { get; set; }
+	        public ulong DwTotalPhys { get; set; } //总的物理内存大小
+	        public ulong DwAvailPhys { get; set; } //可用的物理内存大小
+	        public ulong DwTotalPageFile { get; set; }
+	        public ulong DwAvailPageFile { get; set; } //可用的页面文件大小
+	        public ulong DwTotalVirtual { get; set; } //返回调用进程的用户模式部分的全部可用虚拟地址空间
+	        public ulong DwAvailVirtual { get; set; } // 返回调用进程的用户模式部分的实际自由可用的虚拟地址空间
         }
 
         [DllImport("kernel32.dll", SetLastError = true)]
