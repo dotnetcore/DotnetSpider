@@ -132,6 +132,7 @@ namespace DotnetSpider.Tests
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		[FollowRequestSelector(".//div[@class='page clearfix']", "list\\.html")]
 		[GlobalValueSelector(Name = "Title", Expression = ".//div[@class='s-title']", Type = SelectorType.XPath)]
+		[GlobalValueSelector(Name = "Title2", Expression = ".//div[@class='s-title']", Type = SelectorType.XPath)]
 		private class Product : EntityBase<Product>
 		{
 			[ValueSelector(Expression = "Title", Type = SelectorType.Environment)]
