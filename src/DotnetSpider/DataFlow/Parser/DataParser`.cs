@@ -10,170 +10,201 @@ using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.DataFlow.Parser
 {
-    /// <summary>
-    /// 实体解析器
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class DataParser<T> : DataParser where T : EntityBase<T>, new()
-    {
-        public override string Name => $"DataParser<{typeof(T).Name}>";
+	/// <summary>
+	/// 实体解析器
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	public class DataParser<T> : DataParser where T : EntityBase<T>, new()
+	{
+		public override string Name => $"DataParser<{typeof(T).Name}>";
 
-        protected readonly Model<T> Model;
+		protected readonly Model<T> Model;
 
-        /// <summary>
-        /// 构造方法
-        /// </summary>
-        public DataParser()
-        {
-            Model = new Model<T>();
-            var xPaths = new HashSet<string>();
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		public DataParser()
+		{
+			Model = new Model<T>();
 
-            if (Model.FollowRequestSelectors != null)
-            {
-                foreach (var followSelector in Model.FollowRequestSelectors)
-                {
-                    foreach (var xPath in followSelector.XPaths)
-                    {
-                        xPaths.Add(xPath);
-                    }
-                }
+			var patterns = new HashSet<string>();
+			if (Model.FollowRequestSelectors != null)
+			{
+				foreach (var followSelector in Model.FollowRequestSelectors)
+				{
+					switch (followSelector.SelectorType)
+					{
+						case SelectorType.Css:
+						{
+							foreach (var expression in followSelector.Expressions)
+							{
+								AddFollowRequestQuerier(Selectors.Css(expression));
+							}
 
-                foreach (var xPath in xPaths)
-                {
-                    AddFollowRequestQuerier(Selectors.XPath(xPath));
-                }
+							break;
+						}
+						case SelectorType.Regex:
+						{
+							foreach (var expression in followSelector.Expressions)
+							{
+								AddFollowRequestQuerier(Selectors.Regex(expression));
+							}
 
-                var patterns = new HashSet<string>();
-                foreach (var followSelector in Model.FollowRequestSelectors)
-                {
-                    foreach (var pattern in followSelector.Patterns)
-                    {
-                        patterns.Add(pattern);
-                    }
-                }
+							break;
+						}
+						case SelectorType.XPath:
+						{
+							foreach (var expression in followSelector.Expressions)
+							{
+								AddFollowRequestQuerier(Selectors.XPath(expression));
+							}
 
-                foreach (var pattern in patterns)
-                {
-                    AddRequiredValidator(request => Regex.IsMatch(request.RequestUri.ToString(), pattern));
-                }
-            }
-        }
+							break;
+						}
+						case SelectorType.Environment:
+						{
+							Logger.LogWarning("SelectorType of follow selector is not supported");
+							break;
+						}
+						case SelectorType.JsonPath:
+						{
+							foreach (var expression in followSelector.Expressions)
+							{
+								AddFollowRequestQuerier(Selectors.JsonPath(expression));
+							}
 
-        protected virtual T ConfigureDataObject(T t)
-        {
-            return t;
-        }
+							break;
+						}
+					}
 
-        protected override Task Parse(DataContext context)
-        {
-            var selectable = context.Selectable;
+					foreach (var pattern in followSelector.Patterns)
+					{
+						patterns.Add(pattern);
+					}
+				}
+			}
 
-            var results = new List<T>();
+			foreach (var pattern in patterns)
+			{
+				AddRequiredValidator(request => Regex.IsMatch(request.RequestUri.ToString(), pattern));
+			}
+		}
 
-            // don't change request's properties
-            var properties = new Dictionary<string, object>();
-            foreach (var property in context.Request.Properties)
-            {
-                properties[property.Key] = property.Value;
-            }
+		protected virtual T ConfigureDataObject(T t)
+		{
+			return t;
+		}
 
-            if (Model.GlobalValueSelectors != null)
-            {
-                foreach (var selector in Model.GlobalValueSelectors)
-                {
-                    var name = selector.Name;
-                    if (string.IsNullOrWhiteSpace(name))
-                    {
-                        continue;
-                    }
+		protected override Task Parse(DataContext context)
+		{
+			var selectable = context.Selectable;
 
-                    var value = selectable.Select(selector.ToSelector()).Value;
-                    properties[name] = value;
-                }
-            }
+			var results = new List<T>();
 
-            var single = Model.Selector == null;
-            if (!single)
-            {
-                var selector = Model.Selector.ToSelector();
+			// don't change request properties
+			var properties = new Dictionary<string, object>();
+			foreach (var property in context.Request.Properties)
+			{
+				properties[property.Key] = property.Value;
+			}
 
-                var allEntities = selectable.SelectList(selector)?.ToList();
-                if (allEntities != null)
-                {
-                    var count = allEntities.Count;
-                    IEnumerable<ISelectable> entities;
-                    if (Model.Take > 0 && count > Model.Take)
-                    {
-                        entities = Model.TakeByDescending
-                            ? allEntities.Take(Model.Take)
-                            : allEntities.Skip(count - Model.Take);
-                    }
-                    else
-                    {
-                        entities = allEntities;
-                    }
+			if (Model.GlobalValueSelectors != null)
+			{
+				foreach (var selector in Model.GlobalValueSelectors)
+				{
+					var name = selector.Name;
+					if (string.IsNullOrWhiteSpace(name))
+					{
+						continue;
+					}
 
-                    var index = 0;
-                    foreach (var entity in entities)
-                    {
-                        var obj = ParseObject(context, properties, entity, index);
-                        if (obj != null)
-                        {
-                            results.Add(obj);
-                        }
-                        else
-                        {
-                            Logger.LogWarning($"解析到空数据，类型: {Model.TypeName}");
-                        }
+					var value = selectable.Select(selector.ToSelector()).Value;
+					properties[name] = value;
+				}
+			}
 
-                        index++;
-                    }
-                }
-            }
-            else
-            {
-                var obj = ParseObject(context, properties, selectable, 0);
-                if (obj != null)
-                {
-                    results.Add(obj);
-                }
-                else
-                {
-                    Logger.LogWarning($"解析到空数据，类型: {Model.TypeName}");
-                }
-            }
+			var single = Model.Selector == null;
+			if (!single)
+			{
+				var selector = Model.Selector.ToSelector();
 
-            if (results.Count > 0)
-            {
-                AddParsedResult(context, results);
-            }
+				var allEntities = selectable.SelectList(selector)?.ToList();
+				if (allEntities != null)
+				{
+					var count = allEntities.Count;
+					IEnumerable<ISelectable> entities;
+					if (Model.Take > 0 && count > Model.Take)
+					{
+						entities = Model.TakeByDescending
+							? allEntities.Take(Model.Take)
+							: allEntities.Skip(count - Model.Take);
+					}
+					else
+					{
+						entities = allEntities;
+					}
 
-            return Task.CompletedTask;
-        }
+					var index = 0;
+					foreach (var entity in entities)
+					{
+						var obj = ParseObject(context, properties, entity, index);
+						if (obj != null)
+						{
+							results.Add(obj);
+						}
+						else
+						{
+							Logger.LogWarning($"解析到空数据，类型: {Model.TypeName}");
+						}
 
-        private T ParseObject(DataContext context, Dictionary<string, object> properties, ISelectable selectable,
-            int index)
-        {
-            var dataObject = new T();
-            foreach (var field in Model.ValueSelectors)
-            {
-                string value;
-                if (field.Type == SelectorType.Environment)
-                {
-                    value = GetEnvironment(context, properties, field, index);
-                }
-                else
-                {
-                    var selector = field.ToSelector();
-                    value = selectable.Select(selector)?.Value;
-                }
+						index++;
+					}
+				}
+			}
+			else
+			{
+				var obj = ParseObject(context, properties, selectable, 0);
+				if (obj != null)
+				{
+					results.Add(obj);
+				}
+				else
+				{
+					Logger.LogWarning($"解析到空数据，类型: {Model.TypeName}");
+				}
+			}
 
-                if (!string.IsNullOrWhiteSpace(value))
-                {
-                    if (field.Formatters != null && field.Formatters.Length > 0)
-                    {
-                        foreach (var formatter in field.Formatters)
-                        {
+			if (results.Count > 0)
+			{
+				AddParsedResult(context, results);
+			}
+
+			return Task.CompletedTask;
+		}
+
+		private T ParseObject(DataContext context, Dictionary<string, object> properties, ISelectable selectable,
+			int index)
+		{
+			var dataObject = new T();
+			foreach (var field in Model.ValueSelectors)
+			{
+				string value;
+				if (field.Type == SelectorType.Environment)
+				{
+					value = GetEnvironment(context, properties, field, index);
+				}
+				else
+				{
+					var selector = field.ToSelector();
+					value = selectable.Select(selector)?.Value;
+				}
+
+				if (!string.IsNullOrWhiteSpace(value))
+				{
+					if (field.Formatters != null && field.Formatters.Length > 0)
+					{
+						foreach (var formatter in field.Formatters)
+						{
 #if !DEBUG
 							value = formatter.Format(value);
 #else
@@ -186,87 +217,87 @@ namespace DotnetSpider.DataFlow.Parser
                                 Logger.LogError($"数据格式化失败: {e}");
                             }
 #endif
-                        }
-                    }
-                }
+						}
+					}
+				}
 
 
-                var newValue = value == null ? null : Convert.ChangeType(value, field.PropertyInfo.PropertyType);
-                if (newValue == null && field.NotNull)
-                {
-                    dataObject = null;
-                    break;
-                }
+				var newValue = value == null ? null : Convert.ChangeType(value, field.PropertyInfo.PropertyType);
+				if (newValue == null && field.NotNull)
+				{
+					dataObject = null;
+					break;
+				}
 
-                field.PropertyInfo.SetValue(dataObject, newValue);
-            }
+				field.PropertyInfo.SetValue(dataObject, newValue);
+			}
 
-            return ConfigureDataObject(dataObject);
-        }
+			return ConfigureDataObject(dataObject);
+		}
 
-        private string GetEnvironment(DataContext context, Dictionary<string, object> properties, ValueSelector field,
-            int index)
-        {
-            string value;
-            switch (field.Expression)
-            {
-                case "ENTITY_INDEX":
-                {
-                    value = index.ToString();
-                    break;
-                }
+		private string GetEnvironment(DataContext context, Dictionary<string, object> properties, ValueSelector field,
+			int index)
+		{
+			string value;
+			switch (field.Expression)
+			{
+				case "ENTITY_INDEX":
+				{
+					value = index.ToString();
+					break;
+				}
 
-                case "GUID":
-                {
-                    value = Guid.NewGuid().ToString();
-                    break;
-                }
+				case "GUID":
+				{
+					value = Guid.NewGuid().ToString();
+					break;
+				}
 
-                case "DATE":
-                case "TODAY":
-                {
-                    value = DateTimeOffset.Now.Date.ToString("yyyy-MM-dd");
-                    break;
-                }
+				case "DATE":
+				case "TODAY":
+				{
+					value = DateTimeOffset.Now.Date.ToString("yyyy-MM-dd");
+					break;
+				}
 
-                case "DATETIME":
-                case "NOW":
-                {
-                    value = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                    break;
-                }
+				case "DATETIME":
+				case "NOW":
+				{
+					value = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss");
+					break;
+				}
 
-                case "MONTH":
-                {
-                    value = DateTime2.FirstDayOfMonth.ToString("yyyy-MM-dd");
-                    break;
-                }
+				case "MONTH":
+				{
+					value = DateTime2.FirstDayOfMonth.ToString("yyyy-MM-dd");
+					break;
+				}
 
-                case "MONDAY":
-                {
-                    value = DateTime2.Monday.ToString("yyyy-MM-dd");
-                    break;
-                }
+				case "MONDAY":
+				{
+					value = DateTime2.Monday.ToString("yyyy-MM-dd");
+					break;
+				}
 
-                case "SPIDER_ID":
-                {
-                    value = context.Request.Owner;
-                    break;
-                }
+				case "SPIDER_ID":
+				{
+					value = context.Request.Owner;
+					break;
+				}
 
-                case "REQUEST_HASH":
-                {
-                    value = context.Request.Hash;
-                    break;
-                }
-                default:
-                {
-                    value = properties.ContainsKey(field.Expression) ? properties[field.Expression].ToString() : null;
-                    break;
-                }
-            }
+				case "REQUEST_HASH":
+				{
+					value = context.Request.Hash;
+					break;
+				}
+				default:
+				{
+					value = properties.ContainsKey(field.Expression) ? properties[field.Expression].ToString() : null;
+					break;
+				}
+			}
 
-            return value;
-        }
-    }
+			return value;
+		}
+	}
 }
