@@ -16,13 +16,13 @@ namespace DotnetSpider.DataFlow.Storage
 	/// </summary>
 	public abstract class RelationalDatabaseEntityStorageBase : EntityStorageBase
 	{
-		private readonly ConcurrentDictionary<string, SqlStatements> _sqlStatements =
+		private readonly ConcurrentDictionary<string, SqlStatements> _sqlStatementDict =
 			new ConcurrentDictionary<string, SqlStatements>();
 
 		private readonly ConcurrentDictionary<string, object> _executedCache =
 			new ConcurrentDictionary<string, object>();
 
-		private readonly ConcurrentDictionary<Type, TableMetadata> _tableMetadatas =
+		private readonly ConcurrentDictionary<Type, TableMetadata> _tableMetadataDict =
 			new ConcurrentDictionary<Type, TableMetadata>();
 
 		protected const string BoolType = "Boolean";
@@ -110,7 +110,7 @@ namespace DotnetSpider.DataFlow.Storage
 			foreach (var kv in dict)
 			{
 				var list = (IList)kv.Value;
-				var tableMetadata = _tableMetadatas.GetOrAdd(kv.Key,
+				var tableMetadata = _tableMetadataDict.GetOrAdd(kv.Key,
 					type => ((IEntity)list[0]).GetTableMetadata());
 
 				var sqlStatements = GetSqlStatements(tableMetadata);
@@ -239,7 +239,7 @@ namespace DotnetSpider.DataFlow.Storage
 				key = $"{key}-{DateTimeOffset.Now:yyyyMMdd}";
 			}
 
-			return _sqlStatements.GetOrAdd(key, str => GenerateSqlStatements(tableMetadata));
+			return _sqlStatementDict.GetOrAdd(key, str => GenerateSqlStatements(tableMetadata));
 		}
 
 		private IDbConnection TryCreateDbConnection()
