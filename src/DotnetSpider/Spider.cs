@@ -29,10 +29,11 @@ namespace DotnetSpider
 	{
 		private readonly List<IDataFlow> _dataFlows;
 		private readonly List<IRequestSupplier> _requestSuppliers;
-		private readonly SpiderOptions _options;
 		private readonly RequestedQueue _requestedQueue;
 		private AsyncMessageConsumer<byte[]> _consumer;
 		private readonly SpiderServices _services;
+
+		protected SpiderOptions Options { get; private set; }
 
 		/// <summary>
 		/// 爬虫标识
@@ -53,8 +54,8 @@ namespace DotnetSpider
 		{
 			Logger = logger;
 			_services = services;
-			_options = options.Value;
-			_requestedQueue = new RequestedQueue(_options);
+			Options = options.Value;
+			_requestedQueue = new RequestedQueue(Options);
 			_requestSuppliers = new List<IRequestSupplier>();
 			_dataFlows = new List<IDataFlow>();
 		}
@@ -80,15 +81,15 @@ namespace DotnetSpider
 
 		protected IDataFlow GetDefaultStorage()
 		{
-			if (string.IsNullOrWhiteSpace(_options.Storage))
+			if (string.IsNullOrWhiteSpace(Options.Storage))
 			{
 				throw new ArgumentNullException($"Storage is not configured");
 			}
 
-			var type = Type.GetType(_options.Storage);
+			var type = Type.GetType(Options.Storage);
 			if (type == null)
 			{
-				throw new SpiderException($"Type of storage {_options.Storage} not found");
+				throw new SpiderException($"Type of storage {Options.Storage} not found");
 			}
 
 			if (!typeof(StorageBase).IsAssignableFrom(type) && !typeof(EntityStorageBase).IsAssignableFrom(type))
@@ -103,7 +104,7 @@ namespace DotnetSpider
 				throw new SpiderException($"Storage {type} didn't implement method CreateFromOptions");
 			}
 
-			var storage = method.Invoke(null, new object[] {_options});
+			var storage = method.Invoke(null, new object[] {Options});
 			if (storage == null)
 			{
 				throw new SpiderException("Create default storage failed");
@@ -186,7 +187,7 @@ namespace DotnetSpider
 
 				// 1. 请求次数超过限制则跳过，并添加失败记录
 				// 2. 默认构造的请求次数为 0， 并且不可用户更改，因此可以保证数据安全性
-				if (request.RequestedTimes > _options.RetriedTimes)
+				if (request.RequestedTimes > Options.RetriedTimes)
 				{
 					await _services.StatisticsClient.IncreaseFailureAsync(Id);
 					continue;
@@ -194,7 +195,7 @@ namespace DotnetSpider
 
 				// 1. 默认构造的深度为 0， 并且用户不可更改，可以保证数据安全
 				// 2. 当深度超过限制则跳过
-				if (_options.Depth > 0 && request.Depth > _options.Depth)
+				if (Options.Depth > 0 && request.Depth > Options.Depth)
 				{
 					continue;
 				}
@@ -295,7 +296,7 @@ namespace DotnetSpider
 			try
 			{
 				using var scope = _services.ServiceProvider.CreateScope();
-				var context = new DataContext(scope.ServiceProvider, _options, request, response);
+				var context = new DataContext(scope.ServiceProvider, Options, request, response);
 				context.AddData(Consts.ResponseBytes, responseBytes);
 
 				foreach (var dataFlow in _dataFlows)
@@ -318,8 +319,8 @@ namespace DotnetSpider
 
 		private async Task RunAsync(CancellationToken stoppingToken)
 		{
-			var tuple = ComputeIntervalAndDequeueBatch(_options.Speed);
-			var sleepTimeLimit = _options.EmptySleepTime * 1000;
+			var tuple = ComputeIntervalAndDequeueBatch(Options.Speed);
+			var sleepTimeLimit = Options.EmptySleepTime * 1000;
 
 			await Task.Factory.StartNew(async () =>
 			{
@@ -337,7 +338,7 @@ namespace DotnetSpider
 							await _services.StatisticsClient.PrintAsync(Id);
 						}
 
-						if (_requestedQueue.Count > _options.RequestedQueueCount)
+						if (_requestedQueue.Count > Options.RequestedQueueCount)
 						{
 							if (pausedTime > sleepTimeLimit)
 							{
@@ -434,7 +435,7 @@ namespace DotnetSpider
 			{
 				foreach (var request in requests)
 				{
-					if (_options.UseProxy)
+					if (Options.UseProxy)
 					{
 						var proxy = await _services.ProxyPool.GetAsync(70);
 						if (proxy == null)

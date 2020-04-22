@@ -27,7 +27,7 @@
             </thead>
             <tbody>
             <tr v-if="items.length===0">
-                <td colspan="7">None</td>
+                <td colspan="8">None</td>
             </tr>
             <tr :id="item.id" v-else v-for="item in items">
                 <td v-if="item.online" class="badge-success"></td>
