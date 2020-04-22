@@ -234,6 +234,11 @@ namespace DotnetSpider.Portal.Controllers.API
 				.ToDictionaryAsync(x => x.Id, x => x);
 			foreach (var item in @out.Data)
 			{
+				if (!dict.ContainsKey(item.Batch))
+				{
+					continue;
+				}
+
 				var statistics = dict[item.Batch];
 				if (statistics != null)
 				{

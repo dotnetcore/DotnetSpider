@@ -122,7 +122,7 @@ namespace DotnetSpider.Agent
 						stringContent.Content,
 						Encoding.GetEncoding(stringContent.EncodingName), stringContent.MediaType);
 				}
-				else if (content is ByteArrayContent byteArrayContent)
+				else if (content is ByteArrayContent byteArrayContent && byteArrayContent.Bytes != null)
 				{
 					httpRequestMessage.Content = new System.Net.Http.ByteArrayContent(byteArrayContent.Bytes);
 				}

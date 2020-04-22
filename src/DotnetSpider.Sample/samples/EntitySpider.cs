@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
+using SwiftMQ.DependencyInjection;
 
 namespace DotnetSpider.Sample.samples
 {
