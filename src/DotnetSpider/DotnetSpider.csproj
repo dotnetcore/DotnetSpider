@@ -5,7 +5,6 @@
     <PackageId>DotnetSpider</PackageId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="HashedWheelTimer" Version="1.0.3" />
     <PackageReference Include="lz4net" Version="1.0.15.93" />
     <PackageReference Include="MessagePack" Version="2.1.90" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
@@ -17,6 +16,7 @@
     <PackageReference Include="SwiftMQ.DependencyInjection" Version="0.0.6" />
     <PackageReference Include="System.Collections.Immutable" Version="1.7.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
+    <PackageReference Include="ZCJ.HashedWheelTimer" Version="0.10.1" />
 
   </ItemGroup>
   <ItemGroup>
