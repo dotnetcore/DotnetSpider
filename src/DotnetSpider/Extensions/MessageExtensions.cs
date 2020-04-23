@@ -25,7 +25,7 @@ namespace DotnetSpider.Extensions
 
         public static async Task<object> DeserializeAsync(this byte[] bytes, CancellationToken cancellationToken)
         {
-            bytes = LZ4Codec.Unwrap(bytes);
+	        bytes = LZ4Codec.Unwrap(bytes);
             var stream = new MemoryStream(bytes);
             return await MessagePackSerializer.Typeless.DeserializeAsync(stream, null, cancellationToken);
         }

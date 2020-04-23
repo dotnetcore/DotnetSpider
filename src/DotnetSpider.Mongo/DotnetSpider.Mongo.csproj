@@ -1,16 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="../../package.props"/>
+  <Import Project="../../package.props" />
   <PropertyGroup>
     <PackageId>DotnetSpider.Mongo</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MongoDB.Driver" Version="2.10.2"/>
+    <PackageReference Include="MongoDB.Driver" Version="2.10.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj"/>
+    <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj" />
   </ItemGroup>
 
 </Project>
