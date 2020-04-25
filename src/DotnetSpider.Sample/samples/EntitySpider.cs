@@ -26,7 +26,6 @@ namespace DotnetSpider.Sample.samples
 				options.UseProxy = true;
 			});
 			builder.UseSerilog();
-			builder.UseKuaidaili();
 			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
 			await builder.Build().RunAsync();
 		}

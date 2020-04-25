@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -38,9 +39,10 @@ namespace DotnetSpider.Agent
 
 				var httpRequest = GenerateHttpRequestMessage(request);
 
-				var start = DateTime.Now;
+				var stopwatch = new Stopwatch();
+				stopwatch.Start();
 				var httpResponseMessage = await httpClient.SendAsync(httpRequest);
-				var end = DateTime.Now;
+				stopwatch.Stop();
 				var matchValue = await _pppoeService.DetectAsync(request, httpResponseMessage);
 				if (!string.IsNullOrWhiteSpace(matchValue))
 				{
@@ -60,7 +62,7 @@ namespace DotnetSpider.Agent
 				{
 					var response = new Response
 					{
-						ElapsedMilliseconds = (int)(end - start).TotalMilliseconds,
+						ElapsedMilliseconds = (int)stopwatch.ElapsedMilliseconds,
 						StatusCode = httpResponseMessage.StatusCode
 					};
 					foreach (var header in httpResponseMessage.Headers)

@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -37,8 +35,7 @@ namespace DotnetSpider.Selector
 				return null;
 			}
 
-			var token = JsonConvert.DeserializeObject(text) as JToken;
-			if (token == null)
+			if (!(JsonConvert.DeserializeObject(text) is JToken token))
 			{
 				return null;
 			}

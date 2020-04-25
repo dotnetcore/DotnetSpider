@@ -9,6 +9,7 @@ namespace DotnetSpider.Agent
 			services.AddSingleton<DownloaderFactory>();
 			services.AddSingleton<IDownloader, HttpClientDownloader>();
 			services.AddSingleton<IDownloader, PuppeteerDownloader>();
+			services.AddSingleton<IDownloader, FileDownloader>();
 			services.AddSingleton<PPPoEService>();
 			services.AddHostedService<AgentService>();
 			return services;
