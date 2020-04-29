@@ -74,6 +74,10 @@ namespace DotnetSpider.Selector
 
 		public override string Value => _node?.InnerText;
 
+		public string InnerHtml => _node?.InnerHtml;
+
+		public string OuterHtml => _node?.OuterHtml;
+
 		/// <summary>
 		/// 通过查询器查找结果
 		/// </summary>
