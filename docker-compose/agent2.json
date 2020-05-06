@@ -1,0 +1,14 @@
+{
+  "RabbitMQ": {
+    "Exchange": "DOTNET_SPIDER",
+    "Host": "192.168.124.200",
+    "UserName": "user",
+    "Password": "password"
+  },
+  "AgentId": "AGENT_002",
+  "AgentName": "AGENT_002",
+  "ADSLAccount": "",
+  "ADSLPassword": "",
+  "ADSLInterface": "",
+  "SupportPuppeteer": false
+}

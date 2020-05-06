@@ -43,6 +43,8 @@ ProjectSection(SolutionItems) = preProject
 	docker-compose\rabbitmq.yml = docker-compose\rabbitmq.yml
 	docker-compose\portal.yml = docker-compose\portal.yml
 	docker-compose\agent.yml = docker-compose\agent.yml
+	docker-compose\agent1.json = docker-compose\agent1.json
+	docker-compose\agent2.json = docker-compose\agent2.json
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.AgentRegister", "src\DotnetSpider.AgentRegister\DotnetSpider.AgentRegister.csproj", "{05991456-8637-4BBA-ADEB-95A86C528CBA}"
