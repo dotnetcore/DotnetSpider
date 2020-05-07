@@ -38,7 +38,7 @@ namespace DotnetSpider.Proxy
                     var proxy = new WebProxy(new Uri(uri));
                     PrimaryHandler = new HttpClientHandler
                     {
-                        Proxy = proxy
+                        Proxy = proxy,
                     };
                 }
                 else

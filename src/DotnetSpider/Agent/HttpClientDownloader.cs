@@ -36,7 +36,6 @@ namespace DotnetSpider.Agent
 					: $"{Consts.ProxyPrefix}{request.Proxy}";
 
 				var httpClient = _httpClientFactory.CreateClient(clientName);
-
 				var httpRequest = GenerateHttpRequestMessage(request);
 
 				var stopwatch = new Stopwatch();

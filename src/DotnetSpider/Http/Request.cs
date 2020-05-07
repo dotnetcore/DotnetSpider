@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using DotnetSpider.Agent;
-using DotnetSpider.Extensions;
 using DotnetSpider.Infrastructure;
 using MessagePack;
 
@@ -255,14 +253,16 @@ namespace DotnetSpider.Http
 		public virtual string ComputeHash()
 		{
 			// Agent 不需要添加的原因是，每当 Request 再次添加到 Scheduler 前 Requested +1 已经导致 Hash 变化
-			return new HashObject
+			var obj = new HashObject
 			{
 				Owner = Owner,
 				RequestUri = RequestUri,
 				Method = Method,
 				RequestedTime = RequestedTimes,
 				Content = Content?.ToArray()
-			}.ToBytes().ToMd5();
+			};
+			var bytes = MessagePackSerializer.Typeless.Serialize(obj);
+			return bytes.ToMd5();
 		}
 
 		public override string ToString()
@@ -310,7 +310,7 @@ namespace DotnetSpider.Http
 			return request;
 		}
 
-		private class HashObject
+		public class HashObject
 		{
 			public string Owner { get; set; }
 			public Uri RequestUri { get; set; }

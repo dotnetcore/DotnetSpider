@@ -222,8 +222,8 @@ namespace DotnetSpider
 			Logger.LogInformation($"Initialize {Id}, {Name}");
 			await _services.StatisticsClient.StartAsync(Id, Name);
 			await InitializeAsync(stoppingToken);
-			await LoadRequestsFromSuppliers(stoppingToken);
-			await InitializeDataFlowAsync();
+			await LoadRequestFromSuppliers(stoppingToken);
+			await InitializeDataFlowsAsync();
 			await _services.StatisticsClient.IncreaseTotalAsync(Id, _services.Scheduler.Total);
 			await RegisterConsumerAsync(stoppingToken);
 			await RunAsync(stoppingToken);
@@ -236,7 +236,7 @@ namespace DotnetSpider
 
 			Logger.LogInformation($"Register topic {topic}");
 			_consumer = new AsyncMessageConsumer<byte[]>(topic);
-			_consumer.Received += async (bytes) =>
+			_consumer.Received += async bytes =>
 			{
 				var message = await bytes.DeserializeAsync(stoppingToken);
 				if (message == null)
@@ -257,30 +257,37 @@ namespace DotnetSpider
 				{
 					// 1. 从请求队列中去除请求
 					var request = _requestedQueue.Dequeue(response.RequestHash);
-					if (response.StatusCode == HttpStatusCode.OK)
+					if (request == null)
 					{
-						if (_services.IsDistributed)
-						{
-							Logger.LogInformation($"download {request.RequestUri} success");
-						}
-
-						request.Agent = response.Agent;
-						await _services.StatisticsClient.IncreaseAgentSuccessAsync(response.Agent,
-							response.ElapsedMilliseconds);
-						await HandleResponseAsync(request, response, bytes);
+						Logger.LogError($"Dequeue {response.RequestHash} failed");
 					}
 					else
 					{
-						await _services.StatisticsClient.IncreaseAgentFailureAsync(response.Agent,
-							response.ElapsedMilliseconds);
-						var exception = Encoding.UTF8.GetString(response.Content.Data);
-						if (_services.IsDistributed)
+						if (response.StatusCode == HttpStatusCode.OK)
 						{
-							Logger.LogError($"download {request.RequestUri} failed: {exception}");
-						}
+							if (_services.IsDistributed)
+							{
+								Logger.LogInformation($"download {request.RequestUri} success");
+							}
 
-						// 每次调用添加会导致 Requested + 1, 因此失败多次的请求最终会被过滤不再加到调度队列
-						await AddRequestsAsync(request);
+							request.Agent = response.Agent;
+							await _services.StatisticsClient.IncreaseAgentSuccessAsync(response.Agent,
+								response.ElapsedMilliseconds);
+							await HandleResponseAsync(request, response, bytes);
+						}
+						else
+						{
+							await _services.StatisticsClient.IncreaseAgentFailureAsync(response.Agent,
+								response.ElapsedMilliseconds);
+							var exception = Encoding.UTF8.GetString(response.Content.Data);
+							if (_services.IsDistributed)
+							{
+								Logger.LogError($"download {request.RequestUri} failed: {exception}");
+							}
+
+							// 每次调用添加会导致 Requested + 1, 因此失败多次的请求最终会被过滤不再加到调度队列
+							await AddRequestsAsync(request);
+						}
 					}
 				}
 				else
@@ -335,6 +342,7 @@ namespace DotnetSpider
 						if (printFlag >= 5000)
 						{
 							printFlag = 0;
+							// todo: distribute spider should not print
 							await _services.StatisticsClient.PrintAsync(Id);
 						}
 
@@ -350,6 +358,7 @@ namespace DotnetSpider
 							pausedTime += tuple.Interval;
 							Logger.LogInformation(
 								$"{Id}, {Name} too much requests enqueued");
+							await Task.Delay(tuple.Interval, default);
 							continue;
 						}
 
@@ -483,13 +492,17 @@ namespace DotnetSpider
 					{
 						await _services.MessageQueue.PublishAsBytesAsync(topic, request);
 					}
+					else
+					{
+						Logger.LogWarning($"Enqueue request: {request.RequestUri} failed");
+					}
 				}
 			}
 
 			return true;
 		}
 
-		private async Task LoadRequestsFromSuppliers(CancellationToken stoppingToken)
+		private async Task LoadRequestFromSuppliers(CancellationToken stoppingToken)
 		{
 			// 通过供应接口添加请求
 			foreach (var requestSupplier in _requestSuppliers)
@@ -500,11 +513,11 @@ namespace DotnetSpider
 				}
 
 				Logger.LogInformation(
-					$"{Id}, {Name} load requests from {requestSupplier.GetType().Name} {_requestSuppliers.IndexOf(requestSupplier)}/{_requestSuppliers.Count}");
+					$"{Id}, {Name} load request from {requestSupplier.GetType().Name} {_requestSuppliers.IndexOf(requestSupplier)}/{_requestSuppliers.Count}");
 			}
 		}
 
-		private async Task InitializeDataFlowAsync()
+		private async Task InitializeDataFlowsAsync()
 		{
 			if (_dataFlows.Count == 0)
 			{
@@ -523,7 +536,7 @@ namespace DotnetSpider
 					}
 					catch (Exception e)
 					{
-						Logger.LogError($"Init dataFlow {dataFlow.GetType().Name} failed: {e}");
+						Logger.LogError($"Initialize dataFlow {dataFlow.GetType().Name} failed: {e}");
 						_services.ApplicationLifetime.StopApplication();
 					}
 				}
