@@ -259,7 +259,7 @@ namespace DotnetSpider
 					var request = _requestedQueue.Dequeue(response.RequestHash);
 					if (request == null)
 					{
-						Logger.LogError($"Dequeue {response.RequestHash} failed");
+						Logger.LogWarning($"Dequeue {response.RequestHash} failed");
 					}
 					else
 					{
