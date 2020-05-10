@@ -57,7 +57,7 @@ namespace DotnetSpider
 			Logger = logger;
 			_services = services;
 			Options = options.Value;
-			_requestedQueue = new RequestedQueue(Options);
+			_requestedQueue = new RequestedQueue(Options, logger);
 			_requestSuppliers = new List<IRequestSupplier>();
 			_dataFlows = new List<IDataFlow>();
 		}

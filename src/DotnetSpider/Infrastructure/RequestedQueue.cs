@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using DotnetSpider.Http;
 using HWT;
+using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Infrastructure
 {
@@ -17,12 +18,14 @@ namespace DotnetSpider.Infrastructure
 
 		private readonly List<Request> _queue;
 		private readonly SpiderOptions _options;
+		private readonly ILogger _logger;
 
-		public RequestedQueue(SpiderOptions options)
+		public RequestedQueue(SpiderOptions options, ILogger logger)
 		{
 			_dict = new Dictionary<string, Request>();
 			_queue = new List<Request>();
 			_options = options;
+			_logger = logger;
 		}
 
 		public int Count => _dict.Count;
@@ -33,6 +36,7 @@ namespace DotnetSpider.Infrastructure
 			if (!_dict.ContainsKey(request.Hash))
 			{
 				_dict.Add(request.Hash, request);
+				_logger.LogInformation($"Start {request.Hash} timer at {DateTime.Now:yyyyj-MM-dd HH:mm:ss}");
 				_timer.NewTimeout(new TimeoutTask(this, request.Hash),
 					TimeSpan.FromSeconds(_options.RequestTimeout));
 				return true;
@@ -62,7 +66,9 @@ namespace DotnetSpider.Infrastructure
 		{
 			if (_dict.ContainsKey(hash))
 			{
-				_queue.Add(_dict[hash]);
+				var request = _dict[hash];
+				_logger.LogInformation($"Timeout {request.Hash} timer at {DateTime.Now:yyyyj-MM-dd HH:mm:ss}");
+				_queue.Add(request);
 				_dict.Remove(hash);
 			}
 		}
