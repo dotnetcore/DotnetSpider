@@ -33,6 +33,8 @@ namespace DotnetSpider
 		private AsyncMessageConsumer<byte[]> _consumer;
 		private readonly SpiderServices _services;
 
+		protected event Action<Request[]> RequestTimeouted;
+
 		protected SpiderOptions Options { get; private set; }
 
 		/// <summary>
@@ -373,6 +375,8 @@ namespace DotnetSpider
 							}
 
 							await AddRequestsAsync(timeoutRequests);
+
+							RequestTimeouted?.Invoke(timeoutRequests);
 						}
 						else
 						{
