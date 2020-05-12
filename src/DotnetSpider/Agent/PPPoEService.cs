@@ -32,7 +32,7 @@ namespace DotnetSpider.Agent
         /// <returns></returns>
         public async Task<string> DetectAsync(Request request, HttpResponseMessage httpResponseMessage)
         {
-            var redialRegExp = request.GetHeader(Consts.RedialRegExp);
+            var redialRegExp = request.GetHeader(Consts.RedialRegexExpression);
             if (IsActive && !string.IsNullOrWhiteSpace(redialRegExp))
             {
                 var text = await httpResponseMessage.Content.ReadAsStringAsync();

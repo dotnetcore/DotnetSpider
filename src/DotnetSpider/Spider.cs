@@ -57,7 +57,7 @@ namespace DotnetSpider
 			Logger = logger;
 			_services = services;
 			Options = options.Value;
-			_requestedQueue = new RequestedQueue(Options, logger);
+			_requestedQueue = new RequestedQueue(Options);
 			_requestSuppliers = new List<IRequestSupplier>();
 			_dataFlows = new List<IDataFlow>();
 		}
@@ -117,7 +117,7 @@ namespace DotnetSpider
 
 		public override async Task StopAsync(CancellationToken cancellationToken)
 		{
-			Logger.LogInformation($"{Id}, {Name} stopping");
+			Logger.LogInformation($"{Id} stopping");
 			_consumer?.Close();
 
 			await base.StopAsync(cancellationToken);
@@ -126,8 +126,8 @@ namespace DotnetSpider
 			{
 				dataFlow.Dispose();
 			}
-
-			Logger.LogInformation($"{Id}, {Name} stopped");
+			// _services.MessageQueue.
+			Logger.LogInformation($"{Id} stopped");
 		}
 
 		protected virtual void ConfigureRequest(Request request)
@@ -179,10 +179,10 @@ namespace DotnetSpider
 			foreach (var request in requests)
 			{
 				if (request.DownloaderType.Contains("ADSL") &&
-				    string.IsNullOrWhiteSpace(request.GetHeader(Consts.RedialRegExp)))
+				    string.IsNullOrWhiteSpace(request.GetHeader(Consts.RedialRegexExpression)))
 				{
 					throw new ArgumentException(
-						$"Request {request.RequestUri} set to use ADSL but RedialEgeExp is empty");
+						$"Request {request.RequestUri}, {request.Hash} set to use ADSL but RedialRegExp is empty");
 				}
 
 				request.RequestedTimes += 1;
@@ -221,7 +221,7 @@ namespace DotnetSpider
 
 			Id = tuple.Id;
 			Name = tuple.Name;
-			Logger.LogInformation($"Initialize {Id}, {Name}");
+			Logger.LogInformation($"Initialize {Id}");
 			await _services.StatisticsClient.StartAsync(Id, Name);
 			await InitializeAsync(stoppingToken);
 			await LoadRequestFromSuppliers(stoppingToken);
@@ -229,27 +229,27 @@ namespace DotnetSpider
 			await _services.StatisticsClient.IncreaseTotalAsync(Id, _services.Scheduler.Total);
 			await RegisterConsumerAsync(stoppingToken);
 			await RunAsync(stoppingToken);
-			Logger.LogInformation($"{Id}, {Name} started");
+			Logger.LogInformation($"{Id} started");
 		}
 
 		private async Task RegisterConsumerAsync(CancellationToken stoppingToken)
 		{
 			var topic = string.Format(TopicNames.Spider, Id.ToUpper());
 
-			Logger.LogInformation($"Register topic {topic}");
+			Logger.LogInformation($"{Id} register topic {topic}");
 			_consumer = new AsyncMessageConsumer<byte[]>(topic);
 			_consumer.Received += async bytes =>
 			{
 				var message = await bytes.DeserializeAsync(stoppingToken);
 				if (message == null)
 				{
-					Logger.LogWarning("Received empty message");
+					Logger.LogWarning("{Id} received empty message");
 					return;
 				}
 
 				if (message is Exit exit)
 				{
-					Logger.LogInformation($"Receive exit message {JsonConvert.SerializeObject(exit)}");
+					Logger.LogInformation($"{Id} receive exit message {JsonConvert.SerializeObject(exit)}");
 					if (exit.Id == Id.ToUpper())
 					{
 						await ExitAsync();
@@ -261,7 +261,7 @@ namespace DotnetSpider
 					var request = _requestedQueue.Dequeue(response.RequestHash);
 					if (request == null)
 					{
-						Logger.LogWarning($"Dequeue {response.RequestHash} failed");
+						Logger.LogWarning($"{Id} dequeue {response.RequestHash} failed");
 					}
 					else
 					{
@@ -269,7 +269,7 @@ namespace DotnetSpider
 						{
 							if (_services.IsDistributed)
 							{
-								Logger.LogInformation($"download {request.RequestUri} success");
+								Logger.LogInformation($"{Id} download {request.RequestUri}, {request.Hash} success");
 							}
 
 							request.Agent = response.Agent;
@@ -284,7 +284,7 @@ namespace DotnetSpider
 							var exception = Encoding.UTF8.GetString(response.Content.Data);
 							if (_services.IsDistributed)
 							{
-								Logger.LogError($"download {request.RequestUri} failed: {exception}");
+								Logger.LogError($"{Id} download {request.RequestUri}, {request.Hash} failed: {exception}");
 							}
 
 							// 每次调用添加会导致 Requested + 1, 因此失败多次的请求最终会被过滤不再加到调度队列
@@ -294,7 +294,7 @@ namespace DotnetSpider
 				}
 				else
 				{
-					Logger.LogError($"Receive error message {JsonConvert.SerializeObject(message)}");
+					Logger.LogError($"{Id} receive error message {JsonConvert.SerializeObject(message)}");
 				}
 			};
 			await _services.MessageQueue.ConsumeAsync(_consumer, stoppingToken);
@@ -322,7 +322,7 @@ namespace DotnetSpider
 				// if download correct content, parser or storage failed by network or something else
 				// retry it until trigger retryTimes limitation
 				await AddRequestsAsync(request);
-				Logger.LogError($"Handle {JsonConvert.SerializeObject(request)} failed: {e}");
+				Logger.LogError($"{Id} handle {JsonConvert.SerializeObject(request)} failed: {e}");
 			}
 		}
 
@@ -353,13 +353,13 @@ namespace DotnetSpider
 							if (pausedTime > sleepTimeLimit)
 							{
 								Logger.LogInformation(
-									$"{Id}, {Name} paused too much time");
+									$"{Id} paused too much time");
 								break;
 							}
 
 							pausedTime += tuple.Interval;
 							Logger.LogInformation(
-								$"{Id}, {Name} too much requests enqueued");
+								$"{Id} too much requests enqueued");
 							await Task.Delay(tuple.Interval, default);
 							continue;
 						}
@@ -371,7 +371,7 @@ namespace DotnetSpider
 							foreach (var request in timeoutRequests)
 							{
 								Logger.LogWarning(
-									$"{Id}, {Name} request {request.RequestUri} timeout");
+									$"{Id} request {request.RequestUri}, {request.Hash} timeout");
 							}
 
 							await AddRequestsAsync(timeoutRequests);
@@ -411,7 +411,7 @@ namespace DotnetSpider
 				}
 				catch (Exception e)
 				{
-					Logger.LogError($"{Id}, {Name} exited by exception: {e}");
+					Logger.LogError($"{Id} exited by exception: {e}");
 				}
 				finally
 				{
@@ -426,7 +426,7 @@ namespace DotnetSpider
 			_services.ApplicationLifetime.StopApplication();
 		}
 
-		private (int Interval, int Batch) ComputeIntervalAndDequeueBatch(double speed)
+		private static (int Interval, int Batch) ComputeIntervalAndDequeueBatch(double speed)
 		{
 			if (speed >= 1)
 			{
@@ -453,7 +453,7 @@ namespace DotnetSpider
 						var proxy = await _services.ProxyPool.GetAsync(70);
 						if (proxy == null)
 						{
-							Logger.LogError("Exit because there is no available proxy");
+							Logger.LogError("{Id} exit because there is no available proxy");
 							return false;
 						}
 
@@ -498,7 +498,7 @@ namespace DotnetSpider
 					}
 					else
 					{
-						Logger.LogWarning($"Enqueue request: {request.RequestUri} failed");
+						Logger.LogWarning($"{Id} enqueue request: {request.RequestUri}, {request.Hash} failed");
 					}
 				}
 			}
@@ -517,7 +517,7 @@ namespace DotnetSpider
 				}
 
 				Logger.LogInformation(
-					$"{Id}, {Name} load request from {requestSupplier.GetType().Name} {_requestSuppliers.IndexOf(requestSupplier)}/{_requestSuppliers.Count}");
+					$"{Id} load request from {requestSupplier.GetType().Name} {_requestSuppliers.IndexOf(requestSupplier)}/{_requestSuppliers.Count}");
 			}
 		}
 
@@ -525,12 +525,12 @@ namespace DotnetSpider
 		{
 			if (_dataFlows.Count == 0)
 			{
-				Logger.LogWarning("There is no any dataFlow");
+				Logger.LogWarning("{Id} there is no any dataFlow");
 			}
 			else
 			{
 				var dataFlowInfo = string.Join(" -> ", _dataFlows.Select(x => x.GetType().Name));
-				Logger.LogInformation($"{Id}, {Name} DataFlows: {dataFlowInfo}");
+				Logger.LogInformation($"{Id} DataFlows: {dataFlowInfo}");
 				foreach (var dataFlow in _dataFlows)
 				{
 					dataFlow.SetLogger(Logger);
@@ -540,7 +540,7 @@ namespace DotnetSpider
 					}
 					catch (Exception e)
 					{
-						Logger.LogError($"Initialize dataFlow {dataFlow.GetType().Name} failed: {e}");
+						Logger.LogError($"{Id} initialize dataFlow {dataFlow.GetType().Name} failed: {e}");
 						_services.ApplicationLifetime.StopApplication();
 					}
 				}

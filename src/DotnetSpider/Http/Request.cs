@@ -87,8 +87,8 @@ namespace DotnetSpider.Http
 		[IgnoreMember]
 		public string RedialRegExp
 		{
-			get => GetProperty(Consts.RedialRegExp);
-			set => SetProperty(Consts.RedialRegExp, value);
+			get => GetProperty(Consts.RedialRegexExpression);
+			set => SetProperty(Consts.RedialRegexExpression, value);
 		}
 
 		/// <summary>

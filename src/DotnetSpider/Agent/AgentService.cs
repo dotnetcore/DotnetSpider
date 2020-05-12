@@ -134,7 +134,7 @@ namespace DotnetSpider.Agent
 				response.Agent = _options.AgentId;
 				await _messageQueue.PublishAsBytesAsync(string.Format(TopicNames.Spider, request.Owner.ToUpper()),
 					response);
-				_logger.LogInformation($"{request.RequestUri} download success");
+				_logger.LogInformation($"{request.Owner} download {request.RequestUri}, {request.Hash} success");
 			}
 			else
 			{
