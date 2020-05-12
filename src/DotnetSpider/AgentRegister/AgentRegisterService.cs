@@ -57,7 +57,7 @@ namespace DotnetSpider.AgentRegister
 				{
 					if (_distributed)
 					{
-						_logger.LogInformation($"Hearbeat: {heartbeat.AgentId}, {heartbeat.AgentName}");
+						_logger.LogInformation($"Heartbeat: {heartbeat.AgentId}, {heartbeat.AgentName}");
 					}
 
 					await _agentStore.HeartbeatAsync(new AgentHeartbeat(heartbeat.AgentId, heartbeat.AgentName,

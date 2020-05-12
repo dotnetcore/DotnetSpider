@@ -126,7 +126,8 @@ namespace DotnetSpider
 			{
 				dataFlow.Dispose();
 			}
-			// _services.MessageQueue.
+
+			_services.MessageQueue.CloseQueue(Id);
 			Logger.LogInformation($"{Id} stopped");
 		}
 
@@ -284,7 +285,8 @@ namespace DotnetSpider
 							var exception = Encoding.UTF8.GetString(response.Content.Data);
 							if (_services.IsDistributed)
 							{
-								Logger.LogError($"{Id} download {request.RequestUri}, {request.Hash} failed: {exception}");
+								Logger.LogError(
+									$"{Id} download {request.RequestUri}, {request.Hash} failed: {exception}");
 							}
 
 							// 每次调用添加会导致 Requested + 1, 因此失败多次的请求最终会被过滤不再加到调度队列

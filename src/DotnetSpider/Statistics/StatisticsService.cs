@@ -79,7 +79,7 @@ namespace DotnetSpider.Statistics
                             ? (statistics.Total - statistics.Success - statistics.Failure).ToString()
                             : "unknown";
                         _logger.LogInformation(
-                            $"{print.Id} total {statistics.Total}, success {statistics.Success}, failed {statistics.Failure}, left {left}");
+                            $"{print.Id} total {statistics.Total}, success {statistics.Success}, failure {statistics.Failure}, left {left}");
                     }
                 }
                 else

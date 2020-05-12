@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using RabbitMQ.Client.Framing;
 using SwiftMQ;
 
 [assembly: InternalsVisibleTo("DotnetSpider.Tests")]
@@ -71,6 +70,14 @@ namespace DotnetSpider.RabbitMQ
 			}
 
 			await Task.CompletedTask;
+		}
+
+		public void CloseQueue(string queue)
+		{
+			if (_modelDict.TryGetValue(queue, out var model))
+			{
+				model.QueueDelete(queue);
+			}
 		}
 
 		public Task ConsumeAsync<TMessage>(AsyncMessageConsumer<TMessage> consumer,
