@@ -47,7 +47,7 @@ namespace DotnetSpider.Selector
         /// <param name="options"></param>
         /// <param name="group">分组</param>
         /// <returns>查询接口</returns>
-        ISelectable Regex(string pattern, RegexOptions options = RegexOptions.None, int group = 0);
+        ISelectable Regex(string pattern, RegexOptions options = RegexOptions.None, string replacement = "$0");
 
         /// <summary>
         /// 获得当前查询器的文本结果, 如果查询结果为多个, 则返回第一个结果的值

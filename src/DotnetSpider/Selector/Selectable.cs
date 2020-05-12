@@ -54,9 +54,9 @@ namespace DotnetSpider.Selector
         /// <param name="options"></param>
         /// <param name="group">分组</param>
         /// <returns>查询接口</returns>
-        public virtual ISelectable Regex(string pattern, RegexOptions options = RegexOptions.None, int group = 0)
+        public virtual ISelectable Regex(string pattern, RegexOptions options = RegexOptions.None, string replacement = "$0")
         {
-            return Select(Selectors.Regex(pattern, options, group));
+            return Select(Selectors.Regex(pattern, options, replacement));
         }
 
         public abstract IEnumerable<ISelectable> Nodes();
