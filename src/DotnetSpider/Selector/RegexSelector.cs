@@ -11,19 +11,19 @@ namespace DotnetSpider.Selector
     public class RegexSelector : ISelector
     {
         private readonly Regex _regex;
-        private readonly int _group;
+        private readonly string _replacement;
 
         /// <summary>
         /// 构造方法
         /// </summary>
         /// <param name="pattern">正则表达式</param>
         /// <param name="options"></param>
-        /// <param name="group"></param>
-        public RegexSelector(string pattern, RegexOptions options = RegexOptions.None, int group = 0)
+        /// <param name="replacement"></param>
+        public RegexSelector(string pattern, RegexOptions options = RegexOptions.None, string replacement = "$1")
         {
             pattern.NotNullOrWhiteSpace(nameof(pattern));
             _regex = new Regex(pattern, options);
-            _group = group;
+            _replacement = replacement;
         }
 
         /// <summary>
@@ -42,14 +42,7 @@ namespace DotnetSpider.Selector
             var match = _regex.Match(text);
             if (match.Success)
             {
-                if (match.Groups.Count > _group)
-                {
-                    return new TextSelectable(match.Groups[_group].Value);
-                }
-                else
-                {
-                    return null;
-                }
+				return new TextSelectable(match.Result(_replacement));
             }
 
             return null;
@@ -72,14 +65,11 @@ namespace DotnetSpider.Selector
             var results = new List<string>();
             foreach (Match match in matches)
             {
-                if (match.Groups.Count > _group)
-                {
-                    var value = match.Groups[_group].Value;
-                    if (!string.IsNullOrWhiteSpace(value))
-                    {
-                        results.Add(value);
-                    }
-                }
+				var value = match.Result(_replacement);
+				if (!string.IsNullOrWhiteSpace(value))
+				{
+					results.Add(value);
+				}
             }
 
             return results.Select(x => new TextSelectable(x));
