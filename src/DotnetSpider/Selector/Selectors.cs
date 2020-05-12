@@ -19,12 +19,12 @@ namespace DotnetSpider.Selector
         /// <param name="group"></param>
         /// <returns>查询器</returns>
         public static ISelector Regex(string expr,
-            RegexOptions options = RegexOptions.None, int group = 0)
+            RegexOptions options = RegexOptions.None, string replacement = "$0")
         {
-            var key = $"r_{expr}_{group}";
+            var key = $"r_{expr}_{replacement}";
             if (!Cache.ContainsKey(key))
             {
-                Cache.TryAdd(key, new RegexSelector(expr, options, group));
+                Cache.TryAdd(key, new RegexSelector(expr, options, replacement));
             }
 
             return Cache[key];

@@ -39,8 +39,8 @@ namespace DotnetSpider.DataFlow.Parser
 
                         var arguments = selector.Arguments.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
                         var options = (RegexOptions) Enum.Parse(typeof(RegexOptions), arguments[0]);
-                        var group = int.Parse(arguments[1]);
-                        return Selectors.Regex(expression, options, group);
+                        var replacement = arguments[1];
+                        return Selectors.Regex(expression, options, replacement);
                     }
                     case SelectorType.XPath:
                     {

@@ -91,7 +91,7 @@ namespace DotnetSpider.Tests
         public void Regex()
         {
             Assert.Equal("a href=\"xxx\"", Selectors.Regex("a href=\"(.*)\"").Select(html).Value);
-            Assert.Equal("xxx", Selectors.Regex("(a href)=\"(.*)\"", RegexOptions.None, 2).Select(html).Value);
+            Assert.Equal("xxx", Selectors.Regex("(a href)=\"(.*)\"", RegexOptions.None, "$2").Select(html).Value);
         }
 
 

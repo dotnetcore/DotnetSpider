@@ -19,7 +19,7 @@ namespace DotnetSpider.Selector
         /// <param name="pattern">正则表达式</param>
         /// <param name="options"></param>
         /// <param name="replacement"></param>
-        public RegexSelector(string pattern, RegexOptions options = RegexOptions.None, string replacement = "$1")
+        public RegexSelector(string pattern, RegexOptions options = RegexOptions.None, string replacement = "$0")
         {
             pattern.NotNullOrWhiteSpace(nameof(pattern));
             _regex = new Regex(pattern, options);
