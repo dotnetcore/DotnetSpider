@@ -16,8 +16,6 @@ namespace DotnetSpider.DataFlow.Parser
 	/// <typeparam name="T"></typeparam>
 	public class DataParser<T> : DataParser where T : EntityBase<T>, new()
 	{
-		//暂时未启用
-		//public override string Name => $"DataParser<{typeof(T).Name}>";
 		protected readonly Model<T> Model;
 
 		/// <summary>
@@ -89,6 +87,8 @@ namespace DotnetSpider.DataFlow.Parser
 				AddRequiredValidator(request => Regex.IsMatch(request.RequestUri.ToString(), pattern));
 			}
 		}
+
+		public override string Name => $"DataParser<{typeof(T).Name}>";
 
 		protected virtual T ConfigureDataObject(T t)
 		{
