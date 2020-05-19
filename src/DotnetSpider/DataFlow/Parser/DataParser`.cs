@@ -268,13 +268,13 @@ namespace DotnetSpider.DataFlow.Parser
 
 				case DefaultEnvName.Month:
 					{
-						value = DateTime2.FirstDayOfMonth.ToString("yyyy-MM-dd");
+						value = DateTimeHelper.FirstDayOfMonth.ToString("yyyy-MM-dd");
 						break;
 					}
 
 				case DefaultEnvName.Monday:
 					{
-						value = DateTime2.Monday.ToString("yyyy-MM-dd");
+						value = DateTimeHelper.Monday.ToString("yyyy-MM-dd");
 						break;
 					}
 

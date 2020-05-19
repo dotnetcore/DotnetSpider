@@ -2,7 +2,7 @@ using System;
 
 namespace DotnetSpider.Infrastructure
 {
-	public sealed class DateTime2
+	public sealed class DateTimeHelper
 	{
 		public static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
