@@ -37,5 +37,11 @@ namespace DotnetSpider.Portal.ViewObject
 		/// </summary>
 		[StringLength(2000)]
 		public string Environment { get; set; }
+
+		/// <summary>
+		/// 挂载目录
+		/// </summary>
+		[StringLength(2000)]
+		public string Volume { get; set; }
 	}
 }

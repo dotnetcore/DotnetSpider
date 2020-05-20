@@ -59,6 +59,13 @@ namespace DotnetSpider.Portal.Data
 		public string Environment { get; set; }
 
 		/// <summary>
+		/// docker 运行挂载的盘
+		/// </summary>
+		[StringLength(2000)]
+		[Column("VOLUME")]
+		public string Volume { get; set; }
+
+		/// <summary>
 		/// Creation time of this entity.
 		/// </summary>
 		[Required]

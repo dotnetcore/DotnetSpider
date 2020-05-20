@@ -8,6 +8,9 @@
         .modal-header, .modal-footer{
             border: 0;
         }
+        .modal-lg {
+            max-width: 1024px;
+        }
     </style>
 }
 
@@ -134,7 +137,15 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <label>Environment</label>
-                            <textarea style="height: 80px" type="text" v-model="item.environment" class="form-control"></textarea>
+                            <textarea style="height: 100px" type="text" v-model="item.environment" class="form-control"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Volume</label>
+                            <textarea style="height: 100px" type="text" v-model="item.volume" class="form-control"></textarea>
                         </div>
                     </div>
                 </div>

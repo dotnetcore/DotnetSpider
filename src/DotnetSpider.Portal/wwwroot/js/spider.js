@@ -38,7 +38,8 @@ $(function () {
                     image: record.image,
                     cron: record.cron,
                     type: record.type,
-                    environment: record.environment
+                    environment: record.environment,
+                    volume: record.volume
                 };
                 $('#modal').modal('show')
             },
