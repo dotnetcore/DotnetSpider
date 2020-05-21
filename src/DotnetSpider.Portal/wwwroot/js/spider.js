@@ -37,7 +37,6 @@ $(function () {
                     name: record.name,
                     image: record.image,
                     cron: record.cron,
-                    type: record.type,
                     environment: record.environment,
                     volume: record.volume
                 };

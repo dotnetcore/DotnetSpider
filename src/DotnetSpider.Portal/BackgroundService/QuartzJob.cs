@@ -50,7 +50,6 @@ namespace DotnetSpider.Portal.BackgroundService
 						StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()))
 					{
 						$"DOTNET_SPIDER_ID={batch}",
-						$"DOTNET_SPIDER_TYPE={spider.Type}",
 						$"DOTNET_SPIDER_NAME={spider.Name}"
 					};
 
@@ -63,7 +62,6 @@ namespace DotnetSpider.Portal.BackgroundService
 						{
 							{"dotnetspider.spider.id", spider.Id.ToString()},
 							{"dotnetspider.spider.batch", batch},
-							{"dotnetspider.spider.type", spider.Type},
 							{"dotnetspider.spider.name", spider.Name}
 						},
 						Env = env,
