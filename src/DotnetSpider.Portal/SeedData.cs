@@ -77,7 +77,6 @@ namespace DotnetSpider.Portal
 				{
 					Name = "cnblogs",
 					Cron = "0 1 */1 * * ?",
-					Type = "DotnetSpider.Spiders.CnblogsSpider",
 					Image = "dotnetspider/spiders.startup:latest",
 					CreationTime = DateTimeOffset.Now,
 					Enabled = true,

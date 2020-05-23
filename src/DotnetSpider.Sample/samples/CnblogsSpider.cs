@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
@@ -63,7 +64,13 @@ namespace DotnetSpider.Sample.samples
 		{
 			public ListNewsParser()
 			{
-				AddRequiredValidator("news\\.cnblogs\\.com/n/page");
+				// AddRequiredValidator("news\\.cnblogs\\.com/n/page");
+				AddRequiredValidator((request =>
+				{
+					var host = request.RequestUri.Host;
+					var regex = host + "/$";
+					return Regex.IsMatch(request.RequestUri.ToString(), regex);
+				}));
 				// if you want to collect every pages
 				// AddFollowRequestQuerier(Selectors.XPath(".//div[@class='pager']"));
 			}

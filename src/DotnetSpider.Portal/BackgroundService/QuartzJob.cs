@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Docker.DotNet;
 using Docker.DotNet.Models;
@@ -45,11 +46,10 @@ namespace DotnetSpider.Portal.BackgroundService
 							new Uri(options.Docker))
 						.CreateClient();
 					var batch = Guid.NewGuid().ToString("N");
-					var env = new List<string>((spider.Environment ?? "").Split(new[] {" "},
-						StringSplitOptions.RemoveEmptyEntries))
+					var env = new List<string>((spider.Environment ?? "").Split(new[] {" ", "\n"},
+						StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()))
 					{
 						$"DOTNET_SPIDER_ID={batch}",
-						$"DOTNET_SPIDER_TYPE={spider.Type}",
 						$"DOTNET_SPIDER_NAME={spider.Name}"
 					};
 
@@ -62,13 +62,26 @@ namespace DotnetSpider.Portal.BackgroundService
 						{
 							{"dotnetspider.spider.id", spider.Id.ToString()},
 							{"dotnetspider.spider.batch", batch},
-							{"dotnetspider.spider.type", spider.Type},
 							{"dotnetspider.spider.name", spider.Name}
 						},
 						Env = env,
 						HostConfig = new HostConfig()
 					};
-					parameters.HostConfig.Binds = options.DockerVolumes;
+					var volumes = new HashSet<string>();
+					foreach (var volume in options.DockerVolumes)
+					{
+						volumes.Add(volume);
+					}
+
+					var configVolumes = new List<string>((spider.Volume ?? "").Split(new[] {" ", "\n"},
+						StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()));
+					foreach (var volume in configVolumes)
+					{
+						volumes.Add(volume);
+					}
+
+					parameters.HostConfig.Binds = volumes.ToList();
+
 					var result = await client.Containers.CreateContainerAsync(parameters);
 
 					if (result.ID == null)

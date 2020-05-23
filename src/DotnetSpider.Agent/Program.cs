@@ -20,7 +20,7 @@ namespace DotnetSpider.Agent
 				.MinimumLevel.Override("System", LogEventLevel.Warning)
 				.MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Warning)
 				.Enrich.FromLogContext()
-				.WriteTo.Console().WriteTo.RollingFile("logs/agent.txt")
+				.WriteTo.Console().WriteTo.RollingFile("logs/agent.log")
 				.CreateLogger();
 
 			var builder = Host.CreateDefaultBuilder(args);

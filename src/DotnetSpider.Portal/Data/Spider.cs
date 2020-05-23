@@ -36,14 +36,6 @@ namespace DotnetSpider.Portal.Data
 		public string Image { get; set; }
 
 		/// <summary>
-		/// 需要运行的爬虫名称
-		/// </summary>
-		[Required]
-		[StringLength(255)]
-		[Column("TYPE")]
-		public string Type { get; set; }
-
-		/// <summary>
 		/// 定时表达式
 		/// </summary>
 		[StringLength(255)]
@@ -57,6 +49,13 @@ namespace DotnetSpider.Portal.Data
 		[StringLength(2000)]
 		[Column("ENVIRONMENT")]
 		public string Environment { get; set; }
+
+		/// <summary>
+		/// docker 运行挂载的盘
+		/// </summary>
+		[StringLength(2000)]
+		[Column("VOLUME")]
+		public string Volume { get; set; }
 
 		/// <summary>
 		/// Creation time of this entity.

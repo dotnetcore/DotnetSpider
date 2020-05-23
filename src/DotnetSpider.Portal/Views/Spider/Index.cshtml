@@ -8,6 +8,9 @@
         .modal-header, .modal-footer{
             border: 0;
         }
+        .modal-lg {
+            max-width: 1024px;
+        }
     </style>
 }
 
@@ -43,7 +46,6 @@
                 <th>NAME</th>
                 <th>IMAGE</th>
                 <th>CRON</th>
-                <th>TYPE</th>
                 <th>ENVIONMENT</th>
                 <th>EDIT TIME</th>
                 <th style="width: 360px">ACTION</th>
@@ -59,7 +61,6 @@
                 <td v-text="item.name"></td>
                 <td v-text="item.image"></td>
                 <td v-text="item.cron"></td>
-                <td v-text="item.type"></td>
                 <td v-text="item.environment"></td>
                 <td v-text="item.lastModificationTime"></td>
                 <td>
@@ -123,18 +124,20 @@
                             <input type="text" v-model="item.cron" class="form-control"/>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
                         <div class="form-group">
-                            <label>Type</label>
-                            <input type="text" v-model="item.type" class="form-control"/>
+                            <label>Environment</label>
+                            <textarea style="height: 100px" type="text" v-model="item.environment" class="form-control"></textarea>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            <label>Environment</label>
-                            <textarea style="height: 80px" type="text" v-model="item.environment" class="form-control"></textarea>
+                            <label>Volume</label>
+                            <textarea style="height: 100px" type="text" v-model="item.volume" class="form-control"></textarea>
                         </div>
                     </div>
                 </div>
