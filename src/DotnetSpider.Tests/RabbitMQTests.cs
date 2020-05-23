@@ -31,6 +31,7 @@ namespace DotnetSpider.Tests
 			var consumer = new AsyncMessageConsumer<byte[]>("test");
 			consumer.Received += bytes => null;
 			await messageQueue.ConsumeAsync(consumer, default);
+			messageQueue.CloseQueue("test");
 		}
 
 		[Fact]
@@ -56,6 +57,7 @@ namespace DotnetSpider.Tests
 			await messageQueue.PublishAsBytesAsync(queue, new Message {Index = 2000});
 			Sleep();
 			Assert.Equal(0, counter);
+			messageQueue.CloseQueue(queue);
 		}
 
 
@@ -69,6 +71,7 @@ namespace DotnetSpider.Tests
 				consumer.Received += bytes => null;
 				await messageQueue.ConsumeAsync(consumer, default);
 			});
+			messageQueue.CloseQueue("test");
 		}
 
 		[Fact]
@@ -88,6 +91,7 @@ namespace DotnetSpider.Tests
 			await messageQueue.PublishAsBytesAsync(queue, new Message {Index = 1000});
 			Sleep();
 			Assert.Equal(1000, counter);
+			messageQueue.CloseQueue(queue);
 		}
 
 		public class Message
@@ -127,6 +131,7 @@ namespace DotnetSpider.Tests
 			Sleep();
 
 			Assert.Equal(20, counter);
+			messageQueue.CloseQueue(queue);
 		}
 
 

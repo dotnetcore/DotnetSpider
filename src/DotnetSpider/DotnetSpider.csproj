@@ -16,6 +16,7 @@
     <PackageReference Include="SwiftMQ.DependencyInjection" Version="0.0.8" />
     <PackageReference Include="System.Collections.Immutable" Version="1.7.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
+    <PackageReference Include="System.Text.Json" Version="4.7.2" />
     <PackageReference Include="ZCJ.HashedWheelTimer" Version="0.10.2" />
 
   </ItemGroup>

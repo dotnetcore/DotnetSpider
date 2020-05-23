@@ -74,10 +74,8 @@ namespace DotnetSpider.RabbitMQ
 
 		public void CloseQueue(string queue)
 		{
-			if (_modelDict.TryGetValue(queue, out var model))
-			{
-				model.QueueDelete(queue);
-			}
+			using var channel = _connection.CreateModel();
+			channel.QueueDelete(queue);
 		}
 
 		public Task ConsumeAsync<TMessage>(AsyncMessageConsumer<TMessage> consumer,
