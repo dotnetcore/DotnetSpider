@@ -26,13 +26,6 @@ namespace DotnetSpider.Portal.ViewObject
 		public string Cron { get; set; }
 
 		/// <summary>
-		/// 执行类型的类型
-		/// </summary>
-		[Required]
-		[StringLength(255)]
-		public string Type { get; set; }
-
-		/// <summary>
 		/// 环境变量
 		/// </summary>
 		[StringLength(2000)]
