@@ -33,7 +33,9 @@ namespace DotnetSpider
 		private AsyncMessageConsumer<byte[]> _consumer;
 		private readonly SpiderServices _services;
 
-		protected event Action<Request[]> RequestTimeout;
+		protected event Action<Request[]> OnTimeout;
+
+		protected event Action<Request, Response> OnError;
 
 		protected SpiderOptions Options { get; private set; }
 
@@ -291,6 +293,8 @@ namespace DotnetSpider
 
 							// 每次调用添加会导致 Requested + 1, 因此失败多次的请求最终会被过滤不再加到调度队列
 							await AddRequestsAsync(request);
+
+							OnError?.Invoke(request, response);
 						}
 					}
 				}
@@ -379,7 +383,7 @@ namespace DotnetSpider
 
 							await AddRequestsAsync(timeoutRequests);
 
-							RequestTimeout?.Invoke(timeoutRequests);
+							OnTimeout?.Invoke(timeoutRequests);
 						}
 						else
 						{
