@@ -23,7 +23,7 @@ namespace DotnetSpider.Sample.samples
 		{
 			var builder = Builder.CreateDefaultBuilder<EntitySpider>(options =>
 			{
-				options.UseProxy = true;
+				options.UseProxy = false;
 			});
 			builder.UseSerilog();
 			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();

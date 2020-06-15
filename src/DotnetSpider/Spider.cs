@@ -309,6 +309,7 @@ namespace DotnetSpider
 				using var scope = _services.ServiceProvider.CreateScope();
 				var context = new DataContext(scope.ServiceProvider, Options, request, response);
 				context.AddData(Consts.ResponseBytes, responseBytes);
+				context.AddData(Consts.SpiderId, Id);
 
 				foreach (var dataFlow in _dataFlows)
 				{

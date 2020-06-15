@@ -33,7 +33,7 @@ namespace DotnetSpider.Sample
 				.WriteTo.Console().WriteTo.RollingFile("logs/spider.txt")
 				.CreateLogger();
 
-			await DistributedSpider.RunAsync();
+			await CnblogsSpider.RunAsync();
 
 			Console.WriteLine("Bye!");
 			Environment.Exit(0);
