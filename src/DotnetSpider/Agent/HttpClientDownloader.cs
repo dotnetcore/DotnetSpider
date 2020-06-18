@@ -117,20 +117,23 @@ namespace DotnetSpider.Agent
 			if (request.Method.ToUpper() == "POST")
 			{
 				var content = request.GetContentObject();
-				if (content is StringContent stringContent)
+				if (content != null)
 				{
-					httpRequestMessage.Content = new System.Net.Http.StringContent(
-						stringContent.Content,
-						Encoding.GetEncoding(stringContent.EncodingName), stringContent.MediaType);
-				}
-				else if (content is ByteArrayContent byteArrayContent && byteArrayContent.Bytes != null)
-				{
-					httpRequestMessage.Content = new System.Net.Http.ByteArrayContent(byteArrayContent.Bytes);
-				}
+					if (content is StringContent stringContent)
+					{
+						httpRequestMessage.Content = new System.Net.Http.StringContent(
+							stringContent.Content,
+							Encoding.GetEncoding(stringContent.EncodingName), stringContent.MediaType);
+					}
+					else if (content is ByteArrayContent byteArrayContent && byteArrayContent.Bytes != null)
+					{
+						httpRequestMessage.Content = new System.Net.Http.ByteArrayContent(byteArrayContent.Bytes);
+					}
 
-				foreach (var header in content.Headers)
-				{
-					httpRequestMessage.Content.Headers.TryAddWithoutValidation(header.Key, header.Value);
+					foreach (var header in content.Headers)
+					{
+						httpRequestMessage.Content.Headers.TryAddWithoutValidation(header.Key, header.Value);
+					}
 				}
 			}
 

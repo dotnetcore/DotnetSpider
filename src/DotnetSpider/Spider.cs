@@ -37,6 +37,8 @@ namespace DotnetSpider
 
 		protected event Action<Request, Response> OnError;
 
+		protected event Action OnSchedulerEmpty;
+
 		protected SpiderOptions Options { get; private set; }
 
 		/// <summary>
@@ -400,6 +402,8 @@ namespace DotnetSpider
 								{
 									break;
 								}
+
+								OnSchedulerEmpty?.Invoke();
 							}
 
 							foreach (var request in requests)
