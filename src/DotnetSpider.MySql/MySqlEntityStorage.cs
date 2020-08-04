@@ -4,7 +4,7 @@ using System.Text;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Storage;
 using Microsoft.Extensions.Logging;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 
 namespace DotnetSpider.MySql
 {

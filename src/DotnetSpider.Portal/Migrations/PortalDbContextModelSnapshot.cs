@@ -3,7 +3,6 @@ using System;
 using DotnetSpider.Portal.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DotnetSpider.Portal.Migrations
 {

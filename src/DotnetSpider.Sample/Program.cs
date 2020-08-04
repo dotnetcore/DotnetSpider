@@ -1,19 +1,6 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Threading;
 using System.Threading.Tasks;
-using DotnetSpider.DataFlow.Parser;
-using DotnetSpider.DataFlow.Parser.Formatters;
-using DotnetSpider.DataFlow.Storage;
-using DotnetSpider.HBase;
-using DotnetSpider.Http;
-using DotnetSpider.RabbitMQ;
 using DotnetSpider.Sample.samples;
-using DotnetSpider.Scheduler.Component;
-using DotnetSpider.Selector;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Events;
 

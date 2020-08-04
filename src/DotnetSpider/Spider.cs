@@ -287,12 +287,8 @@ namespace DotnetSpider
 							await _services.StatisticsClient.IncreaseAgentFailureAsync(response.Agent,
 								response.ElapsedMilliseconds);
 							var exception = Encoding.UTF8.GetString(response.Content.Data);
-							if (_services.IsDistributed)
-							{
-								Logger.LogError(
-									$"{Id} download {request.RequestUri}, {request.Hash} failed: {exception}");
-							}
-
+							Logger.LogError(
+								$"{Id} download {request.RequestUri}, {request.Hash} status code: {response.StatusCode} failed: {exception}");
 							// 每次调用添加会导致 Requested + 1, 因此失败多次的请求最终会被过滤不再加到调度队列
 							await AddRequestsAsync(request);
 
@@ -325,6 +321,11 @@ namespace DotnetSpider
 				var count = await AddRequestsAsync(context.FollowRequests);
 				await _services.StatisticsClient.IncreaseTotalAsync(Id, count);
 				await _services.StatisticsClient.IncreaseSuccessAsync(Id);
+			}
+			catch (ExitException ee)
+			{
+				Logger.LogError($"Exit by: {ee.Message}");
+				await ExitAsync();
 			}
 			catch (Exception e)
 			{

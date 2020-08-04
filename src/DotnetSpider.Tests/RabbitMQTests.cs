@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 using DotnetSpider.Extensions;
 using DotnetSpider.RabbitMQ;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
-using MongoDB.Driver;
 using SwiftMQ;
 using Xunit;
 

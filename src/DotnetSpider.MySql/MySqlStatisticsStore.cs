@@ -4,7 +4,7 @@ using Dapper;
 using DotnetSpider.Infrastructure;
 using DotnetSpider.Statistics.Store;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 
 namespace DotnetSpider.MySql
 {

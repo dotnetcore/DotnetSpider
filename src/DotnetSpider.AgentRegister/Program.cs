@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using DotnetSpider.Agent;
 using DotnetSpider.Extensions;
 using DotnetSpider.MySql;
 using DotnetSpider.RabbitMQ;
