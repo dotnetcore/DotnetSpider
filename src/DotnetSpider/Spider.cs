@@ -401,6 +401,7 @@ namespace DotnetSpider
 								sleepTime += tuple.Interval;
 								if (sleepTime > sleepTimeLimit)
 								{
+									Logger.LogError($"Exit by sleep too long: {sleepTime}");
 									break;
 								}
 
@@ -414,6 +415,7 @@ namespace DotnetSpider
 
 							if (!await PublishRequestMessagesAsync(requests))
 							{
+								Logger.LogError("Exit by publish request message failed");
 								break;
 							}
 						}
