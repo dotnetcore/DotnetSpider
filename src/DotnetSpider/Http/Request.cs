@@ -280,7 +280,6 @@ namespace DotnetSpider.Http
 				Depth = Depth,
 				RequestUri = new Uri(RequestUri.ToString(), UriKind.RelativeOrAbsolute),
 				AutoRedirect = AutoRedirect,
-				RequestedTimes = RequestedTimes,
 				Method = Method,
 				Timestamp = Timestamp,
 				Content = Content?.ToArray(),
