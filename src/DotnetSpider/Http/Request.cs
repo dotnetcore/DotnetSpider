@@ -280,7 +280,6 @@ namespace DotnetSpider.Http
 				Depth = Depth,
 				RequestUri = new Uri(RequestUri.ToString(), UriKind.RelativeOrAbsolute),
 				AutoRedirect = AutoRedirect,
-				RequestedTimes = RequestedTimes,
 				Method = Method,
 				Timestamp = Timestamp,
 				Content = Content?.ToArray(),
@@ -304,6 +303,7 @@ namespace DotnetSpider.Http
 		{
 			uri.NotNullOrWhiteSpace(nameof(uri));
 			var request = Clone();
+			request.RequestedTimes = 0;
 			request.Depth += 1;
 			request.Hash = null;
 			request.RequestUri = new Uri(uri, UriKind.RelativeOrAbsolute);
