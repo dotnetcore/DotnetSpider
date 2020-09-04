@@ -210,17 +210,17 @@ namespace DotnetSpider.DataFlow.Storage
 			{
 				case TablePostfix.Monday:
 				{
-					return $"{tableName}_{DateTime2.Monday:yyyyMMdd}";
+					return $"{tableName}_{DateTimeHelper.Monday:yyyyMMdd}";
 				}
 
 				case TablePostfix.Month:
 				{
-					return $"{tableName}_{DateTime2.FirstDayOfMonth:yyyyMMdd}";
+					return $"{tableName}_{DateTimeHelper.FirstDayOfMonth:yyyyMMdd}";
 				}
 
 				case TablePostfix.Today:
 				{
-					return $"{tableName}_{DateTime2.Today:yyyyMMdd}";
+					return $"{tableName}_{DateTimeHelper.Today:yyyyMMdd}";
 				}
 
 				default:

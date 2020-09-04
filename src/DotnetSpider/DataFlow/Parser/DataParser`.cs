@@ -16,8 +16,6 @@ namespace DotnetSpider.DataFlow.Parser
 	/// <typeparam name="T"></typeparam>
 	public class DataParser<T> : DataParser where T : EntityBase<T>, new()
 	{
-		public override string Name => $"DataParser<{typeof(T).Name}>";
-
 		protected readonly Model<T> Model;
 
 		/// <summary>
@@ -35,46 +33,46 @@ namespace DotnetSpider.DataFlow.Parser
 					switch (followSelector.SelectorType)
 					{
 						case SelectorType.Css:
-						{
-							foreach (var expression in followSelector.Expressions)
 							{
-								AddFollowRequestQuerier(Selectors.Css(expression));
-							}
+								foreach (var expression in followSelector.Expressions)
+								{
+									AddFollowRequestQuerier(Selectors.Css(expression));
+								}
 
-							break;
-						}
+								break;
+							}
 						case SelectorType.Regex:
-						{
-							foreach (var expression in followSelector.Expressions)
 							{
-								AddFollowRequestQuerier(Selectors.Regex(expression));
-							}
+								foreach (var expression in followSelector.Expressions)
+								{
+									AddFollowRequestQuerier(Selectors.Regex(expression));
+								}
 
-							break;
-						}
+								break;
+							}
 						case SelectorType.XPath:
-						{
-							foreach (var expression in followSelector.Expressions)
 							{
-								AddFollowRequestQuerier(Selectors.XPath(expression));
-							}
+								foreach (var expression in followSelector.Expressions)
+								{
+									AddFollowRequestQuerier(Selectors.XPath(expression));
+								}
 
-							break;
-						}
+								break;
+							}
 						case SelectorType.Environment:
-						{
-							Logger.LogWarning("SelectorType of follow selector is not supported");
-							break;
-						}
-						case SelectorType.JsonPath:
-						{
-							foreach (var expression in followSelector.Expressions)
 							{
-								AddFollowRequestQuerier(Selectors.JsonPath(expression));
+								Logger.LogWarning("SelectorType of follow selector is not supported");
+								break;
 							}
+						case SelectorType.JsonPath:
+							{
+								foreach (var expression in followSelector.Expressions)
+								{
+									AddFollowRequestQuerier(Selectors.JsonPath(expression));
+								}
 
-							break;
-						}
+								break;
+							}
 					}
 
 					foreach (var pattern in followSelector.Patterns)
@@ -89,6 +87,8 @@ namespace DotnetSpider.DataFlow.Parser
 				AddRequiredValidator(request => Regex.IsMatch(request.RequestUri.ToString(), pattern));
 			}
 		}
+
+		public override string Name => $"DataParser<{typeof(T).Name}>";
 
 		protected virtual T ConfigureDataObject(T t)
 		{
@@ -208,19 +208,18 @@ namespace DotnetSpider.DataFlow.Parser
 #if !DEBUG
 							value = formatter.Format(value);
 #else
-                            try
-                            {
-                                value = formatter.Format(value);
-                            }
-                            catch (Exception e)
-                            {
-                                Logger.LogError($"数据格式化失败: {e}");
-                            }
+							try
+							{
+								value = formatter.Format(value);
+							}
+							catch (Exception e)
+							{
+								Logger.LogError($"数据格式化失败: {e}");
+							}
 #endif
 						}
 					}
 				}
-
 
 				var newValue = value == null ? null : Convert.ChangeType(value, field.PropertyInfo.PropertyType);
 				if (newValue == null && field.NotNull)
@@ -241,60 +240,60 @@ namespace DotnetSpider.DataFlow.Parser
 			string value;
 			switch (field.Expression)
 			{
-				case "ENTITY_INDEX":
-				{
-					value = index.ToString();
-					break;
-				}
+				case DefaultEnvName.Entity_Index:
+					{
+						value = index.ToString();
+						break;
+					}
 
-				case "GUID":
-				{
-					value = Guid.NewGuid().ToString();
-					break;
-				}
+				case DefaultEnvName.GUID:
+					{
+						value = Guid.NewGuid().ToString();
+						break;
+					}
 
-				case "DATE":
-				case "TODAY":
-				{
-					value = DateTimeOffset.Now.Date.ToString("yyyy-MM-dd");
-					break;
-				}
+				case DefaultEnvName.Date:
+				case DefaultEnvName.ToDay:
+					{
+						value = DateTimeOffset.Now.Date.ToString("yyyy-MM-dd");
+						break;
+					}
 
-				case "DATETIME":
-				case "NOW":
-				{
-					value = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss");
-					break;
-				}
+				case DefaultEnvName.DateTime:
+				case DefaultEnvName.Now:
+					{
+						value = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss");
+						break;
+					}
 
-				case "MONTH":
-				{
-					value = DateTime2.FirstDayOfMonth.ToString("yyyy-MM-dd");
-					break;
-				}
+				case DefaultEnvName.Month:
+					{
+						value = DateTimeHelper.FirstDayOfMonth.ToString("yyyy-MM-dd");
+						break;
+					}
 
-				case "MONDAY":
-				{
-					value = DateTime2.Monday.ToString("yyyy-MM-dd");
-					break;
-				}
+				case DefaultEnvName.Monday:
+					{
+						value = DateTimeHelper.Monday.ToString("yyyy-MM-dd");
+						break;
+					}
 
-				case "SPIDER_ID":
-				{
-					value = context.Request.Owner;
-					break;
-				}
+				case DefaultEnvName.Spider_Id:
+					{
+						value = context.Request.Owner;
+						break;
+					}
 
-				case "REQUEST_HASH":
-				{
-					value = context.Request.Hash;
-					break;
-				}
+				case DefaultEnvName.Request_Hash:
+					{
+						value = context.Request.Hash;
+						break;
+					}
 				default:
-				{
-					value = properties.ContainsKey(field.Expression) ? properties[field.Expression].ToString() : null;
-					break;
-				}
+					{
+						value = properties.ContainsKey(field.Expression) ? properties[field.Expression].ToString() : null;
+						break;
+					}
 			}
 
 			return value;
