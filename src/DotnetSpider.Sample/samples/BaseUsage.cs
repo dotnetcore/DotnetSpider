@@ -40,7 +40,7 @@ namespace DotnetSpider.Sample.samples
 			}
 		}
 
-		public BaseUsageSpider(IOptions<SpiderOptions> options, SpiderServices services, ILogger<Spider> logger) : base(
+		public BaseUsageSpider(IOptions<SpiderOptions> options, DependenceServices services, ILogger<Spider> logger) : base(
 			options, services, logger)
 		{
 		}

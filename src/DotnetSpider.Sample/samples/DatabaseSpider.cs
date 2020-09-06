@@ -23,7 +23,7 @@ namespace DotnetSpider.Sample.samples
 			await builder.Build().RunAsync();
 		}
 
-		public DatabaseSpider(IOptions<SpiderOptions> options, SpiderServices services, ILogger<Spider> logger) : base(
+		public DatabaseSpider(IOptions<SpiderOptions> options, DependenceServices services, ILogger<Spider> logger) : base(
 			options, services, logger)
 		{
 		}

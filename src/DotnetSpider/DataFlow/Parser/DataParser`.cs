@@ -33,46 +33,46 @@ namespace DotnetSpider.DataFlow.Parser
 					switch (followSelector.SelectorType)
 					{
 						case SelectorType.Css:
+						{
+							foreach (var expression in followSelector.Expressions)
 							{
-								foreach (var expression in followSelector.Expressions)
-								{
-									AddFollowRequestQuerier(Selectors.Css(expression));
-								}
-
-								break;
+								AddFollowRequestQuerier(Selectors.Css(expression));
 							}
+
+							break;
+						}
 						case SelectorType.Regex:
+						{
+							foreach (var expression in followSelector.Expressions)
 							{
-								foreach (var expression in followSelector.Expressions)
-								{
-									AddFollowRequestQuerier(Selectors.Regex(expression));
-								}
-
-								break;
+								AddFollowRequestQuerier(Selectors.Regex(expression));
 							}
+
+							break;
+						}
 						case SelectorType.XPath:
+						{
+							foreach (var expression in followSelector.Expressions)
 							{
-								foreach (var expression in followSelector.Expressions)
-								{
-									AddFollowRequestQuerier(Selectors.XPath(expression));
-								}
-
-								break;
+								AddFollowRequestQuerier(Selectors.XPath(expression));
 							}
+
+							break;
+						}
 						case SelectorType.Environment:
-							{
-								Logger.LogWarning("SelectorType of follow selector is not supported");
-								break;
-							}
+						{
+							Logger.LogWarning("SelectorType of follow selector is not supported");
+							break;
+						}
 						case SelectorType.JsonPath:
+						{
+							foreach (var expression in followSelector.Expressions)
 							{
-								foreach (var expression in followSelector.Expressions)
-								{
-									AddFollowRequestQuerier(Selectors.JsonPath(expression));
-								}
-
-								break;
+								AddFollowRequestQuerier(Selectors.JsonPath(expression));
 							}
+
+							break;
+						}
 					}
 
 					foreach (var pattern in followSelector.Patterns)
@@ -238,62 +238,63 @@ namespace DotnetSpider.DataFlow.Parser
 			int index)
 		{
 			string value;
-			switch (field.Expression)
+			switch (field.Expression?.ToUpper())
 			{
-				case DefaultEnvName.Entity_Index:
-					{
-						value = index.ToString();
-						break;
-					}
+				case EnvironmentNames.EntityIndex:
+				{
+					value = index.ToString();
+					break;
+				}
 
-				case DefaultEnvName.GUID:
-					{
-						value = Guid.NewGuid().ToString();
-						break;
-					}
+				case EnvironmentNames.Guid:
+				{
+					value = Guid.NewGuid().ToString();
+					break;
+				}
 
-				case DefaultEnvName.Date:
-				case DefaultEnvName.ToDay:
-					{
-						value = DateTimeOffset.Now.Date.ToString("yyyy-MM-dd");
-						break;
-					}
+				case EnvironmentNames.Date:
+				case EnvironmentNames.Today:
+				{
+					value = DateTimeOffset.Now.Date.ToString("yyyy-MM-dd");
+					break;
+				}
 
-				case DefaultEnvName.DateTime:
-				case DefaultEnvName.Now:
-					{
-						value = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss");
-						break;
-					}
+				case EnvironmentNames.Datetime:
+				case EnvironmentNames.Now:
+				{
+					value = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss");
+					break;
+				}
 
-				case DefaultEnvName.Month:
-					{
-						value = DateTimeHelper.FirstDayOfMonth.ToString("yyyy-MM-dd");
-						break;
-					}
+				case EnvironmentNames.Month:
+				{
+					value = DateTimeHelper.FirstDayOfMonth.ToString("yyyy-MM-dd");
+					break;
+				}
 
-				case DefaultEnvName.Monday:
-					{
-						value = DateTimeHelper.Monday.ToString("yyyy-MM-dd");
-						break;
-					}
+				case EnvironmentNames.Monday:
+				{
+					value = DateTimeHelper.Monday.ToString("yyyy-MM-dd");
+					break;
+				}
 
-				case DefaultEnvName.Spider_Id:
-					{
-						value = context.Request.Owner;
-						break;
-					}
+				case EnvironmentNames.SpiderId:
+				{
+					value = context.Request.Owner;
+					break;
+				}
 
-				case DefaultEnvName.Request_Hash:
-					{
-						value = context.Request.Hash;
-						break;
-					}
+				case EnvironmentNames.RequestHash:
+				{
+					value = context.Request.Hash;
+					break;
+				}
 				default:
-					{
-						value = properties.ContainsKey(field.Expression) ? properties[field.Expression].ToString() : null;
-						break;
-					}
+				{
+					value = string.IsNullOrWhiteSpace(field.Expression) ? null :
+						properties.ContainsKey(field.Expression) ? properties[field.Expression]?.ToString() : null;
+					break;
+				}
 			}
 
 			return value;

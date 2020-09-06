@@ -2,17 +2,17 @@ using System;
 using System.Threading.Tasks;
 using AutoMapper;
 using Dapper;
-using DotnetSpider.Agent.Message;
-using DotnetSpider.AgentRegister.Store;
+using DotnetSpider.AgentCenter.Store;
 using DotnetSpider.Extensions;
 using DotnetSpider.Infrastructure;
+using DotnetSpider.Message.Agent;
+using DotnetSpider.MessageQueue;
 using DotnetSpider.Portal.Common;
 using DotnetSpider.Portal.Data;
 using DotnetSpider.Portal.ViewObject;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using SwiftMQ;
 
 namespace DotnetSpider.Portal.Controllers.API
 {
@@ -36,9 +36,9 @@ namespace DotnetSpider.Portal.Controllers.API
 		}
 
 		[HttpGet]
-		public async Task<PagedQueryResult<AgentViewObject>> PagedQueryAsync(string keyword, int page, int limit)
+		public async Task<PagedResult<AgentViewObject>> PagedQueryAsync(string keyword, int page, int limit)
 		{
-			PagedQueryResult<AgentInfo> @out;
+			PagedResult<AgentInfo> @out;
 			if (!string.IsNullOrWhiteSpace(keyword))
 			{
 				@out = await _dbContext
@@ -58,7 +58,8 @@ namespace DotnetSpider.Portal.Controllers.API
 		}
 
 		[HttpGet("{id}/heartbeats")]
-		public async Task<PagedQueryResult<AgentHeartbeatViewObject>> PagedQueryHeartbeatAsync(string id, int page, int limit)
+		public async Task<PagedResult<AgentHeartbeatViewObject>> PagedQueryHeartbeatAsync(string id, int page,
+			int limit)
 		{
 			page = page <= 1 ? 1 : page;
 			limit = limit <= 5 ? 5 : limit;
@@ -76,7 +77,7 @@ namespace DotnetSpider.Portal.Controllers.API
 				return new FailedResult("Agent is not exists");
 			}
 
-			await _mq.PublishAsBytesAsync(string.Format(TopicNames.Agent, id.ToUpper()), new Exit {Id = id});
+			await _mq.PublishAsBytesAsync(string.Format(TopicNames.Agent, id.ToUpper()), new Exit {AgentId = id});
 
 			using (var conn = _dbContext.Database.GetDbConnection())
 			{
@@ -96,7 +97,7 @@ namespace DotnetSpider.Portal.Controllers.API
 				return new FailedResult("Agent is not exists");
 			}
 
-			await _mq.PublishAsBytesAsync(string.Format(TopicNames.Agent, id.ToUpper()), new Exit {Id = id});
+			await _mq.PublishAsBytesAsync(string.Format(TopicNames.Agent, id.ToUpper()), new Exit {AgentId = id});
 			return new ApiResult("OK");
 		}
 	}

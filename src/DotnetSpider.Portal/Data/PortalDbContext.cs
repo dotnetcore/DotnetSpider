@@ -1,4 +1,4 @@
-using DotnetSpider.AgentRegister.Store;
+using DotnetSpider.AgentCenter.Store;
 using DotnetSpider.Statistics.Store;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;

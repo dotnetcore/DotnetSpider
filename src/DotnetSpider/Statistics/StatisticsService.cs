@@ -3,11 +3,11 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Extensions;
-using DotnetSpider.Statistics.Message;
+using DotnetSpider.Message.Statistics;
 using DotnetSpider.Statistics.Store;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using SwiftMQ;
+using IMessageQueue = DotnetSpider.MessageQueue.IMessageQueue;
 
 namespace DotnetSpider.Statistics
 {
@@ -16,7 +16,7 @@ namespace DotnetSpider.Statistics
         private readonly ILogger<StatisticsService> _logger;
         private readonly IStatisticsStore _statisticsStore;
         private readonly IMessageQueue _messageQueue;
-        private AsyncMessageConsumer<byte[]> _consumer;
+        private MessageQueue.AsyncMessageConsumer<byte[]> _consumer;
 
         public StatisticsService(ILogger<StatisticsService> logger,
             IMessageQueue messageQueue,
@@ -32,7 +32,7 @@ namespace DotnetSpider.Statistics
             _logger.LogInformation("Statistics service starting");
             await _statisticsStore.EnsureDatabaseAndTableCreatedAsync();
 
-            _consumer = new AsyncMessageConsumer<byte[]>(TopicNames.Statistics);
+            _consumer = new MessageQueue.AsyncMessageConsumer<byte[]>(TopicNames.Statistics);
             _consumer.Received += async bytes =>
             {
                 var message = await bytes.DeserializeAsync(stoppingToken);
@@ -44,42 +44,42 @@ namespace DotnetSpider.Statistics
 
                 if (message is Success success)
                 {
-                    await _statisticsStore.IncreaseSuccessAsync(success.Id);
+                    await _statisticsStore.IncreaseSuccessAsync(success.SpiderId);
                 }
                 else if (message is Start start)
                 {
-                    await _statisticsStore.StartAsync(start.Id, start.Name);
+                    await _statisticsStore.StartAsync(start.SpiderId, start.SpiderName);
                 }
                 else if (message is Failure failure)
                 {
-                    await _statisticsStore.IncreaseFailureAsync(failure.Id);
+                    await _statisticsStore.IncreaseFailureAsync(failure.SpiderId);
                 }
                 else if (message is Total total)
                 {
-                    await _statisticsStore.IncreaseTotalAsync(total.Id, total.Count);
+                    await _statisticsStore.IncreaseTotalAsync(total.SpiderId, total.Count);
                 }
                 else if (message is Exit exit)
                 {
-                    await _statisticsStore.ExitAsync(exit.Id);
+                    await _statisticsStore.ExitAsync(exit.SpiderId);
                 }
                 else if (message is AgentSuccess agentSuccess)
                 {
-                    await _statisticsStore.IncreaseAgentSuccessAsync(agentSuccess.Id, agentSuccess.ElapsedMilliseconds);
+                    await _statisticsStore.IncreaseAgentSuccessAsync(agentSuccess.AgentId, agentSuccess.ElapsedMilliseconds);
                 }
                 else if (message is AgentFailure agentFailure)
                 {
-                    await _statisticsStore.IncreaseAgentFailureAsync(agentFailure.Id, agentFailure.ElapsedMilliseconds);
+                    await _statisticsStore.IncreaseAgentFailureAsync(agentFailure.AgentId, agentFailure.ElapsedMilliseconds);
                 }
                 else if (message is Print print)
                 {
-                    var statistics = await _statisticsStore.GetSpiderStatisticsAsync(print.Id);
+                    var statistics = await _statisticsStore.GetSpiderStatisticsAsync(print.SpiderId);
                     if (statistics != null)
                     {
                         var left = statistics.Total >= statistics.Success
                             ? (statistics.Total - statistics.Success - statistics.Failure).ToString()
                             : "unknown";
                         _logger.LogInformation(
-                            $"{print.Id} total {statistics.Total}, success {statistics.Success}, failure {statistics.Failure}, left {left}");
+                            $"{print.SpiderId} total {statistics.Total}, success {statistics.Success}, failure {statistics.Failure}, left {left}");
                     }
                 }
                 else

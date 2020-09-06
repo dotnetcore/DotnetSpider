@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using AutoMapper;
 using DotnetSpider.Extensions;
 using DotnetSpider.Infrastructure;
+using DotnetSpider.Message.Spider;
+using DotnetSpider.MessageQueue;
 using DotnetSpider.Portal.BackgroundService;
 using DotnetSpider.Portal.Common;
 using DotnetSpider.Portal.Data;
@@ -13,7 +15,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Quartz;
-using SwiftMQ;
 
 namespace DotnetSpider.Portal.Controllers.API
 {
@@ -127,9 +128,9 @@ namespace DotnetSpider.Portal.Controllers.API
 		}
 
 		[HttpGet]
-		public async Task<PagedQueryResult<ListSpiderViewObject>> PagedQueryAsync(string keyword, int page, int limit)
+		public async Task<PagedResult<ListSpiderViewObject>> PagedQueryAsync(string keyword, int page, int limit)
 		{
-			PagedQueryResult<Data.Spider> @out;
+			PagedResult<Data.Spider> @out;
 			if (!string.IsNullOrWhiteSpace(keyword))
 			{
 				@out = await _dbContext
@@ -221,7 +222,7 @@ namespace DotnetSpider.Portal.Controllers.API
 		}
 
 		[HttpGet("{id}/histories")]
-		public async Task<PagedQueryResult<SpiderHistoryViewObject>> PagedQueryHistoryAsync(int id, int page, int limit)
+		public async Task<PagedResult<SpiderHistoryViewObject>> PagedQueryHistoryAsync(int id, int page, int limit)
 		{
 			page = page <= 1 ? 1 : page;
 			limit = limit <= 15 ? 15 : limit;
@@ -267,7 +268,7 @@ namespace DotnetSpider.Portal.Controllers.API
 			var topic = string.Format(TopicNames.Spider, spiderHistory.Batch.ToUpper());
 			_logger.LogInformation($"Try stop spider {topic}");
 			await _mq.PublishAsBytesAsync(topic,
-				new Spider.Exit(spiderId));
+				new Exit(spiderId));
 			return true;
 		}
 

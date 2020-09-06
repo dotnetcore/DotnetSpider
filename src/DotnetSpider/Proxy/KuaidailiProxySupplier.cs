@@ -17,13 +17,13 @@ namespace DotnetSpider.Proxy
         {
             _httpClientFactory = httpClientFactory;
             _options = options.Value;
-            _options.ProxySupplierUri.NotNullOrWhiteSpace(nameof(_options.ProxySupplierUri));
+            _options.ProxySupplierUrl.NotNullOrWhiteSpace(nameof(_options.ProxySupplierUrl));
         }
 
         public async Task<IEnumerable<HttpProxy>> GetProxiesAsync()
         {
             var client = _httpClientFactory.CreateClient("kuaidaili");
-            var text = await client.GetStringAsync(_options.ProxySupplierUri);
+            var text = await client.GetStringAsync(_options.ProxySupplierUrl);
             var proxies = text.Split(new [] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries);
             return proxies.Select(x => new HttpProxy($"http://{x}"));
         }

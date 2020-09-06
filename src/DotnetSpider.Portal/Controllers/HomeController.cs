@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using DotnetSpider.AgentRegister.Store;
+using DotnetSpider.AgentCenter.Store;
 using DotnetSpider.Portal.Data;
 using DotnetSpider.Statistics.Store;
 using Microsoft.AspNetCore.Mvc;

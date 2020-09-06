@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Extensions;
+using DotnetSpider.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 

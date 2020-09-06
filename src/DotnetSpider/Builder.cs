@@ -4,10 +4,11 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using DotnetSpider.Agent;
-using DotnetSpider.AgentRegister;
-using DotnetSpider.AgentRegister.Store;
+using DotnetSpider.AgentCenter;
+using DotnetSpider.AgentCenter.Store;
 using DotnetSpider.Extensions;
 using DotnetSpider.Infrastructure;
+using DotnetSpider.MessageQueue;
 using DotnetSpider.Proxy;
 using DotnetSpider.Statistics;
 using DotnetSpider.Statistics.Store;
@@ -17,7 +18,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
-using SwiftMQ.DependencyInjection;
 
 namespace DotnetSpider
 {
@@ -99,9 +99,9 @@ namespace DotnetSpider
 					services.Configure<AgentOptions>(configuration);
 				}
 
-				services.AddSwiftMQ();
+				services.AddInProcessMessageQueue();
 				services.AddStatistics<MemoryStatisticsStore>();
-				services.AddAgentRegister<MemoryAgentStore>();
+				services.AddAgentCenter<MemoryAgentStore>();
 				services.AddAgent();
 				services.AddSingleton(typeof(IHostedService), type);
 			});
@@ -175,8 +175,8 @@ namespace DotnetSpider
 					services.Configure(configureDelegate);
 				}
 
-				services.AddSingleton<SpiderServices>();
-				services.AddHostedService<ArgumentPrintService>();
+				services.AddSingleton<DependenceServices>();
+				services.AddHostedService<PrintArgumentService>();
 				services.AddHostedService<ProxyService>();
 				services.AddHttpClient();
 				services.AddTransient<HttpMessageHandlerBuilder, ProxyHttpMessageHandlerBuilder>();

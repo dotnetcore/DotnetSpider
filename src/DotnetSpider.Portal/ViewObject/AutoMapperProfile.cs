@@ -1,5 +1,5 @@
 using AutoMapper;
-using DotnetSpider.AgentRegister.Store;
+using DotnetSpider.AgentCenter.Store;
 using DotnetSpider.Portal.Data;
 
 namespace DotnetSpider.Portal.ViewObject

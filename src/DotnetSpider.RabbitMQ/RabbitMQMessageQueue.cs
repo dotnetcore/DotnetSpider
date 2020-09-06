@@ -1,15 +1,16 @@
 ﻿using System;
-using System.Collections.Concurrent;
+using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using DotnetSpider.Extensions;
-using MessagePack;
+using DotnetSpider.MessageQueue;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Polly;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using SwiftMQ;
+using RabbitMQ.Client.Exceptions;
+
 
 [assembly: InternalsVisibleTo("DotnetSpider.Tests")]
 
@@ -17,25 +18,22 @@ namespace DotnetSpider.RabbitMQ
 {
 	public class RabbitMQMessageQueue : IMessageQueue
 	{
-		private RabbitMQOptions _options;
-		private IConnection _connection;
-		private ConcurrentDictionary<string, IModel> _modelDict;
+		private readonly RabbitMQOptions _options;
+		private readonly PersistentConnection _connection;
 		private readonly ILogger<RabbitMQMessageQueue> _logger;
 
-		public RabbitMQMessageQueue(IOptions<RabbitMQOptions> options, ILogger<RabbitMQMessageQueue> logger)
+		public RabbitMQMessageQueue(IOptions<RabbitMQOptions> options, ILoggerFactory loggerFactory)
 		{
-			_logger = logger;
-			if (options != null)
-			{
-				Initialize(options.Value);
-			}
+			_logger = loggerFactory.CreateLogger<RabbitMQMessageQueue>();
+			_options = options.Value;
+			_connection = new PersistentConnection(CreateConnectionFactory(),
+				loggerFactory.CreateLogger<PersistentConnection>(), _options.RetryCount);
+			CreateConsumerChannel();
 		}
 
-		internal void Initialize(RabbitMQOptions options)
+		private IConnectionFactory CreateConnectionFactory()
 		{
-			_options = options;
-			_logger.LogInformation($"RabbitMQ Host: {_options.Host}, Port: {_options.Port}");
-			var connectionFactory = new ConnectionFactory {HostName = _options.Host, DispatchConsumersAsync = true};
+			var connectionFactory = new ConnectionFactory {HostName = _options.HostName, DispatchConsumersAsync = true};
 			if (_options.Port > 0)
 			{
 				connectionFactory.Port = _options.Port;
@@ -51,23 +49,46 @@ namespace DotnetSpider.RabbitMQ
 				connectionFactory.Password = _options.Password;
 			}
 
-			_connection = connectionFactory.CreateConnection();
-			_modelDict = new ConcurrentDictionary<string, IModel>();
+			return connectionFactory;
 		}
 
-		public async Task PublishAsync<TMessage>(string queue, TMessage message)
+		public async Task PublishAsync(string topic, byte[] bytes)
 		{
-			if (message == null)
+			if (bytes == null)
 			{
-				throw new ArgumentNullException(nameof(message));
+				throw new ArgumentNullException(nameof(bytes));
 			}
 
-			var channel = _modelDict.GetOrAdd(queue, CreateChannel);
-			var bytes = message as byte[] ?? MessagePackSerializer.Typeless.Serialize(message);
-			if (channel.IsOpen)
+			if (!_connection.IsConnected)
 			{
-				channel.BasicPublish(_options.Exchange, queue, null, bytes);
+				_connection.TryConnect();
 			}
+
+			var policy = Policy.Handle<BrokerUnreachableException>()
+				.Or<SocketException>()
+				.WaitAndRetry(_options.RetryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+					(ex, time) =>
+					{
+						_logger.LogWarning(ex,
+							"Could not publish data after {Timeout}s ({ExceptionMessage})",
+							$"{time.TotalSeconds:n1}", ex.Message);
+					});
+			var channel = _connection.CreateModel();
+
+			_logger.LogTrace("Declaring RabbitMQ exchange to publish event");
+
+			channel.ExchangeDeclare(exchange: _options.Exchange, type: "direct");
+
+			policy.Execute(() =>
+			{
+				var properties = channel.CreateBasicProperties();
+				properties.DeliveryMode = 2; // persistent
+
+				_logger.LogTrace("Publishing event to RabbitMQ");
+
+				channel.BasicPublish(_options.Exchange, topic, true, properties, bytes);
+				channel.Dispose();
+			});
 
 			await Task.CompletedTask;
 		}
@@ -78,49 +99,50 @@ namespace DotnetSpider.RabbitMQ
 			channel.QueueDelete(queue);
 		}
 
-		public Task ConsumeAsync<TMessage>(AsyncMessageConsumer<TMessage> consumer,
+		public Task ConsumeAsync(AsyncMessageConsumer<byte[]> consumer,
 			CancellationToken stoppingToken)
 		{
-			var topic = consumer.Queue;
-			var channel = _modelDict.GetOrAdd(topic, CreateChannel);
-			var consumer1 = new AsyncEventingBasicConsumer(channel);
-			var queue = channel.QueueDeclare().QueueName;
-			channel.QueueBind(queue: queue, _options.Exchange, routingKey: topic);
-			consumer1.Received += async (model, ea) =>
+			if (consumer.Registered)
 			{
-				if (consumer is AsyncMessageConsumer<byte[]> bytesConsumer)
-				{
-					await bytesConsumer.InvokeAsync(ea.Body);
-				}
-				else
-				{
-					var message = (TMessage)await ea.Body.DeserializeAsync(stoppingToken);
-					if (message != null)
-					{
-						await consumer.InvokeAsync(message);
-					}
-				}
+				throw new ApplicationException("This consumer is already registered");
+			}
 
+			if (!_connection.IsConnected)
+			{
+				_connection.TryConnect();
+			}
+
+			var channel = _connection.CreateModel();
+			var eventingBasicConsumer = new AsyncEventingBasicConsumer(channel);
+			var queue = channel.QueueDeclare().QueueName;
+			var topic = consumer.Queue;
+			channel.QueueBind(queue: queue, _options.Exchange, routingKey: topic);
+			eventingBasicConsumer.Received += async (model, ea) =>
+			{
+				await consumer.InvokeAsync(ea.Body.ToArray());
 				channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
 			};
-
-			consumer.OnClosing += () =>
+			consumer.OnClosing += x =>
 			{
 				channel.Close();
 			};
 			//7. 启动消费者
-			channel.BasicConsume(queue: queue, autoAck: false, consumer: consumer1);
+			channel.BasicConsume(queue: queue, autoAck: false, consumer: eventingBasicConsumer);
 
 			return Task.CompletedTask;
 		}
 
-		private IModel CreateChannel(string topic)
+		private void CreateConsumerChannel()
 		{
+			if (!_connection.IsConnected)
+			{
+				_connection.TryConnect();
+			}
+
+			_logger.LogTrace("Creating RabbitMQ consumer channel");
+
 			var channel = _connection.CreateModel();
-			channel.QueueDeclare(topic, durable: true, exclusive: false, autoDelete: false,
-				arguments: null);
-			channel.ExchangeDeclare(exchange: _options.Exchange, type: "direct", durable: true);
-			return channel;
+			channel.ExchangeDeclare(exchange: _options.Exchange, "direct");
 		}
 	}
 }

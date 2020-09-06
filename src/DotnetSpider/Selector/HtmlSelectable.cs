@@ -22,13 +22,13 @@ namespace DotnetSpider.Selector
 
 			if (!string.IsNullOrWhiteSpace(relativeUri))
 			{
-				HtmlUtils.FixAllRelativeHref(document, relativeUri);
+				HtmlUtilities.FixAllRelativeHref(document, relativeUri);
 				if (removeOutboundLinks)
 				{
 					var host = new Uri(relativeUri).Host;
 					var parts = host.Split('.');
 					var domainPattern = string.Join("\\.", parts);
-					HtmlUtils.RemoveOutboundLinks(document, domainPattern);
+					HtmlUtilities.RemoveOutboundLinks(document, domainPattern);
 				}
 			}
 

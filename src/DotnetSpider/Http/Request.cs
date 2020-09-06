@@ -45,7 +45,7 @@ namespace DotnetSpider.Http
 		/// <summary>
 		/// 链接的深度
 		/// </summary>
-		public uint Depth { get; internal set; }
+		public uint Depth { get; set; }
 
 		/// <summary>
 		/// 请求链接
@@ -60,7 +60,7 @@ namespace DotnetSpider.Http
 		/// <summary>
 		/// 已经重试的次数
 		/// </summary>
-		public int RequestedTimes { get; internal set; }
+		public int RequestedTimes { get; set; }
 
 		/// <summary>
 		/// 请求的方法
@@ -253,16 +253,15 @@ namespace DotnetSpider.Http
 		public virtual string ComputeHash()
 		{
 			// Agent 不需要添加的原因是，每当 Request 再次添加到 Scheduler 前 Requested +1 已经导致 Hash 变化
-			var obj = new HashObject
+			var bytes = MessagePackSerializer.Typeless.Serialize(new
 			{
-				Owner = Owner,
-				RequestUri = RequestUri,
-				Method = Method,
+				Owner,
+				RequestUri,
+				Method,
 				RequestedTime = RequestedTimes,
 				Content = Content?.ToArray()
-			};
-			var bytes = MessagePackSerializer.Typeless.Serialize(obj);
-			return bytes.ToMd5();
+			});
+			return bytes.GetMurmurHash();
 		}
 
 		public override string ToString()
@@ -306,17 +305,9 @@ namespace DotnetSpider.Http
 			request.RequestedTimes = 0;
 			request.Depth += 1;
 			request.Hash = null;
+			request.Timestamp = DateTimeHelper.Timestamp;
 			request.RequestUri = new Uri(uri, UriKind.RelativeOrAbsolute);
 			return request;
-		}
-
-		public class HashObject
-		{
-			public string Owner { get; set; }
-			public Uri RequestUri { get; set; }
-			public int RequestedTime { get; set; }
-			public string Method { get; set; }
-			public byte[] Content { get; set; }
 		}
 	}
 }

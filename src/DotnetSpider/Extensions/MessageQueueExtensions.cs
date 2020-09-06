@@ -1,14 +1,14 @@
 using System.Threading.Tasks;
-using SwiftMQ;
+using DotnetSpider.MessageQueue;
 
 namespace DotnetSpider.Extensions
 {
-    public static class MessageQueueExtensions
-    {
-        public static async Task PublishAsBytesAsync(this IMessageQueue messageQueue, string queue, object message)
-        {
-            var bytes = message.ToBytes();
-            await messageQueue.PublishAsync(queue, bytes);
-        }
-    }
+	public static class MessageQueueExtensions
+	{
+		public static async Task PublishAsBytesAsync<T>(this IMessageQueue messageQueue, string queue, T message)
+		{
+			var bytes = message.Serialize();
+			await messageQueue.PublishAsync(queue, bytes);
+		}
+	}
 }

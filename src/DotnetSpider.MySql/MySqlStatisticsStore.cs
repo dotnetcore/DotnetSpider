@@ -120,7 +120,7 @@ namespace DotnetSpider.MySql
 			}
 		}
 
-		public async Task<PagedQueryResult<AgentStatistics>> PagedQueryAgentStatisticsAsync(string agentId, int page,
+		public async Task<PagedResult<AgentStatistics>> PagedQueryAgentStatisticsAsync(string agentId, int page,
 			int limit)
 		{
 			if (page <= 0)
@@ -147,7 +147,7 @@ namespace DotnetSpider.MySql
 				var result = (await conn.QueryAsync<AgentStatistics>(
 					$"SELECT * FROM {_options.Database}.agent_statistics {where} ORDER BY creation_time LIMIT @Start, @Offset;",
 					new {Start = start, Offfset = limit, AgentId = agentId}));
-				return new PagedQueryResult<AgentStatistics>(page, limit, count, result);
+				return new PagedResult<AgentStatistics>(page, limit, count, result);
 			}
 		}
 
@@ -171,7 +171,7 @@ namespace DotnetSpider.MySql
 			}
 		}
 
-		public async Task<PagedQueryResult<SpiderStatistics>> PagedQuerySpiderStatisticsAsync(string keyword, int page,
+		public async Task<PagedResult<SpiderStatistics>> PagedQuerySpiderStatisticsAsync(string keyword, int page,
 			int limit)
 		{
 			if (page <= 0)
@@ -198,7 +198,7 @@ namespace DotnetSpider.MySql
 				var result = (await conn.QueryAsync<SpiderStatistics>(
 					$"SELECT * FROM {_options.Database}.statistics {where} ORDER BY creation_time LIMIT @Start, @Offset;",
 					new {Start = start, Offfset = limit, Keyword = $"%{keyword}%"}));
-				return new PagedQueryResult<SpiderStatistics>(page, limit, count, result);
+				return new PagedResult<SpiderStatistics>(page, limit, count, result);
 			}
 		}
 	}

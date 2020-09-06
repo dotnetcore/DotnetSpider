@@ -29,7 +29,7 @@ namespace DotnetSpider.Sample.samples
 			await builder.Build().RunAsync();
 		}
 
-		public EntitySpider(IOptions<SpiderOptions> options, SpiderServices services, ILogger<Spider> logger) : base(
+		public EntitySpider(IOptions<SpiderOptions> options, DependenceServices services, ILogger<Spider> logger) : base(
 			options, services, logger)
 		{
 		}

@@ -84,7 +84,7 @@ namespace DotnetSpider.Statistics.Store
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public Task<PagedQueryResult<AgentStatistics>> PagedQueryAgentStatisticsAsync(string keyword, int page, int limit)
+        public Task<PagedResult<AgentStatistics>> PagedQueryAgentStatisticsAsync(string keyword, int page, int limit)
         {
             throw new NotImplementedException();
         }
@@ -106,7 +106,7 @@ namespace DotnetSpider.Statistics.Store
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public Task<PagedQueryResult<SpiderStatistics>> PagedQuerySpiderStatisticsAsync(string keyword, int page, int size)
+        public Task<PagedResult<SpiderStatistics>> PagedQuerySpiderStatisticsAsync(string keyword, int page, int size)
         {
             throw new NotImplementedException();
         }

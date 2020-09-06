@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using DotnetSpider.Http;
+using DotnetSpider.Infrastructure;
 using Microsoft.Extensions.Logging;
 using ByteArrayContent = DotnetSpider.Http.ByteArrayContent;
 using StringContent = DotnetSpider.Http.StringContent;
@@ -31,13 +32,8 @@ namespace DotnetSpider.Agent
 		{
 			try
 			{
-				var clientName = string.IsNullOrWhiteSpace(request.Proxy)
-					? request.RequestUri.Host
-					: $"{Consts.ProxyPrefix}{request.Proxy}";
-
-				var httpClient = _httpClientFactory.CreateClient(clientName);
 				var httpRequest = GenerateHttpRequestMessage(request);
-
+				var httpClient = Create(request);
 				var stopwatch = new Stopwatch();
 				stopwatch.Start();
 				var httpResponseMessage = await httpClient.SendAsync(httpRequest);
@@ -92,6 +88,16 @@ namespace DotnetSpider.Agent
 					Content = new ResponseContent {Data = Encoding.UTF8.GetBytes(e.ToString())}
 				};
 			}
+		}
+
+		protected virtual HttpClient Create(Request request)
+		{
+			var clientName = string.IsNullOrWhiteSpace(request.Proxy)
+				? request.RequestUri.Host
+				: $"{Consts.ProxyPrefix}{request.Proxy}";
+
+			var httpClient = _httpClientFactory.CreateClient(clientName);
+			return httpClient;
 		}
 
 		private HttpRequestMessage GenerateHttpRequestMessage(Request request)

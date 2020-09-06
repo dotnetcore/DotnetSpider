@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using AutoMapper;
-using DotnetSpider.AgentRegister;
+using DotnetSpider.AgentCenter;
 using DotnetSpider.MySql;
 using DotnetSpider.Portal.BackgroundService;
 using DotnetSpider.Portal.Common;
@@ -78,7 +78,7 @@ namespace DotnetSpider.Portal
 				x.UseMySqlConnector(options.ConnectionString);
 			});
 			services.AddHttpClient();
-			services.AddAgentRegister<MySqlAgentStore>();
+			services.AddAgentCenter<MySqlAgentStore>();
 			services.AddStatistics<MySqlStatisticsStore>();
 			services.AddHostedService<QuartzService>();
 			services.AddHostedService<CleanDockerContainerService>();

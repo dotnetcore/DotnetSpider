@@ -12,13 +12,13 @@ using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Extensions;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
+using DotnetSpider.Message.Spider;
 using DotnetSpider.RequestSupplier;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using SwiftMQ;
 
 [assembly: InternalsVisibleTo("DotnetSpider.Tests")]
 
@@ -30,8 +30,8 @@ namespace DotnetSpider
 		private readonly List<IDataFlow> _dataFlows;
 		private readonly List<IRequestSupplier> _requestSuppliers;
 		private readonly RequestedQueue _requestedQueue;
-		private AsyncMessageConsumer<byte[]> _consumer;
-		private readonly SpiderServices _services;
+		private MessageQueue.AsyncMessageConsumer<byte[]> _consumer;
+		private readonly DependenceServices _services;
 
 		protected event Action<Request[]> OnTimeout;
 
@@ -54,7 +54,7 @@ namespace DotnetSpider
 		protected readonly ILogger Logger;
 
 		protected Spider(IOptions<SpiderOptions> options,
-			SpiderServices services,
+			DependenceServices services,
 			ILogger<Spider> logger
 		)
 		{
@@ -242,7 +242,7 @@ namespace DotnetSpider
 			var topic = string.Format(TopicNames.Spider, Id.ToUpper());
 
 			Logger.LogInformation($"{Id} register topic {topic}");
-			_consumer = new AsyncMessageConsumer<byte[]>(topic);
+			_consumer = new MessageQueue.AsyncMessageConsumer<byte[]>(topic);
 			_consumer.Received += async bytes =>
 			{
 				var message = await bytes.DeserializeAsync(stoppingToken);
@@ -255,7 +255,7 @@ namespace DotnetSpider
 				if (message is Exit exit)
 				{
 					Logger.LogInformation($"{Id} receive exit message {JsonConvert.SerializeObject(exit)}");
-					if (exit.Id == Id.ToUpper())
+					if (exit.SpiderId == Id.ToUpper())
 					{
 						await ExitAsync();
 					}
@@ -264,6 +264,7 @@ namespace DotnetSpider
 				{
 					// 1. 从请求队列中去除请求
 					var request = _requestedQueue.Dequeue(response.RequestHash);
+
 					if (request == null)
 					{
 						Logger.LogWarning($"{Id} dequeue {response.RequestHash} failed");
@@ -354,7 +355,7 @@ namespace DotnetSpider
 						if (printFlag >= 5000)
 						{
 							printFlag = 0;
-							// todo: distribute spider should not print
+
 							await _services.StatisticsClient.PrintAsync(Id);
 						}
 
@@ -475,7 +476,7 @@ namespace DotnetSpider
 					}
 
 					string topic;
-					request.Timestamp = DateTimeOffset.Now.ToTimestamp();
+					request.Timestamp = DateTimeHelper.ToTimestamp(DateTimeOffset.Now);
 					if (string.IsNullOrWhiteSpace(request.Agent))
 					{
 						topic = string.IsNullOrEmpty(request.DownloaderType)

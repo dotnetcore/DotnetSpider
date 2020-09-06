@@ -3,22 +3,36 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Extensions;
+using DotnetSpider.MessageQueue;
 using DotnetSpider.RabbitMQ;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using SwiftMQ;
+using Microsoft.Extensions.Options;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace DotnetSpider.Tests
 {
 	public class RabbitMQTests
 	{
+		private readonly ITestOutputHelper _testOutputHelper;
+
+		public RabbitMQTests(ITestOutputHelper testOutputHelper)
+		{
+			_testOutputHelper = testOutputHelper;
+		}
+
+		public class MyOptions : IOptions<RabbitMQOptions>
+		{
+			public RabbitMQOptions Value => new RabbitMQOptions
+			{
+				Exchange = "Test", HostName = "localhost", UserName = "user", Password = "password"
+			};
+		}
+
 		protected virtual IMessageQueue GetMessageQueue()
 		{
-			var mq = new RabbitMQMessageQueue(default, NullLogger<RabbitMQMessageQueue>.Instance);
-			mq.Initialize(new RabbitMQOptions
-			{
-				Exchange = "MessageQueue", Host = "localhost", UserName = "user", Password = "password"
-			});
+			var mq = new RabbitMQMessageQueue(new MyOptions(), new LoggerFactory());
 			return mq;
 		}
 
@@ -43,7 +57,6 @@ namespace DotnetSpider.Tests
 			{
 				var message = (Message)await bytes.DeserializeAsync(default);
 				counter = message.Index;
-				await Task.CompletedTask;
 			};
 			await messageQueue.ConsumeAsync(consumer, default);
 			await messageQueue.PublishAsBytesAsync(queue, new Message {Index = 1000});
@@ -66,7 +79,11 @@ namespace DotnetSpider.Tests
 			Parallel.For(0, 1000, async i =>
 			{
 				var consumer = new AsyncMessageConsumer<byte[]>("test");
-				consumer.Received += bytes => null;
+				consumer.Received += bytes =>
+				{
+					_testOutputHelper.WriteLine("hi");
+					return Task.CompletedTask;
+				};
 				await messageQueue.ConsumeAsync(consumer, default);
 			});
 			messageQueue.CloseQueue("test");

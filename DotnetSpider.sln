@@ -47,7 +47,7 @@ ProjectSection(SolutionItems) = preProject
 	docker-compose\agent2.json = docker-compose\agent2.json
 EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.AgentRegister", "src\DotnetSpider.AgentRegister\DotnetSpider.AgentRegister.csproj", "{05991456-8637-4BBA-ADEB-95A86C528CBA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.AgentCenter", "src\DotnetSpider.AgentCenter\DotnetSpider.AgentCenter.csproj", "{05991456-8637-4BBA-ADEB-95A86C528CBA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Portal", "src\DotnetSpider.Portal\DotnetSpider.Portal.csproj", "{303543D4-1883-424F-89B9-5BA1B9F1B38A}"
 EndProject

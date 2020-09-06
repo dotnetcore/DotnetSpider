@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace DotnetSpider.Agent
 {
@@ -6,11 +7,11 @@ namespace DotnetSpider.Agent
 	{
 		public static IServiceCollection AddAgent(this IServiceCollection services)
 		{
-			services.AddSingleton<DownloaderFactory>();
+			services.TryAddSingleton<DownloaderFactory>();
 			services.AddSingleton<IDownloader, HttpClientDownloader>();
 			services.AddSingleton<IDownloader, PuppeteerDownloader>();
 			services.AddSingleton<IDownloader, FileDownloader>();
-			services.AddSingleton<PPPoEService>();
+			services.TryAddSingleton<PPPoEService>();
 			services.AddHostedService<AgentService>();
 			return services;
 		}

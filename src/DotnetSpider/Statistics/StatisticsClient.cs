@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using DotnetSpider.Extensions;
-using DotnetSpider.Statistics.Message;
-using SwiftMQ;
+using DotnetSpider.Message.Statistics;
+using IMessageQueue = DotnetSpider.MessageQueue.IMessageQueue;
 
 namespace DotnetSpider.Statistics
 {

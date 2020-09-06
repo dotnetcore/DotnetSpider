@@ -20,11 +20,11 @@ namespace DotnetSpider.Proxy
             _logger = logger;
             _options = options.Value;
 
-            _options.ProxyTestUri.NotNullOrWhiteSpace(nameof(_options.ProxyTestUri));
+            _options.ProxyTestUrl.NotNullOrWhiteSpace(nameof(_options.ProxyTestUrl));
 
-            if (!Uri.TryCreate(_options.ProxyTestUri, UriKind.RelativeOrAbsolute, out _))
+            if (!Uri.TryCreate(_options.ProxyTestUrl, UriKind.RelativeOrAbsolute, out _))
             {
-                throw new ArgumentException($"{nameof(_options.ProxyTestUri)} is not a valid uri");
+                throw new ArgumentException($"{nameof(_options.ProxyTestUrl)} is not a valid uri");
             }
         }
 
@@ -39,7 +39,7 @@ namespace DotnetSpider.Proxy
             httpClient.Timeout = new TimeSpan(0, 0, 3);
             try
             {
-                var msg = new HttpRequestMessage(HttpMethod.Head, _options.ProxyTestUri);
+                var msg = new HttpRequestMessage(HttpMethod.Head, _options.ProxyTestUrl);
                 var response = await httpClient.SendAsync(msg);
                 return response.IsSuccessStatusCode;
             }

@@ -24,7 +24,7 @@ namespace DotnetSpider.Sample.samples
 			await builder.Build().RunAsync();
 		}
 
-		public JsonEntitySpider(IOptions<SpiderOptions> options, SpiderServices services, ILogger<Spider> logger) :
+		public JsonEntitySpider(IOptions<SpiderOptions> options, DependenceServices services, ILogger<Spider> logger) :
 			base(options, services, logger)
 		{
 		}

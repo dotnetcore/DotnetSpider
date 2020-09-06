@@ -16,7 +16,7 @@ namespace DotnetSpider.Sample.samples
 	{
 		public TestSpider2(
 			IOptions<SpiderOptions> options,
-			SpiderServices services,
+			DependenceServices services,
 			ILogger<Spider> logger) : base(
 			options,
 			services, logger)

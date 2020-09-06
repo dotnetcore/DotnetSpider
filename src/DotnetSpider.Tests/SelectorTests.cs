@@ -57,22 +57,22 @@ namespace DotnetSpider.Tests
         public void FixRelativeUrl()
         {
             var absoluteUrl =
-                UriUtils.CanonicalizeUrl("?aa", "http://www.dianping.com/sh/ss/com");
+                UriUtilities.CanonicalizeUrl("?aa", "http://www.dianping.com/sh/ss/com");
             Assert.Equal("http://www.dianping.com/sh/ss/com?aa", absoluteUrl);
 
             absoluteUrl =
-                UriUtils.CanonicalizeUrl("../aa", "http://www.dianping.com/sh/ss/com");
+                UriUtilities.CanonicalizeUrl("../aa", "http://www.dianping.com/sh/ss/com");
             Assert.Equal("http://www.dianping.com/sh/aa", absoluteUrl);
 
-            absoluteUrl = UriUtils.CanonicalizeUrl("..aa", "http://www.dianping.com/sh/ss/com");
+            absoluteUrl = UriUtilities.CanonicalizeUrl("..aa", "http://www.dianping.com/sh/ss/com");
             Assert.Equal("http://www.dianping.com/sh/ss/..aa", absoluteUrl);
 
             absoluteUrl =
-                UriUtils.CanonicalizeUrl("../../aa", "http://www.dianping.com/sh/ss/com/");
+                UriUtilities.CanonicalizeUrl("../../aa", "http://www.dianping.com/sh/ss/com/");
             Assert.Equal("http://www.dianping.com/sh/aa", absoluteUrl);
 
             absoluteUrl =
-                UriUtils.CanonicalizeUrl("../../aa", "http://www.dianping.com/sh/ss/com");
+                UriUtilities.CanonicalizeUrl("../../aa", "http://www.dianping.com/sh/ss/com");
             Assert.Equal("http://www.dianping.com/aa", absoluteUrl);
 
             // 只有相对路径需要做补充

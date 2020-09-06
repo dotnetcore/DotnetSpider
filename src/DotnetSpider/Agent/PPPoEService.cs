@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DotnetSpider.Http;
+using DotnetSpider.Infrastructure;
 using Microsoft.Extensions.Options;
 
 namespace DotnetSpider.Agent

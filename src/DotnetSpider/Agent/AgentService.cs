@@ -6,14 +6,14 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Extensions;
-using DotnetSpider.AgentRegister.Message;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
+using DotnetSpider.Message.Agent;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SwiftMQ;
-using Exit = DotnetSpider.Agent.Message.Exit;
+using Exit = DotnetSpider.Message.Agent.Exit;
+using IMessageQueue = DotnetSpider.MessageQueue.IMessageQueue;
 
 namespace DotnetSpider.Agent
 {
@@ -21,7 +21,7 @@ namespace DotnetSpider.Agent
 	{
 		private readonly ILogger<AgentService> _logger;
 		private readonly IMessageQueue _messageQueue;
-		private readonly List<AsyncMessageConsumer<byte[]>> _consumers;
+		private readonly List<MessageQueue.AsyncMessageConsumer<byte[]>> _consumers;
 		private readonly IHostApplicationLifetime _applicationLifetime;
 		private readonly bool _distributed;
 		private readonly DownloaderFactory _downloaderFactory;
@@ -38,8 +38,8 @@ namespace DotnetSpider.Agent
 			_messageQueue = messageQueue;
 			_applicationLifetime = applicationLifetime;
 			_downloaderFactory = downloaderFactory;
-			_consumers = new List<AsyncMessageConsumer<byte[]>>();
-			_distributed = !(messageQueue is MessageQueue);
+			_consumers = new List<MessageQueue.AsyncMessageConsumer<byte[]>>();
+			_distributed = !(messageQueue is MessageQueue.MessageQueue);
 			if (!_distributed)
 			{
 				_options.AgentId = Guid.NewGuid().ToString();
@@ -56,17 +56,20 @@ namespace DotnetSpider.Agent
 				_logger.LogInformation($"Register agent: {_options.AgentId}, {_options.AgentName}");
 			}
 
-			await _messageQueue.PublishAsBytesAsync(TopicNames.AgentRegister,
+			await _messageQueue.PublishAsBytesAsync(TopicNames.AgentCenter,
 				new Register
 				{
-					Id = _options.AgentId,
-					Name = _options.AgentName,
+					AgentId = _options.AgentId,
+					AgentName = _options.AgentName,
 					TotalMemory = SystemInformation.TotalMemory,
 					ProcessorCount = Environment.ProcessorCount
 				});
 
 			var topics = GetDownloaderTopics();
 
+			// 节点注册对应的 topic 才会收到下载的请求
+			// agent_{id} 这是用于指定节点下载
+			// httpclient 这是指定下载器
 			await RegisterAgentAsync(topics, stoppingToken);
 
 			await Task.Factory.StartNew(async () =>
@@ -104,7 +107,7 @@ namespace DotnetSpider.Agent
 		{
 			foreach (var topic in topics)
 			{
-				var consumer = new AsyncMessageConsumer<byte[]>(topic);
+				var consumer = new MessageQueue.AsyncMessageConsumer<byte[]>(topic);
 				consumer.Received += HandleMessageAsync;
 				await _messageQueue.ConsumeAsync(consumer, stoppingToken);
 				_consumers.Add(consumer);
@@ -122,7 +125,7 @@ namespace DotnetSpider.Agent
 
 			if (message is Exit exit)
 			{
-				if (exit.Id == _options.AgentId)
+				if (exit.AgentId == _options.AgentId)
 				{
 					_applicationLifetime.StopApplication();
 				}
@@ -150,10 +153,13 @@ namespace DotnetSpider.Agent
 				_logger.LogInformation($"Heartbeat: {_options.AgentId}, {_options.AgentName}");
 			}
 
-			await _messageQueue.PublishAsBytesAsync(TopicNames.AgentRegister,
+			await _messageQueue.PublishAsBytesAsync(TopicNames.AgentCenter,
 				new Heartbeat
 				{
-					AgentId = _options.AgentId, AgentName = _options.AgentName, FreeMemory = 8, CpuLoad = 0
+					AgentId = _options.AgentId,
+					AgentName = _options.AgentName,
+					FreeMemory = SystemInformation.FreeMemory,
+					CpuLoad = 0
 				});
 		}
 

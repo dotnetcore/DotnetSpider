@@ -73,7 +73,7 @@ namespace DotnetSpider.Statistics.Store
 		/// <param name="page"></param>
 		/// <param name="limit"></param>
 		/// <returns></returns>
-		Task<PagedQueryResult<AgentStatistics>> PagedQueryAgentStatisticsAsync(string agentId, int page, int limit);
+		Task<PagedResult<AgentStatistics>> PagedQueryAgentStatisticsAsync(string agentId, int page, int limit);
 
 		/// <summary>
 		/// 查询指定下载代理器的统计信息
@@ -96,6 +96,6 @@ namespace DotnetSpider.Statistics.Store
 		/// <param name="page"></param>
 		/// <param name="size"></param>
 		/// <returns></returns>
-		Task<PagedQueryResult<SpiderStatistics>> PagedQuerySpiderStatisticsAsync(string keyword, int page, int size);
+		Task<PagedResult<SpiderStatistics>> PagedQuerySpiderStatisticsAsync(string keyword, int page, int size);
 	}
 }

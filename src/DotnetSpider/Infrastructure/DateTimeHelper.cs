@@ -2,7 +2,7 @@ using System;
 
 namespace DotnetSpider.Infrastructure
 {
-	public sealed class DateTimeHelper
+	public static class DateTimeHelper
 	{
 		public static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -87,16 +87,18 @@ namespace DotnetSpider.Infrastructure
 		/// 获取当前Unix时间(毫秒)
 		/// </summary>
 		/// <returns>Unix时间</returns>
-		public static double UnixTimestamp =>
-			DateTime.Now.ToUniversalTime().Subtract(Epoch)
+		public static long Timestamp =>
+			(long)DateTime.Now.ToUniversalTime().Subtract(Epoch)
 				.TotalMilliseconds;
 
-		/// <summary>
-		/// 获取当前Unix时间(秒)
-		/// </summary>
-		/// <returns>Unix时间</returns>
-		public static double UnixSecondTimestamp =>
-			DateTime.Now.ToUniversalTime().Subtract(Epoch)
-				.TotalSeconds;
+		public static DateTimeOffset ToDateTimeOffset(long timestamp)
+		{
+			return Epoch.AddMilliseconds(timestamp);
+		}
+
+		public static long ToTimestamp(DateTimeOffset dateTime)
+		{
+			return (long)(dateTime - Epoch).TotalMilliseconds;
+		}
 	}
 }

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dapper;
-using DotnetSpider.AgentRegister.Store;
+using DotnetSpider.AgentCenter.Store;
 using Microsoft.Extensions.Options;
 using MySqlConnector;
 

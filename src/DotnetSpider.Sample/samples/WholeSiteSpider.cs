@@ -27,7 +27,7 @@ namespace DotnetSpider.Sample.samples
 		}
 
 		public WholeSiteSpider(IOptions<SpiderOptions> options,
-			SpiderServices services,
+			DependenceServices services,
 			ILogger<Spider> logger) : base(
 			options, services, logger)
 		{

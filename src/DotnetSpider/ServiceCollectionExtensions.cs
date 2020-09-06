@@ -1,4 +1,5 @@
 using DotnetSpider.Agent;
+using DotnetSpider.Infrastructure;
 using DotnetSpider.Proxy;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Scheduler.Component;
@@ -15,11 +16,11 @@ namespace DotnetSpider
 			return builder;
 		}
 
-		public static Builder RegisterDownloader<T>(this Builder builder) where T : class, IDownloader
+		public static Builder RegisterDownloader<TDownloader>(this Builder builder) where TDownloader : class, IDownloader
 		{
 			builder.ConfigureServices(x =>
 			{
-				x.AddSingleton<IDownloader, T>();
+				x.AddSingleton<IDownloader, TDownloader>();
 			});
 			return builder;
 		}

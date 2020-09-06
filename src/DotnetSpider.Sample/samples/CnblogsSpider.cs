@@ -26,7 +26,7 @@ namespace DotnetSpider.Sample.samples
 		}
 
 		public CnblogsSpider(IOptions<SpiderOptions> options,
-			SpiderServices services,
+			DependenceServices services,
 			ILogger<Spider> logger) : base(
 			options, services, logger)
 		{

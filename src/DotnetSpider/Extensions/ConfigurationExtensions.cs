@@ -6,7 +6,7 @@ namespace DotnetSpider.Extensions
     {
         public static bool IsDistributed(this IConfiguration configuration)
         {
-            return configuration["DOTNET_SPIDER_MODEL"] == "DISTRIBUTED";
+            return configuration["DOTNET_SPIDER_MODE"] == "DISTRIBUTED";
         }
     }
 }

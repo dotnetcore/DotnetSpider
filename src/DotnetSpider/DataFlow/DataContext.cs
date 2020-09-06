@@ -24,6 +24,9 @@ namespace DotnetSpider.DataFlow
 		/// </summary>
 		public Response Response { get; }
 
+		/// <summary>
+		/// 下载的请求
+		/// </summary>
 		public Request Request { get; }
 
 		/// <summary>

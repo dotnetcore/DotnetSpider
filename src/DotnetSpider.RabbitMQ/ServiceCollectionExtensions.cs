@@ -1,9 +1,9 @@
 using System;
 using System.Reflection;
+using DotnetSpider.MessageQueue;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SwiftMQ;
 
 namespace DotnetSpider.RabbitMQ
 {
