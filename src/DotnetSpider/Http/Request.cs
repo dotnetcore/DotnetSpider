@@ -258,7 +258,7 @@ namespace DotnetSpider.Http
 				Owner,
 				RequestUri,
 				Method,
-				RequestedTime = RequestedTimes,
+				RequestedTimes,
 				Content = Content?.ToArray()
 			});
 			return bytes.GetMurmurHash();
@@ -283,7 +283,9 @@ namespace DotnetSpider.Http
 				Timestamp = Timestamp,
 				Content = Content?.ToArray(),
 				Policy = Policy,
-				Hash = Hash
+				RequestedTimes = RequestedTimes,
+				Hash = Hash,
+				Proxy = Proxy
 			};
 			foreach (var kv in Properties)
 			{
@@ -298,7 +300,7 @@ namespace DotnetSpider.Http
 			return request;
 		}
 
-		public Request CreateNew(string uri)
+		public Request Create(string uri)
 		{
 			uri.NotNullOrWhiteSpace(nameof(uri));
 			var request = Clone();

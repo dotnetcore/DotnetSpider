@@ -82,7 +82,7 @@ namespace DotnetSpider.DataFlow
 
 		public Request CreateNewRequest(string uri)
 		{
-			return Request.CreateNew(uri);
+			return Request.Create(uri);
 		}
 
 		/// <summary>
