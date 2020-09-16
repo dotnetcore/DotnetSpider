@@ -2,26 +2,28 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Infrastructure;
-using LZ4;
 using MessagePack;
 
 namespace DotnetSpider.Extensions
 {
 	public static class MessagePackSerializerExtensions
 	{
+		private static readonly MessagePackSerializerOptions SerializerOptions =
+			MessagePackSerializer.Typeless.DefaultOptions.WithCompression(MessagePackCompression.Lz4Block);
+
 		public static byte[] Serialize(this object message)
 		{
 			message.NotNull(nameof(message));
-			var bytes = MessagePackSerializer.Typeless.Serialize(message);
-			return LZ4Codec.Wrap(bytes);
+
+			var bytes = MessagePackSerializer.Typeless.Serialize(message, SerializerOptions);
+			return bytes;
 		}
 
 		public static async Task<object> DeserializeAsync(this byte[] bytes,
 			CancellationToken cancellationToken = default)
 		{
-			bytes = LZ4Codec.Unwrap(bytes);
 			var stream = new MemoryStream(bytes);
-			return await MessagePackSerializer.Typeless.DeserializeAsync(stream, null, cancellationToken);
+			return await MessagePackSerializer.Typeless.DeserializeAsync(stream, SerializerOptions, cancellationToken);
 		}
 
 		public static async Task<T> DeserializeAsync<T>(this byte[] bytes,

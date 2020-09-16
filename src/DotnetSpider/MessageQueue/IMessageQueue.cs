@@ -1,9 +1,10 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace DotnetSpider.MessageQueue
 {
-	public interface IMessageQueue
+	public interface IMessageQueue : IDisposable
 	{
 		Task PublishAsync(string queue, byte[] message);
 

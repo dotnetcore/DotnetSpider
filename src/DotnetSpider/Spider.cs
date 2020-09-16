@@ -402,7 +402,7 @@ namespace DotnetSpider
 								sleepTime += tuple.Interval;
 								if (sleepTime > sleepTimeLimit)
 								{
-									Logger.LogError($"Exit by sleep too long: {sleepTime}");
+									Logger.LogInformation($"Exit by sleep too long: {sleepTime}");
 									break;
 								}
 

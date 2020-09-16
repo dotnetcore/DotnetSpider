@@ -13,6 +13,5 @@ namespace DotnetSpider.RabbitMQ
 		public string Password { get; set; }
 
 		public int RetryCount { get; set; } = 5;
-		public string Queue { get; set; }
 	}
 }

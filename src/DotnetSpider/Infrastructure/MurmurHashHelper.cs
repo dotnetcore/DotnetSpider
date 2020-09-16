@@ -5,23 +5,24 @@ namespace DotnetSpider.Infrastructure
 {
 	public static class MurmurHashHelper
 	{
-		private static readonly Murmur128 MurmurHash3 = MurmurHash.Create128();
+		private static readonly Murmur32 MurmurHash3 = MurmurHash.Create32();
 
 		public static string GetMurmurHash(this string str)
 		{
-			var bytes = MurmurHash3.ComputeHash(Encoding.UTF8.GetBytes(str));
+			var bytes = Encoding.UTF8.GetBytes(str);
 			return bytes.GetMurmurHash();
 		}
 
 		public static string GetMurmurHash(this byte[] bytes)
 		{
-			var sb = new StringBuilder();
-			foreach (var b in bytes)
+			var hashBytes = MurmurHash3.ComputeHash(bytes);
+			var builder = new StringBuilder();
+			foreach (var b in hashBytes)
 			{
-				sb.AppendFormat("{0:x2}", b);
+				builder.AppendFormat("{0:x2}", b);
 			}
 
-			return sb.ToString();
+			return builder.ToString();
 		}
 	}
 }

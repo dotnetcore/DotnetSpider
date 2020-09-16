@@ -77,5 +77,9 @@ namespace DotnetSpider.MessageQueue
 
 			return true;
 		}
+
+		public void Dispose()
+		{
+		}
 	}
 }

@@ -76,7 +76,7 @@ namespace DotnetSpider.Tests
 		public void ConcurrentConsume()
 		{
 			var messageQueue = GetMessageQueue();
-			Parallel.For(0, 1000, async i =>
+			Parallel.For(0, 1000, new ParallelOptions {MaxDegreeOfParallelism = 8}, async i =>
 			{
 				var consumer = new AsyncMessageConsumer<byte[]>("test");
 				consumer.Received += bytes =>
@@ -131,21 +131,15 @@ namespace DotnetSpider.Tests
 				await Task.CompletedTask;
 			};
 			await messageQueue.ConsumeAsync(consumer, default);
-			var list = new List<Task>();
-			for (var i = 0; i < 20; ++i)
-			{
-				var i1 = i;
-				list.Add(Task.Factory.StartNew(async () =>
-				{
-					await messageQueue.PublishAsBytesAsync(queue, new Message {Index = i1});
-				}));
-			}
 
-			Task.WaitAll(list.ToArray());
+			Parallel.For(0, 1000, new ParallelOptions {MaxDegreeOfParallelism = 8}, async (i) =>
+			{
+				await messageQueue.PublishAsBytesAsync(queue, new Message {Index = i});
+			});
 
 			Sleep();
 
-			Assert.Equal(20, counter);
+			Assert.Equal(1000, counter);
 			messageQueue.CloseQueue(queue);
 		}
 

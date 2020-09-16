@@ -20,7 +20,7 @@ namespace DotnetSpider.Sample
 				.WriteTo.Console().WriteTo.RollingFile("logs/spider.txt")
 				.CreateLogger();
 
-			await EntitySpider.RunAsync();
+			await DistributedSpider.RunAsync();
 
 			Console.WriteLine("Bye!");
 			Environment.Exit(0);

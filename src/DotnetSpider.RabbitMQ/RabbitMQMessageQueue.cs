@@ -21,6 +21,7 @@ namespace DotnetSpider.RabbitMQ
 		private readonly RabbitMQOptions _options;
 		private readonly PersistentConnection _connection;
 		private readonly ILogger<RabbitMQMessageQueue> _logger;
+		private readonly IModel _publishChannel;
 
 		public RabbitMQMessageQueue(IOptions<RabbitMQOptions> options, ILoggerFactory loggerFactory)
 		{
@@ -28,7 +29,16 @@ namespace DotnetSpider.RabbitMQ
 			_options = options.Value;
 			_connection = new PersistentConnection(CreateConnectionFactory(),
 				loggerFactory.CreateLogger<PersistentConnection>(), _options.RetryCount);
-			CreateConsumerChannel();
+
+			if (!_connection.IsConnected)
+			{
+				_connection.TryConnect();
+			}
+
+			_logger.LogTrace("Creating RabbitMQ publish channel");
+
+			_publishChannel = _connection.CreateModel();
+			_publishChannel.ExchangeDeclare(exchange: _options.Exchange, type: "direct", durable: true);
 		}
 
 		private IConnectionFactory CreateConnectionFactory()
@@ -73,21 +83,17 @@ namespace DotnetSpider.RabbitMQ
 							"Could not publish data after {Timeout}s ({ExceptionMessage})",
 							$"{time.TotalSeconds:n1}", ex.Message);
 					});
-			var channel = _connection.CreateModel();
 
 			_logger.LogTrace("Declaring RabbitMQ exchange to publish event");
 
-			channel.ExchangeDeclare(exchange: _options.Exchange, type: "direct");
-
 			policy.Execute(() =>
 			{
-				var properties = channel.CreateBasicProperties();
+				var properties = _publishChannel.CreateBasicProperties();
 				properties.DeliveryMode = 2; // persistent
-
+				properties.ContentEncoding = "lz4";
 				_logger.LogTrace("Publishing event to RabbitMQ");
 
-				channel.BasicPublish(_options.Exchange, topic, true, properties, bytes);
-				channel.Dispose();
+				_publishChannel.BasicPublish(_options.Exchange, topic, true, properties, bytes);
 			});
 
 			await Task.CompletedTask;
@@ -114,9 +120,12 @@ namespace DotnetSpider.RabbitMQ
 
 			var channel = _connection.CreateModel();
 			var eventingBasicConsumer = new AsyncEventingBasicConsumer(channel);
-			var queue = channel.QueueDeclare().QueueName;
-			var topic = consumer.Queue;
-			channel.QueueBind(queue: queue, _options.Exchange, routingKey: topic);
+			channel.QueueDeclare(queue: consumer.Queue,
+				durable: true,
+				exclusive: false,
+				autoDelete: false,
+				arguments: null);
+			channel.QueueBind(queue: consumer.Queue, _options.Exchange, routingKey: consumer.Queue);
 			eventingBasicConsumer.Received += async (model, ea) =>
 			{
 				await consumer.InvokeAsync(ea.Body.ToArray());
@@ -127,22 +136,15 @@ namespace DotnetSpider.RabbitMQ
 				channel.Close();
 			};
 			//7. 启动消费者
-			channel.BasicConsume(queue: queue, autoAck: false, consumer: eventingBasicConsumer);
+			channel.BasicConsume(queue: consumer.Queue, autoAck: false, consumer: eventingBasicConsumer);
 
 			return Task.CompletedTask;
 		}
 
-		private void CreateConsumerChannel()
+		public void Dispose()
 		{
-			if (!_connection.IsConnected)
-			{
-				_connection.TryConnect();
-			}
-
-			_logger.LogTrace("Creating RabbitMQ consumer channel");
-
-			var channel = _connection.CreateModel();
-			channel.ExchangeDeclare(exchange: _options.Exchange, "direct");
+			_connection?.Dispose();
+			_publishChannel?.Dispose();
 		}
 	}
 }

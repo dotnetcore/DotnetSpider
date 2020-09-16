@@ -5,7 +5,6 @@
     <PackageId>DotnetSpider</PackageId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="lz4net" Version="1.0.15.93" />
     <PackageReference Include="MessagePack" Version="2.1.165" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.7" />

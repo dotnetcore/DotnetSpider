@@ -16,7 +16,8 @@ namespace DotnetSpider.Tests
             var ownerId = Guid.NewGuid().ToString("N");
             var r1 = new Request("http://www.a.com")
             {
-                Owner = ownerId
+                Owner = ownerId,
+                Accept = "asdfasdfasdf"
             };
             r1.Hash = r1.ComputeHash();
             var isDuplicate = await scheduler.IsDuplicateAsync(r1);

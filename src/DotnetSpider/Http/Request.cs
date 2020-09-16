@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using DotnetSpider.Extensions;
 using DotnetSpider.Infrastructure;
 using MessagePack;
 
@@ -253,14 +254,14 @@ namespace DotnetSpider.Http
 		public virtual string ComputeHash()
 		{
 			// Agent 不需要添加的原因是，每当 Request 再次添加到 Scheduler 前 Requested +1 已经导致 Hash 变化
-			var bytes = MessagePackSerializer.Typeless.Serialize(new
+			var bytes = new
 			{
 				Owner,
 				RequestUri,
 				Method,
 				RequestedTimes,
 				Content = Content?.ToArray()
-			});
+			}.Serialize();
 			return bytes.GetMurmurHash();
 		}
 
