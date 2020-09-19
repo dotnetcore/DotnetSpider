@@ -41,8 +41,8 @@ namespace DotnetSpider.AgentCenter.Store
 		/// <summary>
 		/// 是否已经标记删除
 		/// </summary>
-		[Column("is_deleted")]
-		public bool IsDeleted { get; private set; }
+		[Column("deleted")]
+		public bool Deleted { get; private set; }
 
 		/// <summary>
 		/// 创建时间

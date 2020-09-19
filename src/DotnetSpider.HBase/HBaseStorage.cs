@@ -80,7 +80,7 @@ namespace DotnetSpider.HBase
 				}
 				catch (Exception ex)
 				{
-					Logger.LogError($"Store {context.Request.RequestUri} response to HBase failed [{i}]: {ex}");
+					Logger.LogError($"Store {context.Request.Url} response to HBase failed [{i}]: {ex}");
 				}
 			}
 		}

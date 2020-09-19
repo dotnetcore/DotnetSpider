@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Storage;
+using DotnetSpider.Downloader;
 using DotnetSpider.Http;
+using DotnetSpider.Infrastructure;
 using DotnetSpider.Scheduler.Component;
 using DotnetSpider.Selector;
 using Microsoft.Extensions.Hosting;
@@ -21,7 +23,9 @@ namespace DotnetSpider.Sample.samples
 		{
 			var builder = Builder.CreateDefaultBuilder<CnblogsSpider>();
 			builder.UseSerilog();
+			builder.UseDownloader<HttpClientDownloader>();
 			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
+
 			await builder.Build().RunAsync();
 		}
 
@@ -32,7 +36,7 @@ namespace DotnetSpider.Sample.samples
 		{
 		}
 
-		protected override async Task InitializeAsync(CancellationToken stoppingToken)
+		protected override async Task InitializeAsync(CancellationToken stoppingToken = default)
 		{
 			AddDataFlow(new ListNewsParser());
 			AddDataFlow(new NewsParser());
@@ -42,7 +46,7 @@ namespace DotnetSpider.Sample.samples
 
 		protected override (string Id, string Name) GetIdAndName()
 		{
-			return (Guid.NewGuid().ToString(), "cnblogs");
+			return (ObjectId.NewId().ToString(), "cnblogs");
 		}
 
 		protected class MyConsoleStorage : StorageBase
@@ -67,9 +71,9 @@ namespace DotnetSpider.Sample.samples
 				// AddRequiredValidator("news\\.cnblogs\\.com/n/page");
 				AddRequiredValidator((request =>
 				{
-					var host = request.RequestUri.Host;
+					var host = new Uri(request.Url).Host;
 					var regex = host + "/$";
-					return Regex.IsMatch(request.RequestUri.ToString(), regex);
+					return Regex.IsMatch(request.Url.ToString(), regex);
 				}));
 				// if you want to collect every pages
 				// AddFollowRequestQuerier(Selectors.XPath(".//div[@class='pager']"));
@@ -114,7 +118,7 @@ namespace DotnetSpider.Sample.samples
 				context.AddData(typeName,
 					new News
 					{
-						Url = context.Request.RequestUri.ToString(),
+						Url = context.Request.Url.ToString(),
 						Title = context.Request.Properties["title"]?.Trim(),
 						Summary = context.Request.Properties["summary"]?.Trim(),
 						Views = int.Parse(context.Request.Properties["views"]),

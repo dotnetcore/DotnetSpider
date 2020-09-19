@@ -12,13 +12,14 @@ namespace DotnetSpider.Sample.samples
 		{
 			var builder = Builder.CreateBuilder<TestSpider2>(options =>
 			{
-				options.Speed = 1;
-				options.UseProxy = false;
+				options.Speed = 2;
 			});
 			builder.UseSerilog();
 			builder.UseRabbitMQ();
 			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
 			await builder.Build().RunAsync();
 		}
+
+
 	}
 }

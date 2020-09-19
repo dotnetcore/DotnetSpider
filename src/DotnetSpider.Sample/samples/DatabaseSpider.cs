@@ -3,11 +3,13 @@ using System.Threading.Tasks;
 using Dapper;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Storage;
+using DotnetSpider.Downloader;
 using DotnetSpider.Http;
 using DotnetSpider.Scheduler.Component;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MySql.Data.MySqlClient;
 using MySqlConnector;
 using Serilog;
 
@@ -19,6 +21,7 @@ namespace DotnetSpider.Sample.samples
 		{
 			var builder = Builder.CreateDefaultBuilder<DatabaseSpider>();
 			builder.UseSerilog();
+			builder.UseDownloader<HttpClientDownloader>();
 			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
 			await builder.Build().RunAsync();
 		}

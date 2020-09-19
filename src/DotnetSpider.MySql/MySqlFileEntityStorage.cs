@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Infrastructure;
+using MySql.Data.MySqlClient;
 using MySqlConnector;
 
 namespace DotnetSpider.MySql

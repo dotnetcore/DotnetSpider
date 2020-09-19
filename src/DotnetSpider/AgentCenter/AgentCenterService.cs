@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.AgentCenter.Store;
@@ -16,7 +17,7 @@ namespace DotnetSpider.AgentCenter
 		private readonly ILogger<AgentCenterService> _logger;
 		private readonly IAgentStore _agentStore;
 		private readonly IMessageQueue _messageQueue;
-		private MessageQueue.AsyncMessageConsumer<byte[]> _consumer;
+		private AsyncMessageConsumer<byte[]> _consumer;
 		private readonly bool _distributed;
 
 		public AgentCenterService(IAgentStore agentStore, ILogger<AgentCenterService> logger,
@@ -30,47 +31,55 @@ namespace DotnetSpider.AgentCenter
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			_logger.LogInformation("Agent register service starting");
-
-			await _agentStore.EnsureDatabaseAndTableCreatedAsync();
-
-			_consumer = new AsyncMessageConsumer<byte[]>(TopicNames.AgentCenter);
-			_consumer.Received += async bytes =>
+			try
 			{
-				var message = await bytes.DeserializeAsync(stoppingToken);
-				if (message == null)
-				{
-					_logger.LogWarning("Received empty message");
-					return;
-				}
+				_logger.LogInformation("Agent register service starting");
 
-				if (message is Register register)
+				await _agentStore.EnsureDatabaseAndTableCreatedAsync();
+
+				_consumer = new AsyncMessageConsumer<byte[]>(TopicNames.AgentCenter);
+				_consumer.Received += async bytes =>
 				{
-					if (_distributed)
+					var message = await bytes.DeserializeAsync(stoppingToken);
+					if (message == null)
 					{
-						_logger.LogInformation($"Register agent: {register.AgentId}, {register.AgentName}");
+						_logger.LogWarning("Received empty message");
+						return;
 					}
 
-					await _agentStore.RegisterAsync(new AgentInfo(register.AgentId, register.AgentName, register.ProcessorCount,
-						register.TotalMemory));
-				}
-				else if (message is Heartbeat heartbeat)
-				{
-					if (_distributed)
+					if (message is Register register)
 					{
-						_logger.LogInformation($"Heartbeat: {heartbeat.AgentId}, {heartbeat.AgentName}");
-					}
+						if (_distributed)
+						{
+							_logger.LogInformation($"Register agent: {register.AgentId}, {register.AgentName}");
+						}
 
-					await _agentStore.HeartbeatAsync(new AgentHeartbeat(heartbeat.AgentId, heartbeat.AgentName,
-						heartbeat.FreeMemory, heartbeat.CpuLoad));
-				}
-				else
-				{
-					_logger.LogWarning($"Not supported message: {JsonConvert.SerializeObject(message)}");
-				}
-			};
-			await _messageQueue.ConsumeAsync(_consumer, stoppingToken);
-			_logger.LogInformation("Agent register service started");
+						await _agentStore.RegisterAsync(new AgentInfo(register.AgentId, register.AgentName,
+							register.ProcessorCount,
+							register.TotalMemory));
+					}
+					else if (message is Heartbeat heartbeat)
+					{
+						if (_distributed)
+						{
+							_logger.LogInformation($"Heartbeat: {heartbeat.AgentId}, {heartbeat.AgentName}");
+						}
+
+						await _agentStore.HeartbeatAsync(new AgentHeartbeat(heartbeat.AgentId, heartbeat.AgentName,
+							heartbeat.FreeMemory, heartbeat.CpuLoad));
+					}
+					else
+					{
+						_logger.LogWarning($"Not supported message: {JsonConvert.SerializeObject(message)}");
+					}
+				};
+				await _messageQueue.ConsumeAsync(_consumer, stoppingToken);
+				_logger.LogInformation("Agent register service started");
+			}
+			catch (Exception e)
+			{
+				_logger.LogCritical(e.ToString());
+			}
 		}
 
 		public override async Task StopAsync(CancellationToken cancellationToken)

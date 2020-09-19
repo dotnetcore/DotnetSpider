@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Docker.DotNet;
 using Docker.DotNet.Models;
+using DotnetSpider.Infrastructure;
 using DotnetSpider.Portal.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,7 +46,7 @@ namespace DotnetSpider.Portal.BackgroundService
 					var client = new DockerClientConfiguration(
 							new Uri(options.Docker))
 						.CreateClient();
-					var batch = Guid.NewGuid().ToString("N");
+					var batch = ObjectId.NewId().ToString();
 					var env = new List<string>((spider.Environment ?? "").Split(new[] {" ", "\n"},
 						StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()))
 					{

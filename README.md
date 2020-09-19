@@ -101,7 +101,7 @@ https://github.com/dotnetcore/DotnetSpider/wiki
 
 			protected override (string Id, string Name) GetIdAndName()
 			{
-				return (Guid.NewGuid().ToString(), "博客园");
+				return (ObjectId.NewId.ToString(), "博客园");
 			}
 
 			[Schema("cnblogs", "news")]

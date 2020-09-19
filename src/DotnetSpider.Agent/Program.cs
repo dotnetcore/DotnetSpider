@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using DotnetSpider.Downloader;
 using DotnetSpider.Extensions;
 using DotnetSpider.RabbitMQ;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
@@ -11,7 +11,7 @@ namespace DotnetSpider.Agent
 {
 	class Program
 	{
-		static async Task Main(string[] args)
+		static void Main(string[] args)
 		{
 			Log.Logger = new LoggerConfiguration()
 				.MinimumLevel.Information()
@@ -23,22 +23,40 @@ namespace DotnetSpider.Agent
 				.WriteTo.Console().WriteTo.RollingFile("logs/agent.log")
 				.CreateLogger();
 
-			var builder = Host.CreateDefaultBuilder(args);
-			builder.ConfigureServices(x =>
+			for (var i = 1; i <= 4; ++i)
 			{
-				var configuration = builder.GetConfiguration();
-				if (configuration != null)
+				var i2 = i;
+				Task.Factory.StartNew(async () =>
 				{
-					x.Configure<AgentOptions>(configuration);
-					x.Configure<SpiderOptions>(configuration);
-				}
+					try
+					{
+						var builder = Host.CreateDefaultBuilder(args);
+						var id = i2;
+						builder.UseSerilog();
+						builder.ConfigureServices(x =>
+						{
+							x.AddAgent<HttpClientDownloader>(o =>
+							{
+								o.AgentId = "agent" + id;
+								o.AgentName = o.AgentId;
+							});
+							var configuration = builder.GetConfiguration();
+							x.AddRabbitMQ(configuration.GetSection("RabbitMQ"));
+						});
+						await builder.Build().RunAsync();
+					}
+					catch (Exception e)
+					{
+						Log.Logger.Fatal(e.ToString());
+					}
+				}, TaskCreationOptions.LongRunning).ConfigureAwait(false).GetAwaiter();
+			}
 
-				x.AddHttpClient();
-				x.AddAgent();
-			});
-			builder.UseSerilog();
-			builder.UseRabbitMQ();
-			await builder.Build().RunAsync();
+			while (Console.ReadLine() == "exit")
+			{
+				break;
+			}
+
 			Environment.Exit(0);
 		}
 	}

@@ -38,7 +38,7 @@ namespace DotnetSpider.Http
         /// <summary>
         /// 最终地址
         /// </summary>
-        public string TargetUri { get; set; }
+        public string TargetUrl { get; set; }
 
         public string ReadAsString(Encoding encoding = default)
         {

@@ -6,98 +6,120 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using DotnetSpider.Http;
-using DotnetSpider.Infrastructure;
 using Microsoft.Extensions.Logging;
 using ByteArrayContent = DotnetSpider.Http.ByteArrayContent;
 using StringContent = DotnetSpider.Http.StringContent;
 
-namespace DotnetSpider.Agent
+namespace DotnetSpider.Downloader
 {
 	public class HttpClientDownloader : IDownloader
 	{
-		private readonly IHttpClientFactory _httpClientFactory;
-		private readonly ILogger _logger;
-		private readonly PPPoEService _pppoeService;
+		protected IHttpClientFactory HttpClientFactory { get; }
+		protected ILogger Logger { get; }
 
 		public HttpClientDownloader(IHttpClientFactory httpClientFactory,
-			PPPoEService pppoeService,
 			ILogger<HttpClientDownloader> logger)
 		{
-			_httpClientFactory = httpClientFactory;
-			_logger = logger;
-			_pppoeService = pppoeService;
+			HttpClientFactory = httpClientFactory;
+			Logger = logger;
 		}
 
 		public async Task<Response> DownloadAsync(Request request)
 		{
+			Response response = null;
+			HttpClientEntry httpClientEntry = null;
 			try
 			{
 				var httpRequest = GenerateHttpRequestMessage(request);
-				var httpClient = Create(request);
+				httpClientEntry = await CreateAsync(request);
+
 				var stopwatch = new Stopwatch();
 				stopwatch.Start();
-				var httpResponseMessage = await httpClient.SendAsync(httpRequest);
+				var httpResponseMessage = await httpClientEntry.HttpClient.SendAsync(httpRequest);
 				stopwatch.Stop();
-				var matchValue = await _pppoeService.DetectAsync(request, httpResponseMessage);
-				if (!string.IsNullOrWhiteSpace(matchValue))
-				{
-					_logger.LogError(
-						$"{request.RequestUri} download failed, because content contains {matchValue}");
-					return new Response
-					{
-						RequestHash = request.Hash,
-						StatusCode = HttpStatusCode.BadGateway,
-						Content = new ResponseContent
-						{
-							Data = Encoding.UTF8.GetBytes($"Redial agent because content contains {matchValue}")
-						}
-					};
-				}
-				else
-				{
-					var response = new Response
-					{
-						ElapsedMilliseconds = (int)stopwatch.ElapsedMilliseconds,
-						StatusCode = httpResponseMessage.StatusCode
-					};
-					foreach (var header in httpResponseMessage.Headers)
-					{
-						response.Headers.Add(header.Key, new HashSet<string>(header.Value));
-					}
 
-					response.RequestHash = request.Hash;
-					response.Content = new ResponseContent
-					{
-						Data = await httpResponseMessage.Content.ReadAsByteArrayAsync()
-					};
-					foreach (var header in httpResponseMessage.Content.Headers)
-					{
-						response.Content.Headers.Add(header.Key, new HashSet<string>(header.Value));
-					}
-
+				response = await HandleAsync(request, httpResponseMessage);
+				if (response != null)
+				{
 					return response;
 				}
+
+				response = new Response
+				{
+					ElapsedMilliseconds = (int)stopwatch.ElapsedMilliseconds,
+					StatusCode = httpResponseMessage.StatusCode
+				};
+				foreach (var header in httpResponseMessage.Headers)
+				{
+					response.Headers.Add(header.Key, new HashSet<string>(header.Value));
+				}
+
+				response.RequestHash = request.Hash;
+				response.Content = new ResponseContent
+				{
+					Data = await httpResponseMessage.Content.ReadAsByteArrayAsync()
+				};
+				foreach (var header in httpResponseMessage.Content.Headers)
+				{
+					response.Content.Headers.Add(header.Key, new HashSet<string>(header.Value));
+				}
+
+				return response;
 			}
 			catch (Exception e)
 			{
-				_logger.LogError($"{request.RequestUri} download failed: {e}");
-				return new Response
+				Logger.LogError($"{request.Url} download failed: {e}");
+				response = new Response
 				{
 					RequestHash = request.Hash,
 					StatusCode = HttpStatusCode.BadGateway,
 					Content = new ResponseContent {Data = Encoding.UTF8.GetBytes(e.ToString())}
 				};
+				return response;
+			}
+			finally
+			{
+				Release(response, httpClientEntry);
 			}
 		}
 
-		protected virtual HttpClient Create(Request request)
+		protected virtual void Release(Response response, HttpClientEntry httpClientEntry)
 		{
-			var clientName = string.IsNullOrWhiteSpace(request.Proxy)
-				? request.RequestUri.Host
-				: $"{Consts.ProxyPrefix}{request.Proxy}";
+		}
 
-			var httpClient = _httpClientFactory.CreateClient(clientName);
-			return httpClient;
+		protected virtual Task<Response> HandleAsync(Request request, HttpResponseMessage responseMessage)
+		{
+			return Task.FromResult((Response)null);
+		}
+
+		public virtual string Name => DownloaderNames.HttpClient;
+
+		protected virtual Task<HttpClientEntry> CreateAsync(Request request)
+		{
+			// var host = new Uri(request.Url).Host;
+			// string clientName;
+			// ProxyEntry proxy = null;
+			// if (_proxyService != null)
+			// {
+			// 	proxy = await _proxyService.GetAsync(request.Timeout);
+			// 	if (proxy == null)
+			// 	{
+			// 		throw new SpiderException("获取代理失败");
+			// 	}
+			//
+			// 	clientName = $"{Consts.ProxyPrefix}{proxy.Uri}";
+			// }
+			// else
+			// {
+			// 	clientName = host;
+			// }
+			//
+			// var httpClient = _httpClientFactory.CreateClient(clientName);
+			// return (httpClient, proxy);
+
+			var host = new Uri(request.Url).Host;
+			var httpClient = HttpClientFactory.CreateClient(host);
+			return Task.FromResult(new HttpClientEntry(httpClient, null));
 		}
 
 		private HttpRequestMessage GenerateHttpRequestMessage(Request request)
@@ -107,7 +129,7 @@ namespace DotnetSpider.Agent
 					string.IsNullOrWhiteSpace(request.Method)
 						? HttpMethod.Get
 						: new HttpMethod(request.Method.ToUpper()),
-					request.RequestUri);
+					request.Url);
 
 			foreach (var header in request.Headers)
 			{

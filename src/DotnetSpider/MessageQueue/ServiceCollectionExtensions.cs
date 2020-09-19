@@ -1,12 +1,13 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace DotnetSpider.MessageQueue
 {
 	public static class ServiceCollectionExtensions
 	{
-		public static IServiceCollection AddInProcessMessageQueue(this IServiceCollection serviceCollection)
+		public static IServiceCollection AddMessageQueue(this IServiceCollection serviceCollection)
 		{
-			serviceCollection.AddSingleton<IMessageQueue, MessageQueue>();
+			serviceCollection.TryAddSingleton<IMessageQueue, MessageQueue>();
 			return serviceCollection;
 		}
 	}

@@ -94,7 +94,7 @@ namespace DotnetSpider.Tests
             });
 
             var request = (await scheduler.DequeueAsync()).First();
-            Assert.Equal("http://www.a.com/", request.RequestUri.ToString());
+            Assert.Equal("http://www.a.com/", request.Url.ToString());
             Assert.Equal(2, scheduler.Total);
         }
 
@@ -133,7 +133,7 @@ namespace DotnetSpider.Tests
             });
 
             var request = (await scheduler.DequeueAsync()).First();
-            Assert.Equal("http://www.b.com/", request.RequestUri.ToString());
+            Assert.Equal("http://www.b.com/", request.Url.ToString());
             Assert.Equal(2, scheduler.Total);
         }
 

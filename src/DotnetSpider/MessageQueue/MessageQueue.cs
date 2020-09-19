@@ -67,6 +67,8 @@ namespace DotnetSpider.MessageQueue
 			}
 		}
 
+		public bool IsDistributed => false;
+
 		private bool DeclareQueue(string queue)
 		{
 			if (!_channelDict.ContainsKey(queue))

@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using DotnetSpider.Downloader;
 using DotnetSpider.Extensions;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
@@ -23,35 +23,29 @@ namespace DotnetSpider.Agent
 		private readonly IMessageQueue _messageQueue;
 		private readonly List<MessageQueue.AsyncMessageConsumer<byte[]>> _consumers;
 		private readonly IHostApplicationLifetime _applicationLifetime;
-		private readonly bool _distributed;
-		private readonly DownloaderFactory _downloaderFactory;
+		private readonly IDownloader _downloader;
 		private readonly AgentOptions _options;
 
 		public AgentService(ILogger<AgentService> logger,
 			IMessageQueue messageQueue,
 			IOptions<AgentOptions> options,
 			IHostApplicationLifetime applicationLifetime,
-			DownloaderFactory downloaderFactory)
+			IDownloader downloader)
 		{
 			_options = options.Value;
 			_logger = logger;
 			_messageQueue = messageQueue;
 			_applicationLifetime = applicationLifetime;
-			_downloaderFactory = downloaderFactory;
+			_downloader = downloader;
 			_consumers = new List<MessageQueue.AsyncMessageConsumer<byte[]>>();
-			_distributed = !(messageQueue is MessageQueue.MessageQueue);
-			if (!_distributed)
-			{
-				_options.AgentId = Guid.NewGuid().ToString();
-				_options.AgentName = _options.AgentId;
-			}
 		}
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			_logger.LogInformation(_distributed ? $"Agent {_options.AgentId} starting" : "Agent starting");
+			_logger.LogInformation(
+				_messageQueue.IsDistributed ? $"Agent {_options.AgentId} starting" : "Agent starting");
 
-			if (_distributed)
+			if (_messageQueue.IsDistributed)
 			{
 				_logger.LogInformation($"Register agent: {_options.AgentId}, {_options.AgentName}");
 			}
@@ -65,13 +59,13 @@ namespace DotnetSpider.Agent
 					ProcessorCount = Environment.ProcessorCount
 				});
 
-			var topics = GetDownloaderTopics();
+			var topic = _downloader.Name;
 
 			// 节点注册对应的 topic 才会收到下载的请求
 			// agent_{id} 这是用于指定节点下载
 			// httpclient 这是指定下载器
-			await RegisterAgentAsync(topics, stoppingToken);
-
+			await RegisterAgentAsync(topic, stoppingToken);
+			await RegisterAgentAsync(string.Format(TopicNames.Spider, _options.AgentId), stoppingToken);
 			await Task.Factory.StartNew(async () =>
 			{
 				while (!stoppingToken.IsCancellationRequested)
@@ -81,42 +75,20 @@ namespace DotnetSpider.Agent
 				}
 			}, stoppingToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
-			_logger.LogInformation(_distributed ? $"Agent {_options.AgentId} started" : "Agent started");
+			_logger.LogInformation(_messageQueue.IsDistributed ? $"Agent {_options.AgentId} started" : "Agent started");
 		}
 
-		private List<string> GetDownloaderTopics()
+		private async Task RegisterAgentAsync(string topic, CancellationToken stoppingToken)
 		{
-			var topics = new HashSet<string> {string.Format(TopicNames.Agent, _options.AgentId.ToUpper())};
-			var downloaderNames = _downloaderFactory.GetAllDownloaderNames().ToList();
-			if (!_options.SupportPuppeteer)
-			{
-				downloaderNames.Remove("Puppeteer");
-			}
-
-			foreach (var downloaderName in downloaderNames)
-			{
-				topics.Add(!string.IsNullOrWhiteSpace(_options.ADSLAccount)
-					? $"{downloaderName}WithADSL"
-					: downloaderName);
-			}
-
-			return topics.ToList();
-		}
-
-		private async Task RegisterAgentAsync(List<string> topics, CancellationToken stoppingToken)
-		{
-			foreach (var topic in topics)
-			{
-				var consumer = new MessageQueue.AsyncMessageConsumer<byte[]>(topic);
-				consumer.Received += HandleMessageAsync;
-				await _messageQueue.ConsumeAsync(consumer, stoppingToken);
-				_consumers.Add(consumer);
-			}
+			var consumer = new MessageQueue.AsyncMessageConsumer<byte[]>(topic);
+			consumer.Received += HandleMessageAsync;
+			await _messageQueue.ConsumeAsync(consumer, stoppingToken);
+			_consumers.Add(consumer);
 		}
 
 		private async Task HandleMessageAsync(byte[] bytes)
 		{
-			var message = await bytes.DeserializeAsync(default);
+			var message = await bytes.DeserializeAsync();
 			if (message == null)
 			{
 				_logger.LogWarning("Received empty message");
@@ -132,12 +104,12 @@ namespace DotnetSpider.Agent
 			}
 			else if (message is Request request)
 			{
-				var downloader = _downloaderFactory.Create(request.DownloaderType);
-				var response = await downloader.DownloadAsync(request);
+				var response = await _downloader.DownloadAsync(request);
 				response.Agent = _options.AgentId;
 				await _messageQueue.PublishAsBytesAsync(string.Format(TopicNames.Spider, request.Owner.ToUpper()),
 					response);
-				_logger.LogInformation($"{request.Owner} download {request.RequestUri}, {request.Hash} completed");
+				_logger.LogInformation(
+					$"{_options.AgentName} {request.Owner} download {request.Url}, {request.Hash} completed");
 			}
 			else
 			{
@@ -148,7 +120,7 @@ namespace DotnetSpider.Agent
 
 		private async Task HeartbeatAsync()
 		{
-			if (_distributed)
+			if (_messageQueue.IsDistributed)
 			{
 				_logger.LogInformation($"Heartbeat: {_options.AgentId}, {_options.AgentName}");
 			}
@@ -165,14 +137,15 @@ namespace DotnetSpider.Agent
 
 		public override async Task StopAsync(CancellationToken cancellationToken)
 		{
-			_logger.LogInformation(_distributed ? $"Agent {_options.AgentId} stopping" : "Agent stopping");
+			_logger.LogInformation(
+				_messageQueue.IsDistributed ? $"Agent {_options.AgentId} stopping" : "Agent stopping");
 			foreach (var consumer in _consumers)
 			{
 				consumer.Close();
 			}
 
 			await base.StopAsync(cancellationToken);
-			_logger.LogInformation(_distributed ? $"Agent {_options.AgentId} stopped" : "Agent stopped");
+			_logger.LogInformation(_messageQueue.IsDistributed ? $"Agent {_options.AgentId} stopped" : "Agent stopped");
 		}
 	}
 }

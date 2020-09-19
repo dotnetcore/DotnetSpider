@@ -105,6 +105,8 @@ namespace DotnetSpider.RabbitMQ
 			channel.QueueDelete(queue);
 		}
 
+		public bool IsDistributed => true;
+
 		public Task ConsumeAsync(AsyncMessageConsumer<byte[]> consumer,
 			CancellationToken stoppingToken)
 		{
@@ -119,24 +121,30 @@ namespace DotnetSpider.RabbitMQ
 			}
 
 			var channel = _connection.CreateModel();
-			var eventingBasicConsumer = new AsyncEventingBasicConsumer(channel);
+			var basicConsumer = new AsyncEventingBasicConsumer(channel);
 			channel.QueueDeclare(queue: consumer.Queue,
 				durable: true,
 				exclusive: false,
-				autoDelete: false,
+				autoDelete: true,
 				arguments: null);
 			channel.QueueBind(queue: consumer.Queue, _options.Exchange, routingKey: consumer.Queue);
-			eventingBasicConsumer.Received += async (model, ea) =>
+			basicConsumer.Received += async (model, ea) =>
 			{
-				await consumer.InvokeAsync(ea.Body.ToArray());
-				channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+				try
+				{
+					await consumer.InvokeAsync(ea.Body.ToArray());
+				}
+				finally
+				{
+					channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+				}
 			};
 			consumer.OnClosing += x =>
 			{
 				channel.Close();
 			};
 			//7. 启动消费者
-			channel.BasicConsume(queue: consumer.Queue, autoAck: false, consumer: eventingBasicConsumer);
+			channel.BasicConsume(queue: consumer.Queue, autoAck: false, consumer: basicConsumer);
 
 			return Task.CompletedTask;
 		}

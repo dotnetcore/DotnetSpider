@@ -1,9 +1,10 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Storage;
+using DotnetSpider.Downloader;
+using DotnetSpider.Infrastructure;
 using DotnetSpider.Scheduler.Component;
 using DotnetSpider.Selector;
 using Microsoft.Extensions.Hosting;
@@ -21,6 +22,7 @@ namespace DotnetSpider.Sample.samples
 			{
 				options.Depth = 1000;
 			});
+			builder.UseDownloader<HttpClientDownloader>();
 			builder.UseSerilog();
 			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
 			await builder.Build().RunAsync();
@@ -42,7 +44,7 @@ namespace DotnetSpider.Sample.samples
 
 		protected override (string Id, string Name) GetIdAndName()
 		{
-			return (Guid.NewGuid().ToString(), "博客园全站采集");
+			return (ObjectId.NewId().ToString(), "博客园全站采集");
 		}
 
 		class MyDataParser : DataParser
@@ -55,7 +57,7 @@ namespace DotnetSpider.Sample.samples
 
 			protected override Task Parse(DataContext context)
 			{
-				context.AddData("URL", context.Request.RequestUri);
+				context.AddData("URL", context.Request.Url);
 				context.AddData("Title", context.Selectable.XPath(".//title")?.Value);
 				return Task.CompletedTask;
 			}

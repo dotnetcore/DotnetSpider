@@ -4,6 +4,6 @@ namespace DotnetSpider.Proxy
 {
     public interface IProxyValidator
     {
-        Task<bool> IsAvailable(HttpProxy proxy);
+        Task<bool> IsAvailable(ProxyEntry proxy);
     }
 }

@@ -3,6 +3,7 @@ using System.Reflection;
 using AutoMapper;
 using DotnetSpider.AgentCenter;
 using DotnetSpider.MySql;
+using DotnetSpider.MySql.AgentCenter;
 using DotnetSpider.Portal.BackgroundService;
 using DotnetSpider.Portal.Common;
 using DotnetSpider.Portal.Data;

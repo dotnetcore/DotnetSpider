@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Parser.Formatters;
 using DotnetSpider.DataFlow.Storage;
+using DotnetSpider.Downloader;
 using DotnetSpider.Http;
+using DotnetSpider.Infrastructure;
 using DotnetSpider.Scheduler.Component;
 using DotnetSpider.Selector;
 using Microsoft.Extensions.Hosting;
@@ -22,14 +24,16 @@ namespace DotnetSpider.Sample.samples
 		{
 			var builder = Builder.CreateDefaultBuilder<EntitySpider>(options =>
 			{
-				options.UseProxy = false;
+				options.Speed = 1;
 			});
+			builder.UseDownloader<HttpClientDownloader>();
 			builder.UseSerilog();
 			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
 			await builder.Build().RunAsync();
 		}
 
-		public EntitySpider(IOptions<SpiderOptions> options, DependenceServices services, ILogger<Spider> logger) : base(
+		public EntitySpider(IOptions<SpiderOptions> options, DependenceServices services,
+			ILogger<Spider> logger) : base(
 			options, services, logger)
 		{
 		}
@@ -39,13 +43,17 @@ namespace DotnetSpider.Sample.samples
 			AddDataFlow(new DataParser<CnblogsEntry>());
 			AddDataFlow(GetDefaultStorage());
 			await AddRequestsAsync(
-				new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}}),
+				new Request(
+					"https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}})
+				{
+					Downloader = DownloaderNames.File
+				},
 				new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}}));
 		}
 
 		protected override (string Id, string Name) GetIdAndName()
 		{
-			return (Guid.NewGuid().ToString(), "博客园");
+			return (ObjectId.NewId().ToString(), "博客园");
 		}
 
 		[Schema("cnblogs", "news")]

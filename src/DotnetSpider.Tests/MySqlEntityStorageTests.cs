@@ -9,6 +9,7 @@ using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Http;
 using DotnetSpider.MySql;
+using MySql.Data.MySqlClient;
 using MySqlConnector;
 using Newtonsoft.Json;
 using Xunit;

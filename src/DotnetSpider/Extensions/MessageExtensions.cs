@@ -1,6 +1,5 @@
 using System;
 using DotnetSpider.Infrastructure;
-using DotnetSpider.MessageQueue;
 
 
 namespace DotnetSpider.Extensions

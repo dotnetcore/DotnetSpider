@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DotnetSpider.Agent;
+using DotnetSpider.Downloader;
 using DotnetSpider.Extensions;
 using DotnetSpider.Http;
 using Xunit;
@@ -29,7 +29,7 @@ namespace DotnetSpider.Tests
 				Accept = "Accept",
 				Agent = "Agent",
 				AutoRedirect = true,
-				DownloaderType = DownloaderTypeNames.HttpClient,
+				Downloader = DownloaderNames.HttpClient,
 				UserAgent = "UserAgent",
 				Timestamp = 1000,
 				RedialRegExp = "RedialRegExp"
@@ -48,7 +48,7 @@ namespace DotnetSpider.Tests
 			Assert.Equal("Accept", r1.Accept);
 			// Assert.Equal("Agent", r1.Agent);
 			Assert.True(r1.AutoRedirect);
-			Assert.Equal(DownloaderTypeNames.HttpClient, r1.DownloaderType);
+			Assert.Equal(DownloaderNames.HttpClient, r1.Downloader);
 			Assert.Equal("UserAgent", r1.UserAgent);
 			Assert.Equal(1000, r1.Timestamp);
 			Assert.Equal("RedialRegExp", r1.RedialRegExp);
@@ -64,7 +64,7 @@ namespace DotnetSpider.Tests
 				Accept = "Accept",
 				Agent = "Agent",
 				AutoRedirect = true,
-				DownloaderType = DownloaderTypeNames.HttpClient,
+				Downloader = DownloaderNames.HttpClient,
 				UserAgent = "UserAgent",
 				Timestamp = 1000,
 				RedialRegExp = "RedialRegExp"
@@ -79,7 +79,7 @@ namespace DotnetSpider.Tests
 			Assert.Equal("Accept", r1.Accept);
 			// Assert.Equal("Agent", r1.Agent);
 			Assert.True(r1.AutoRedirect);
-			Assert.Equal(DownloaderTypeNames.HttpClient, r1.DownloaderType);
+			Assert.Equal(DownloaderNames.HttpClient, r1.Downloader);
 			Assert.Equal("UserAgent", r1.UserAgent);
 			Assert.Equal(1000, r1.Timestamp);
 			Assert.Equal("RedialRegExp", r1.RedialRegExp);
@@ -99,7 +99,7 @@ namespace DotnetSpider.Tests
 				Accept = "Accept",
 				Agent = "Agent",
 				AutoRedirect = true,
-				DownloaderType = DownloaderTypeNames.HttpClient,
+				Downloader = DownloaderNames.HttpClient,
 				UserAgent = "UserAgent",
 				Timestamp = 1000,
 				RedialRegExp = "RedialRegExp"
@@ -118,7 +118,7 @@ namespace DotnetSpider.Tests
 			Assert.Equal("Accept", r1.Accept);
 			// Assert.Equal("Agent", r1.Agent);
 			Assert.True(r1.AutoRedirect);
-			Assert.Equal(DownloaderTypeNames.HttpClient, r1.DownloaderType);
+			Assert.Equal(DownloaderNames.HttpClient, r1.Downloader);
 			Assert.Equal("UserAgent", r1.UserAgent);
 			Assert.Equal(1000, r1.Timestamp);
 			Assert.Equal("RedialRegExp", r1.RedialRegExp);
@@ -134,7 +134,7 @@ namespace DotnetSpider.Tests
 				Accept = "Accept",
 				Agent = "Agent",
 				AutoRedirect = true,
-				DownloaderType = DownloaderTypeNames.HttpClient,
+				Downloader = DownloaderNames.HttpClient,
 				UserAgent = "UserAgent",
 				Timestamp = 1000,
 				RedialRegExp = "RedialRegExp"
@@ -148,7 +148,7 @@ namespace DotnetSpider.Tests
 			Assert.Equal("Accept", r1.Accept);
 			// Assert.Equal("Agent", r1.Agent);
 			Assert.True(r1.AutoRedirect);
-			Assert.Equal(DownloaderTypeNames.HttpClient, r1.DownloaderType);
+			Assert.Equal(DownloaderNames.HttpClient, r1.Downloader);
 			Assert.Equal("UserAgent", r1.UserAgent);
 			Assert.Equal(1000, r1.Timestamp);
 			Assert.Equal("RedialRegExp", r1.RedialRegExp);

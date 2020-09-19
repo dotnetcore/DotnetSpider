@@ -6,9 +6,9 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using DotnetSpider.Agent;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Storage;
+using DotnetSpider.Downloader;
 using DotnetSpider.Extensions;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
@@ -24,7 +24,7 @@ using Newtonsoft.Json;
 
 namespace DotnetSpider
 {
-	public abstract partial class Spider :
+	public abstract class Spider :
 		BackgroundService
 	{
 		private readonly List<IDataFlow> _dataFlows;
@@ -53,6 +53,8 @@ namespace DotnetSpider
 
 		protected readonly ILogger Logger;
 
+		protected bool IsDistributed => _services.MessageQueue.IsDistributed;
+
 		protected Spider(IOptions<SpiderOptions> options,
 			DependenceServices services,
 			ILogger<Spider> logger
@@ -61,7 +63,7 @@ namespace DotnetSpider
 			Logger = logger;
 			_services = services;
 			Options = options.Value;
-			_requestedQueue = new RequestedQueue(Options);
+			_requestedQueue = new RequestedQueue();
 			_requestSuppliers = new List<IRequestSupplier>();
 			_dataFlows = new List<IDataFlow>();
 		}
@@ -71,7 +73,7 @@ namespace DotnetSpider
 		/// </summary>
 		/// <param name="stoppingToken"></param>
 		/// <returns></returns>
-		protected abstract Task InitializeAsync(CancellationToken stoppingToken);
+		protected abstract Task InitializeAsync(CancellationToken stoppingToken = default);
 
 		/// <summary>
 		/// 获取爬虫标识和名称
@@ -80,7 +82,7 @@ namespace DotnetSpider
 		protected virtual (string Id, string Name) GetIdAndName()
 		{
 			var id = Environment.GetEnvironmentVariable("DOTNET_SPIDER_ID");
-			id = string.IsNullOrWhiteSpace(id) ? Guid.NewGuid().ToString("N") : id;
+			id = string.IsNullOrWhiteSpace(id) ? ObjectId.NewId().ToString() : id;
 			var name = Environment.GetEnvironmentVariable("DOTNET_SPIDER_NAME");
 			return (id, name);
 		}
@@ -183,11 +185,11 @@ namespace DotnetSpider
 
 			foreach (var request in requests)
 			{
-				if (request.DownloaderType.Contains("ADSL") &&
+				if (request.Downloader.Contains("ADSL") &&
 				    string.IsNullOrWhiteSpace(request.GetHeader(Consts.RedialRegexExpression)))
 				{
 					throw new ArgumentException(
-						$"Request {request.RequestUri}, {request.Hash} set to use ADSL but RedialRegExp is empty");
+						$"Request {request.Url}, {request.Hash} set to use ADSL but RedialRegExp is empty");
 				}
 
 				request.RequestedTimes += 1;
@@ -273,12 +275,14 @@ namespace DotnetSpider
 					{
 						if (response.StatusCode == HttpStatusCode.OK)
 						{
-							if (_services.IsDistributed)
+							request.Agent = response.Agent;
+
+							if (IsDistributed)
 							{
-								Logger.LogInformation($"{Id} download {request.RequestUri}, {request.Hash} success");
+								Logger.LogInformation(
+									$"{Id} download {request.Url}, {request.Hash} via {request.Agent} success");
 							}
 
-							request.Agent = response.Agent;
 							await _services.StatisticsClient.IncreaseAgentSuccessAsync(response.Agent,
 								response.ElapsedMilliseconds);
 							await HandleResponseAsync(request, response, bytes);
@@ -289,7 +293,7 @@ namespace DotnetSpider
 								response.ElapsedMilliseconds);
 							var exception = Encoding.UTF8.GetString(response.Content.Data);
 							Logger.LogError(
-								$"{Id} download {request.RequestUri}, {request.Hash} status code: {response.StatusCode} failed: {exception}");
+								$"{Id} download {request.Url}, {request.Hash} status code: {response.StatusCode} failed: {exception}");
 							// 每次调用添加会导致 Requested + 1, 因此失败多次的请求最终会被过滤不再加到调度队列
 							await AddRequestsAsync(request);
 
@@ -341,7 +345,7 @@ namespace DotnetSpider
 		{
 			var tuple = ComputeIntervalAndDequeueBatch(Options.Speed);
 			var sleepTimeLimit = Options.EmptySleepTime * 1000;
-
+			var start = DateTime.Now;
 			await Task.Factory.StartNew(async () =>
 			{
 				try
@@ -382,7 +386,7 @@ namespace DotnetSpider
 							foreach (var request in timeoutRequests)
 							{
 								Logger.LogWarning(
-									$"{Id} request {request.RequestUri}, {request.Hash} timeout");
+									$"{Id} request {request.Url}, {request.Hash} timeout");
 							}
 
 							await AddRequestsAsync(timeoutRequests);
@@ -402,7 +406,8 @@ namespace DotnetSpider
 								sleepTime += tuple.Interval;
 								if (sleepTime > sleepTimeLimit)
 								{
-									Logger.LogInformation($"Exit by sleep too long: {sleepTime}");
+									var cost = (DateTime.Now - start).TotalSeconds;
+									Logger.LogInformation($"Exit: {cost} seconds");
 									break;
 								}
 
@@ -463,25 +468,13 @@ namespace DotnetSpider
 			{
 				foreach (var request in requests)
 				{
-					if (Options.UseProxy)
-					{
-						var proxy = await _services.ProxyPool.GetAsync(70);
-						if (proxy == null)
-						{
-							Logger.LogError("{Id} exit because there is no available proxy");
-							return false;
-						}
-
-						request.Proxy = proxy.Uri;
-					}
-
 					string topic;
 					request.Timestamp = DateTimeHelper.ToTimestamp(DateTimeOffset.Now);
 					if (string.IsNullOrWhiteSpace(request.Agent))
 					{
-						topic = string.IsNullOrEmpty(request.DownloaderType)
-							? DownloaderTypeNames.HttpClient
-							: request.DownloaderType;
+						topic = string.IsNullOrEmpty(request.Downloader)
+							? DownloaderNames.HttpClient
+							: request.Downloader;
 					}
 					else
 					{
@@ -495,9 +488,9 @@ namespace DotnetSpider
 							}
 							case RequestPolicy.Random:
 							{
-								topic = string.IsNullOrEmpty(request.DownloaderType)
-									? DownloaderTypeNames.HttpClient
-									: request.DownloaderType;
+								topic = string.IsNullOrEmpty(request.Downloader)
+									? DownloaderNames.HttpClient
+									: request.Downloader;
 								break;
 							}
 							default:
@@ -513,7 +506,7 @@ namespace DotnetSpider
 					}
 					else
 					{
-						Logger.LogWarning($"{Id} enqueue request: {request.RequestUri}, {request.Hash} failed");
+						Logger.LogWarning($"{Id} enqueue request: {request.Url}, {request.Hash} failed");
 					}
 				}
 			}
@@ -559,6 +552,24 @@ namespace DotnetSpider
 						_services.ApplicationLifetime.StopApplication();
 					}
 				}
+			}
+		}
+
+		public override void Dispose()
+		{
+			try
+			{
+				_requestedQueue.Dispose();
+				foreach (var dataFlow in _dataFlows)
+				{
+					dataFlow.Dispose();
+				}
+
+				_services.Dispose();
+			}
+			finally
+			{
+				base.Dispose();
 			}
 		}
 	}

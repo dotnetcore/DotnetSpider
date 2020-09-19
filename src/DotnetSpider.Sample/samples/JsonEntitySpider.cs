@@ -1,9 +1,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using DotnetSpider.Agent;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Storage;
+using DotnetSpider.Downloader;
 using DotnetSpider.Http;
 using DotnetSpider.Scheduler.Component;
 using DotnetSpider.Selector;
@@ -20,6 +20,7 @@ namespace DotnetSpider.Sample.samples
 		{
 			var builder = Builder.CreateDefaultBuilder<JsonEntitySpider>();
 			builder.UseSerilog();
+			builder.UseDownloader<HttpClientDownloader>();
 			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
 			await builder.Build().RunAsync();
 		}
@@ -34,7 +35,7 @@ namespace DotnetSpider.Sample.samples
 			AddDataFlow(new DataParser<MyEntity>());
 			AddDataFlow(GetDefaultStorage());
 			await AddRequestsAsync(
-				new Request("file://samples/test.json") {DownloaderType = DownloaderTypeNames.File});
+				new Request("file://samples/test.json") {Downloader = DownloaderNames.File});
 		}
 
 		[Schema("json", "data")]

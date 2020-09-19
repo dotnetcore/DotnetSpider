@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using DotnetSpider.Http;
 using Microsoft.Extensions.Logging;
 
-namespace DotnetSpider.Agent
+namespace DotnetSpider.Downloader
 {
 	public class PuppeteerDownloader : IDownloader
 	{
@@ -24,5 +24,7 @@ namespace DotnetSpider.Agent
 				Content = new ResponseContent {Data = Encoding.UTF8.GetBytes("Not impl")}
 			});
 		}
+
+		public string Name => DownloaderNames.Puppeteer;
 	}
 }

@@ -1,5 +1,6 @@
 using DotnetSpider.Statistics.Store;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace DotnetSpider.Statistics
 {
@@ -8,7 +9,7 @@ namespace DotnetSpider.Statistics
 		public static IServiceCollection AddStatistics<T>(this IServiceCollection services)
 			where T : class, IStatisticsStore
 		{
-			services.AddSingleton<IStatisticsStore, T>();
+			services.TryAddSingleton<IStatisticsStore, T>();
 			services.AddHostedService<StatisticsService>();
 			return services;
 		}

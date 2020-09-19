@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.DataFlow.Storage;
+using DotnetSpider.Downloader;
 using DotnetSpider.Http;
 using DotnetSpider.Scheduler.Component;
 using Microsoft.Extensions.Hosting;
@@ -16,6 +17,7 @@ namespace DotnetSpider.Sample.samples
 		{
 			var builder = Builder.CreateDefaultBuilder<ImageSpider>();
 			builder.UseSerilog();
+			builder.UseDownloader<HttpClientDownloader>();
 			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
 			await builder.Build().RunAsync();
 		}

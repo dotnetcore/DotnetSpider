@@ -11,5 +11,7 @@ namespace DotnetSpider.MessageQueue
 		Task ConsumeAsync(AsyncMessageConsumer<byte[]> consumer, CancellationToken cancellationToken);
 
 		void CloseQueue(string queue);
+
+		bool IsDistributed { get; }
 	}
 }

@@ -31,7 +31,7 @@ namespace DotnetSpider.Tests
 			var requests = dataContext.FollowRequests;
 
 			Assert.Equal(12, requests.Count);
-			Assert.Contains(requests, r => r.RequestUri.ToString() == "http://cnblogs.com/sitehome/p/2");
+			Assert.Contains(requests, r => r.Url.ToString() == "http://cnblogs.com/sitehome/p/2");
 		}
 
 		/// <summary>
@@ -48,7 +48,7 @@ namespace DotnetSpider.Tests
 			var dataParser = new TestDataParser();
 			dataParser.SetLogger(NullLogger.Instance);
 			dataParser.AddFollowRequestQuerier(Selectors.XPath(".//div[@class='pager']"));
-			dataParser.AddRequiredValidator(r => Regex.IsMatch(r.RequestUri.ToString(), "xxxcnblogs\\.com"));
+			dataParser.AddRequiredValidator(r => Regex.IsMatch(r.Url.ToString(), "xxxcnblogs\\.com"));
 
 			await dataParser.HandleAsync(dataContext);
 			var requests = dataContext.FollowRequests;
@@ -60,13 +60,13 @@ namespace DotnetSpider.Tests
 					new Response {Content = new ResponseContent {Data = File.ReadAllBytes("cnblogs.html")}});
 			var dataParser2 = new TestDataParser();
 			dataParser2.AddFollowRequestQuerier(Selectors.XPath(".//div[@class='pager']"));
-			dataParser.AddRequiredValidator(r => Regex.IsMatch(r.RequestUri.ToString(), "cnblogs\\.com"));
+			dataParser.AddRequiredValidator(r => Regex.IsMatch(r.Url.ToString(), "cnblogs\\.com"));
 
 			await dataParser2.HandleAsync(dataContext2);
 			requests = dataContext2.FollowRequests;
 
 			Assert.Equal(12, requests.Count);
-			Assert.Contains(requests, r => r.RequestUri.ToString() == "http://cnblogs.com/sitehome/p/2");
+			Assert.Contains(requests, r => r.Url.ToString() == "http://cnblogs.com/sitehome/p/2");
 		}
 
 		class TestDataParser : DataParser

@@ -5,6 +5,6 @@ namespace DotnetSpider.Proxy
 {
     public interface IProxySupplier
     {
-        Task<IEnumerable<HttpProxy>> GetProxiesAsync();
+        Task<IEnumerable<ProxyEntry>> GetProxiesAsync();
     }
 }

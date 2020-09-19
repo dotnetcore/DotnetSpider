@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using DotnetSpider.Downloader;
 using DotnetSpider.Extensions;
 using DotnetSpider.Infrastructure;
 using MessagePack;
@@ -14,6 +15,9 @@ namespace DotnetSpider.Http
 	[Serializable]
 	public class Request
 	{
+		/// <summary>
+		/// 请求内容
+		/// </summary>
 		[IgnoreMember] private RequestContent _content;
 
 		public string Hash { get; set; }
@@ -34,6 +38,16 @@ namespace DotnetSpider.Http
 		public string Owner { get; set; }
 
 		/// <summary>
+		/// 请求的 Timeout 时间
+		/// </summary>
+		public int Timeout { get; set; } = 30;
+
+		// /// <summary>
+		// /// 是否使用代理
+		// /// </summary>
+		// public bool UseProxy { get; set; }
+
+		/// <summary>
 		/// 下载代理标识
 		/// </summary>
 		public string Agent { get; set; }
@@ -41,7 +55,7 @@ namespace DotnetSpider.Http
 		/// <summary>
 		/// 下载代理类型
 		/// </summary>
-		public string DownloaderType { get; set; } = "HttpClient";
+		public string Downloader { get; set; } = DownloaderNames.HttpClient;
 
 		/// <summary>
 		/// 链接的深度
@@ -51,7 +65,7 @@ namespace DotnetSpider.Http
 		/// <summary>
 		/// 请求链接
 		/// </summary>
-		public Uri RequestUri { get; set; }
+		public string Url { get; set; }
 
 		/// <summary>
 		/// 自动跳转
@@ -82,8 +96,6 @@ namespace DotnetSpider.Http
 		/// 下载策略
 		/// </summary>
 		public RequestPolicy Policy { get; set; }
-
-		public string Proxy { get; set; }
 
 		[IgnoreMember]
 		public string RedialRegExp
@@ -155,14 +167,9 @@ namespace DotnetSpider.Http
 		/// <param name="url">链接</param>
 		/// <param name="propertyDict">额外属性</param>
 		public Request(string url, IDictionary<string, string> propertyDict = null)
-			: this(new Uri(url, UriKind.RelativeOrAbsolute), propertyDict)
 		{
-		}
-
-		public Request(Uri uri, IDictionary<string, string> propertyDict = null)
-		{
-			uri.NotNull(nameof(uri));
-			RequestUri = uri;
+			url.NotNull(nameof(url));
+			Url = url;
 			SetProperty(propertyDict);
 		}
 
@@ -257,7 +264,7 @@ namespace DotnetSpider.Http
 			var bytes = new
 			{
 				Owner,
-				RequestUri,
+				RequestUri = Url,
 				Method,
 				RequestedTimes,
 				Content = Content?.ToArray()
@@ -267,7 +274,7 @@ namespace DotnetSpider.Http
 
 		public override string ToString()
 		{
-			return $"Method: {Method} URL: {RequestUri}, Requested: {RequestedTimes}";
+			return $"Method: {Method} URL: {Url}, Requested: {RequestedTimes}";
 		}
 
 		public Request Clone()
@@ -276,17 +283,16 @@ namespace DotnetSpider.Http
 			{
 				Owner = Owner,
 				Agent = Agent,
-				DownloaderType = DownloaderType,
+				Downloader = Downloader,
 				Depth = Depth,
-				RequestUri = new Uri(RequestUri.ToString(), UriKind.RelativeOrAbsolute),
+				Url = Url,
 				AutoRedirect = AutoRedirect,
 				Method = Method,
 				Timestamp = Timestamp,
 				Content = Content?.ToArray(),
 				Policy = Policy,
 				RequestedTimes = RequestedTimes,
-				Hash = Hash,
-				Proxy = Proxy
+				Hash = Hash
 			};
 			foreach (var kv in Properties)
 			{
@@ -301,15 +307,15 @@ namespace DotnetSpider.Http
 			return request;
 		}
 
-		public Request Create(string uri)
+		public Request Create(string url)
 		{
-			uri.NotNullOrWhiteSpace(nameof(uri));
+			url.NotNullOrWhiteSpace(nameof(url));
 			var request = Clone();
 			request.RequestedTimes = 0;
 			request.Depth += 1;
 			request.Hash = null;
 			request.Timestamp = DateTimeHelper.Timestamp;
-			request.RequestUri = new Uri(uri, UriKind.RelativeOrAbsolute);
+			request.Url = url;
 			return request;
 		}
 	}

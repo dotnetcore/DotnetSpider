@@ -1,17 +1,18 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dapper;
+using DotnetSpider.AgentCenter;
 using DotnetSpider.AgentCenter.Store;
 using Microsoft.Extensions.Options;
-using MySqlConnector;
+using MySql.Data.MySqlClient;
 
-namespace DotnetSpider.MySql
+namespace DotnetSpider.MySql.AgentCenter
 {
 	public class MySqlAgentStore : IAgentStore
 	{
-		private readonly SpiderOptions _options;
+		private readonly AgentCenterOptions _options;
 
-		public MySqlAgentStore(IOptions<SpiderOptions> options)
+		public MySqlAgentStore(IOptions<AgentCenterOptions> options)
 		{
 			_options = options.Value;
 		}

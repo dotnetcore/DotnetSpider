@@ -14,10 +14,10 @@ namespace DotnetSpider.Infrastructure
 
 		public PagedResult(int page, int limit, int count, IEnumerable<TEntity> data)
 		{
-			this.Page = page;
-			this.Limit = limit;
-			this.Count = count;
-			this.Data = data;
+			Page = page;
+			Limit = limit;
+			Count = count;
+			Data = data;
 		}
 	}
 }

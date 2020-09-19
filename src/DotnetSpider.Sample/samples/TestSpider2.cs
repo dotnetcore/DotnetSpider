@@ -5,15 +5,32 @@ using System.Threading.Tasks;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Parser.Formatters;
 using DotnetSpider.DataFlow.Storage;
+using DotnetSpider.Downloader;
 using DotnetSpider.Http;
+using DotnetSpider.Infrastructure;
+using DotnetSpider.Scheduler.Component;
 using DotnetSpider.Selector;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Serilog;
 
 namespace DotnetSpider.Sample.samples
 {
 	public class TestSpider2 : Spider
 	{
+		public static async Task RunAsync()
+		{
+			var builder = Builder.CreateDefaultBuilder<TestSpider2>(options =>
+			{
+				options.Speed = 1;
+			});
+			builder.UseSerilog();
+			builder.UseDownloader<HttpClientDownloader>();
+			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
+			await builder.Build().RunAsync();
+		}
+
 		public TestSpider2(
 			IOptions<SpiderOptions> options,
 			DependenceServices services,
@@ -33,7 +50,7 @@ namespace DotnetSpider.Sample.samples
 
 		protected override (string, string) GetIdAndName()
 		{
-			return (Guid.NewGuid().ToString("N"), "测试爬虫 1");
+			return (ObjectId.NewId().ToString(), "测试爬虫 1");
 		}
 
 		[Schema("cnblogs", "news")]

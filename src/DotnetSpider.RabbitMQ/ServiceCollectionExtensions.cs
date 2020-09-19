@@ -3,13 +3,14 @@ using System.Reflection;
 using DotnetSpider.MessageQueue;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
 namespace DotnetSpider.RabbitMQ
 {
 	public static class ServiceCollectionExtensions
 	{
-		public static IHostBuilder UseRabbitMQ(this IHostBuilder builder,
+		public static Builder UseRabbitMQ(this Builder builder,
 			Action<RabbitMQOptions> configureDelegate = null)
 		{
 			builder.ConfigureServices(services =>
@@ -27,7 +28,7 @@ namespace DotnetSpider.RabbitMQ
 					services.Configure(configureDelegate);
 				}
 
-				services.AddSingleton<IMessageQueue, RabbitMQMessageQueue>();
+				services.TryAddSingleton<IMessageQueue, RabbitMQMessageQueue>();
 			});
 			return builder;
 		}
@@ -35,7 +36,7 @@ namespace DotnetSpider.RabbitMQ
 		public static IServiceCollection AddRabbitMQ(this IServiceCollection services, IConfiguration configuration)
 		{
 			services.Configure<RabbitMQOptions>(configuration);
-			services.AddSingleton<IMessageQueue, RabbitMQMessageQueue>();
+			services.TryAddSingleton<IMessageQueue, RabbitMQMessageQueue>();
 			return services;
 		}
 	}

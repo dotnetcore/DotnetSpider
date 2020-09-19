@@ -21,7 +21,7 @@ namespace DotnetSpider.DataFlow.Storage
 
 		protected override Task StoreAsync(DataContext context)
 		{
-			var fileName = context.Request.RequestUri.AbsolutePath;
+			var fileName = new Uri(context.Request.Url).AbsolutePath;
 			if (_imageSuffixes.Any(x => fileName.EndsWith(x)))
 			{
 				var path = Path.Combine(AppContext.BaseDirectory, "data", context.Request.Owner, "image");

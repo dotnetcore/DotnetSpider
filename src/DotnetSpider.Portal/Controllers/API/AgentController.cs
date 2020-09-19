@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using AutoMapper;
 using Dapper;
+using DotnetSpider.AgentCenter;
 using DotnetSpider.AgentCenter.Store;
 using DotnetSpider.Extensions;
 using DotnetSpider.Infrastructure;
@@ -22,12 +23,12 @@ namespace DotnetSpider.Portal.Controllers.API
 	{
 		private readonly PortalDbContext _dbContext;
 		private readonly IMessageQueue _mq;
-		private readonly SpiderOptions _options;
+		private readonly AgentCenterOptions _options;
 		private readonly IMapper _mapper;
 
 		public AgentController(PortalDbContext dbContext,
 			IMessageQueue eventBus,
-			IOptions<SpiderOptions> options, IMapper mapper)
+			IOptions<AgentCenterOptions> options, IMapper mapper)
 		{
 			_dbContext = dbContext;
 			_mq = eventBus;
@@ -77,7 +78,7 @@ namespace DotnetSpider.Portal.Controllers.API
 				return new FailedResult("Agent is not exists");
 			}
 
-			await _mq.PublishAsBytesAsync(string.Format(TopicNames.Agent, id.ToUpper()), new Exit {AgentId = id});
+			await _mq.PublishAsBytesAsync(string.Format(TopicNames.Spider, id.ToUpper()), new Exit {AgentId = id});
 
 			using (var conn = _dbContext.Database.GetDbConnection())
 			{
@@ -97,7 +98,7 @@ namespace DotnetSpider.Portal.Controllers.API
 				return new FailedResult("Agent is not exists");
 			}
 
-			await _mq.PublishAsBytesAsync(string.Format(TopicNames.Agent, id.ToUpper()), new Exit {AgentId = id});
+			await _mq.PublishAsBytesAsync(string.Format(TopicNames.Spider, id.ToUpper()), new Exit {AgentId = id});
 			return new ApiResult("OK");
 		}
 	}

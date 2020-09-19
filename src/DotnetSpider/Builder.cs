@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using DotnetSpider.Agent;
 using DotnetSpider.AgentCenter;
 using DotnetSpider.AgentCenter.Store;
 using DotnetSpider.Extensions;
@@ -14,6 +13,7 @@ using DotnetSpider.Statistics;
 using DotnetSpider.Statistics.Store;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Logging;
@@ -21,6 +21,9 @@ using Microsoft.Extensions.Logging.EventLog;
 
 namespace DotnetSpider
 {
+	/// <summary>
+	/// 单机爬虫构建器
+	/// </summary>
 	public class Builder : HostBuilder
 	{
 		private Builder()
@@ -36,7 +39,13 @@ namespace DotnetSpider
 		public static Builder CreateBuilder<T>(Action<SpiderOptions> configureDelegate = null)
 			where T : Spider
 		{
-			return CreateBuilder(typeof(T), null, configureDelegate);
+			return CreateBuilder<T>(null, configureDelegate);
+		}
+
+		public static Builder CreateDefaultBuilder<T>(Action<SpiderOptions> configureDelegate = null)
+			where T : Spider
+		{
+			return CreateDefaultBuilder<T>(null, configureDelegate);
 		}
 
 		/// <summary>
@@ -52,67 +61,42 @@ namespace DotnetSpider
 			return CreateBuilder(typeof(T), args, configureDelegate);
 		}
 
-		public static Builder CreateBuilder(Type type, string[] args = null,
-			Action<SpiderOptions> configureDelegate = null)
-		{
-			var hostBuilder = CreateBuilder(args, configureDelegate);
-			hostBuilder.ConfigureServices(services =>
-			{
-				services.AddSingleton(typeof(IHostedService), type);
-			});
-			return hostBuilder;
-		}
-
-		/// <summary>
-		/// Create a default local spider builder
-		/// </summary>
-		/// <param name="configureDelegate"></param>
-		/// <typeparam name="T"></typeparam>
-		/// <returns></returns>
-		public static Builder CreateDefaultBuilder<T>(Action<SpiderOptions> configureDelegate = null) where T : Spider
-		{
-			return CreateDefaultBuilder<T>(null, configureDelegate);
-		}
-
-		/// <summary>
-		/// Create a default local spider builder
-		/// </summary>
-		/// <param name="args"></param>
-		/// <param name="configureDelegate"></param>
-		/// <typeparam name="T"></typeparam>
-		/// <returns></returns>
-		public static Builder CreateDefaultBuilder<T>(
-			string[] args, Action<SpiderOptions> configureDelegate = null) where T : Spider
+		public static Builder CreateDefaultBuilder<T>(string[] args, Action<SpiderOptions> configureDelegate = null)
+			where T : Spider
 		{
 			return CreateDefaultBuilder(typeof(T), args, configureDelegate);
 		}
 
-		public static Builder CreateDefaultBuilder(Type type,
-			string[] args, Action<SpiderOptions> configureDelegate = null)
+		public static Builder CreateBuilder(Type type,
+			string[] args = null, Action<SpiderOptions> configureDelegate = null)
 		{
-			var hostBuilder = CreateBuilder(args, configureDelegate);
-			hostBuilder.ConfigureServices(services =>
+			var builder = new Builder();
+			ConfigureBuilder(builder, args, configureDelegate);
+			builder.ConfigureServices(services =>
 			{
-				var configuration = hostBuilder.GetConfiguration();
-				if (configuration != null)
-				{
-					services.Configure<AgentOptions>(configuration);
-				}
-
-				services.AddInProcessMessageQueue();
-				services.AddStatistics<MemoryStatisticsStore>();
-				services.AddAgentCenter<MemoryAgentStore>();
-				services.AddAgent();
 				services.AddSingleton(typeof(IHostedService), type);
 			});
-			return hostBuilder;
+			return builder;
 		}
 
-		private static Builder CreateBuilder(string[] args, Action<SpiderOptions> configureDelegate = null)
+		public static Builder CreateDefaultBuilder(Type type, string[] args = null,
+			Action<SpiderOptions> configure = null)
 		{
-			var hostBuilder = new Builder();
-			hostBuilder.UseContentRoot(Directory.GetCurrentDirectory());
-			hostBuilder.ConfigureHostConfiguration(config =>
+			var builder = CreateBuilder(type, args, configure);
+			builder.ConfigureServices(services =>
+			{
+				services.AddMessageQueue();
+				services.AddStatistics<MemoryStatisticsStore>();
+				services.AddAgentCenter<MemoryAgentStore>();
+			});
+			return builder;
+		}
+
+		public static void ConfigureBuilder(HostBuilder builder, string[] args = null,
+			Action<SpiderOptions> configureDelegate = null)
+		{
+			builder.UseContentRoot(Directory.GetCurrentDirectory());
+			builder.ConfigureHostConfiguration(config =>
 			{
 				config.AddEnvironmentVariables("DOTNET_");
 				if (args == null)
@@ -122,7 +106,7 @@ namespace DotnetSpider
 
 				config.AddCommandLine(args);
 			});
-			hostBuilder.ConfigureAppConfiguration(
+			builder.ConfigureAppConfiguration(
 				(hostingContext, config) =>
 				{
 					var hostingEnvironment = hostingContext.HostingEnvironment;
@@ -164,7 +148,7 @@ namespace DotnetSpider
 				logging.AddEventLog();
 			}).ConfigureServices(services =>
 			{
-				var configuration = hostBuilder.GetConfiguration();
+				var configuration = builder.GetConfiguration();
 				if (configuration != null)
 				{
 					services.Configure<SpiderOptions>(configuration);
@@ -175,21 +159,17 @@ namespace DotnetSpider
 					services.Configure(configureDelegate);
 				}
 
-				services.AddSingleton<DependenceServices>();
-				services.AddHostedService<PrintArgumentService>();
-				services.AddHostedService<ProxyService>();
 				services.AddHttpClient();
 				services.AddTransient<HttpMessageHandlerBuilder, ProxyHttpMessageHandlerBuilder>();
-				services.AddSingleton<IProxyValidator, DefaultProxyValidator>();
-				services.AddSingleton<IProxyPool, ProxyPool>();
-				services.AddSingleton<IStatisticsClient, StatisticsClient>();
+				services.TryAddSingleton<IStatisticsClient, StatisticsClient>();
+				services.TryAddSingleton<DependenceServices>();
+				services.AddHostedService<PrintArgumentService>();
 			}).UseDefaultServiceProvider((context, options) =>
 			{
 				var flag = context.HostingEnvironment.IsDevelopment();
 				options.ValidateScopes = flag;
 				options.ValidateOnBuild = flag;
 			});
-			return hostBuilder;
 		}
 	}
 }

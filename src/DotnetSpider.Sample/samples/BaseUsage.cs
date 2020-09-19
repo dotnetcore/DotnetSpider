@@ -1,10 +1,11 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Storage;
+using DotnetSpider.Downloader;
 using DotnetSpider.Http;
+using DotnetSpider.Infrastructure;
 using DotnetSpider.Scheduler.Component;
 using DotnetSpider.Selector;
 using Microsoft.Extensions.Hosting;
@@ -20,6 +21,7 @@ namespace DotnetSpider.Sample.samples
 		{
 			var builder = Builder.CreateDefaultBuilder<BaseUsageSpider>();
 			builder.UseSerilog();
+			builder.UseDownloader<HttpClientDownloader>();
 			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
 			await builder.Build().RunAsync();
 		}
@@ -34,13 +36,14 @@ namespace DotnetSpider.Sample.samples
 
 			protected override Task Parse(DataContext context)
 			{
-				context.AddData("URL", context.Request.RequestUri);
+				context.AddData("URL", context.Request.Url);
 				context.AddData("Title", context.Selectable.XPath(".//title")?.Value);
 				return Task.CompletedTask;
 			}
 		}
 
-		public BaseUsageSpider(IOptions<SpiderOptions> options, DependenceServices services, ILogger<Spider> logger) : base(
+		public BaseUsageSpider(IOptions<SpiderOptions> options, DependenceServices services,
+			ILogger<Spider> logger) : base(
 			options, services, logger)
 		{
 		}
@@ -54,7 +57,7 @@ namespace DotnetSpider.Sample.samples
 
 		protected override (string Id, string Name) GetIdAndName()
 		{
-			return (Guid.NewGuid().ToString(), "Cnblogs");
+			return (ObjectId.NewId().ToString(), "Cnblogs");
 		}
 	}
 }

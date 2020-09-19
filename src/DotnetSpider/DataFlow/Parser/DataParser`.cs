@@ -84,7 +84,7 @@ namespace DotnetSpider.DataFlow.Parser
 
 			foreach (var pattern in patterns)
 			{
-				AddRequiredValidator(request => Regex.IsMatch(request.RequestUri.ToString(), pattern));
+				AddRequiredValidator(request => Regex.IsMatch(request.Url.ToString(), pattern));
 			}
 		}
 

@@ -1,10 +1,15 @@
-using System;
+using DotnetSpider.Infrastructure;
 
 namespace DotnetSpider.MessageQueue
 {
 	public abstract class Message
 	{
 		public long Timestamp { get; set; }
-		public Guid MessageId { get; set; }
+		public string MessageId { get; set; }
+
+		protected Message()
+		{
+			MessageId = ObjectId.NewId().ToString();
+		}
 	}
 }

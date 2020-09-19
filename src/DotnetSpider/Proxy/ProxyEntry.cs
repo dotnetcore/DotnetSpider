@@ -2,7 +2,7 @@ using System;
 
 namespace DotnetSpider.Proxy
 {
-    public class HttpProxy
+    public class ProxyEntry
     {
         public string Uri { get; private set; }
 
@@ -11,7 +11,7 @@ namespace DotnetSpider.Proxy
         /// </summary>
         public int FailedNum { get; set; }
 
-        public HttpProxy(string uri)
+        public ProxyEntry(string uri)
         {
             Uri = new Uri(uri).ToString();
         }

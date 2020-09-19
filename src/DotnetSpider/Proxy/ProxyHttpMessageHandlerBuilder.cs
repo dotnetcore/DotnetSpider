@@ -35,8 +35,11 @@ namespace DotnetSpider.Proxy
 			{
 				if (Name.StartsWith(Consts.ProxyPrefix))
 				{
-					var uri = Name.Replace(Consts.ProxyPrefix, "");
-					var proxy = new WebProxy(new Uri(uri));
+					var uri = new Uri(Name.Replace(Consts.ProxyPrefix, ""));
+					var proxy = new WebProxy(uri)
+					{
+						Credentials = new NetworkCredential()
+					};
 					PrimaryHandler = new HttpClientHandler
 					{
 						AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,

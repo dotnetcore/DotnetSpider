@@ -63,7 +63,7 @@ namespace DotnetSpider.DataFlow.Parser
 
 		public void AddRequiredValidator(string pattern)
 		{
-			_requiredValidator.Add(request => Regex.IsMatch(request.RequestUri.ToString(), pattern));
+			_requiredValidator.Add(request => Regex.IsMatch(request.Url.ToString(), pattern));
 		}
 
 		protected virtual void AddParsedResult<T>(DataContext context, IEnumerable<T> results)
@@ -100,9 +100,10 @@ namespace DotnetSpider.DataFlow.Parser
 		private ISelectable GetHtmlSelectable(DataContext context, string text)
 		{
 			var request = context.Request;
-			var domain = request.RequestUri.Port == 80 || request.RequestUri.Port == 443
-				? $"{request.RequestUri.Scheme}://{request.RequestUri.Host}"
-				: $"{request.RequestUri.Scheme}://{request.RequestUri.Host}:{request.RequestUri.Port}";
+			var uri = new Uri(request.Url);
+			var domain = uri.Port == 80 || uri.Port == 443
+				? $"{uri.Scheme}://{uri.Host}"
+				: $"{uri.Scheme}://{uri.Host}:{uri.Port}";
 			return new HtmlSelectable(text, domain, context.Options.RemoveOutboundLinks);
 		}
 
@@ -118,7 +119,7 @@ namespace DotnetSpider.DataFlow.Parser
 
 			if (!IsValidRequest(context.Request))
 			{
-				Logger.LogInformation($"{GetType().Name} ignore request {context.Request.RequestUri}");
+				Logger.LogInformation($"{GetType().Name} ignore request {context.Request.Url}");
 				return;
 			}
 

@@ -22,7 +22,7 @@ namespace DotnetSpider.DataFlow.Storage
 			var file = Path.Combine(GetDataFolder(context.Request.Owner),
 				$"{context.Request.Hash}.dat");
 			using var writer = OpenWrite(file);
-			await writer.WriteLineAsync("RequestUri:\t" + context.Request.RequestUri);
+			await writer.WriteLineAsync("RequestUri:\t" + context.Request.Url);
 			var items = context.GetData().Where(x => !ReferenceEquals(x.Key, Consts.ResponseBytes));
 			await writer.WriteLineAsync("Data:\t" + JsonConvert.SerializeObject(items));
 		}

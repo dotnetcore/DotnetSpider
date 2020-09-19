@@ -7,61 +7,67 @@ using DotnetSpider.Scheduler.Component;
 
 namespace DotnetSpider.Scheduler
 {
-    /// <summary>
-    /// 基于内存的深度优先调度(去重 URL)
-    /// </summary>
-    public class QueueDistinctDfsScheduler : SchedulerBase
-    {
-        private readonly List<Request> _requests =
-            new List<Request>();
+	/// <summary>
+	/// 基于内存的深度优先调度(去重 URL)
+	/// </summary>
+	public class QueueDistinctDfsScheduler : SchedulerBase
+	{
+		private readonly List<Request> _requests =
+			new List<Request>();
 
 
-        public QueueDistinctDfsScheduler(IDuplicateRemover duplicateRemover) : base(duplicateRemover)
-        {
-        }
+		public QueueDistinctDfsScheduler(IDuplicateRemover duplicateRemover) : base(duplicateRemover)
+		{
+		}
 
-        /// <summary>
-        /// 如果请求未重复就添加到队列中
-        /// </summary>
-        /// <param name="request">请求</param>
-        protected override Task PushWhenNoDuplicate(Request request)
-        {
-            _requests.Add(request);
-            return Task.CompletedTask;
-        }
+		public override void Dispose()
+		{
+			_requests.Clear();
+			base.Dispose();
+		}
 
-        /// <summary>
-        /// 从队列中取出指定爬虫的指定个数请求
-        /// </summary>
-        /// <param name="count">出队数</param>
-        /// <returns>请求</returns>
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public override Task<IEnumerable<Request>> DequeueAsync(int count = 1)
-        {
-            var dequeueCount = count;
-            int start;
-            if (_requests.Count < count)
-            {
-                dequeueCount = _requests.Count;
-                start = 0;
-            }
-            else
-            {
-                start = _requests.Count - dequeueCount;
-            }
+		/// <summary>
+		/// 如果请求未重复就添加到队列中
+		/// </summary>
+		/// <param name="request">请求</param>
+		protected override Task PushWhenNoDuplicate(Request request)
+		{
+			_requests.Add(request);
+			return Task.CompletedTask;
+		}
 
-            var requests = new List<Request>();
-            for (var i = _requests.Count; i > start; --i)
-            {
-                requests.Add(_requests[i - 1]);
-            }
+		/// <summary>
+		/// 从队列中取出指定爬虫的指定个数请求
+		/// </summary>
+		/// <param name="count">出队数</param>
+		/// <returns>请求</returns>
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		public override Task<IEnumerable<Request>> DequeueAsync(int count = 1)
+		{
+			var dequeueCount = count;
+			int start;
+			if (_requests.Count < count)
+			{
+				dequeueCount = _requests.Count;
+				start = 0;
+			}
+			else
+			{
+				start = _requests.Count - dequeueCount;
+			}
 
-            if (dequeueCount > 0)
-            {
-                _requests.RemoveRange(start, dequeueCount);
-            }
+			var requests = new List<Request>();
+			for (var i = _requests.Count; i > start; --i)
+			{
+				requests.Add(_requests[i - 1]);
+			}
 
-            return Task.FromResult(requests.Select(x => x.Clone()));
-        }
-    }
+			if (dequeueCount > 0)
+			{
+				_requests.RemoveRange(start, dequeueCount);
+			}
+
+			return Task.FromResult(requests.Select(x => x.Clone()));
+		}
+	}
 }

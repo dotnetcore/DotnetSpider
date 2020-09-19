@@ -10,10 +10,10 @@ namespace DotnetSpider.Proxy
     public class DefaultProxyValidator : IProxyValidator
     {
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly SpiderOptions _options;
+        private readonly ProxyOptions _options;
         private readonly ILogger<DefaultProxyValidator> _logger;
 
-        public DefaultProxyValidator(IOptions<SpiderOptions> options, IHttpClientFactory httpClientFactory,
+        public DefaultProxyValidator(IOptions<ProxyOptions> options, IHttpClientFactory httpClientFactory,
             ILogger<DefaultProxyValidator> logger)
         {
             _httpClientFactory = httpClientFactory;
@@ -28,7 +28,7 @@ namespace DotnetSpider.Proxy
             }
         }
 
-        public async Task<bool> IsAvailable(HttpProxy proxy)
+        public async Task<bool> IsAvailable(ProxyEntry proxy)
         {
             if (proxy == null)
             {
