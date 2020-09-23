@@ -17,22 +17,22 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Quartz;
 using Quartz.AspNetCore;
 using Quartz.AspNetCore.MySqlConnector;
+using Quartz.Impl.Matchers;
 using ServiceProvider = DotnetSpider.Portal.Common.ServiceProvider;
 
 namespace DotnetSpider.Portal
 {
 	public class Startup
 	{
-		private readonly PortalOptions _options;
-
 		public Startup(IConfiguration configuration)
 		{
 			Configuration = configuration;
-			_options = new PortalOptions(Configuration);
 		}
 
 		public IConfiguration Configuration { get; }
@@ -40,8 +40,7 @@ namespace DotnetSpider.Portal
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
-			services.Configure<SpiderOptions>(Configuration);
-			services.AddSingleton<PortalOptions>();
+			services.TryAddSingleton<PortalOptions>();
 
 			services.AddControllersWithViews()
 				.SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
@@ -49,15 +48,17 @@ namespace DotnetSpider.Portal
 				.AddRazorRuntimeCompilation();
 			services.AddHealthChecks();
 
+			var options = new PortalOptions(Configuration);
+
 			// Add DbContext
 			Action<DbContextOptionsBuilder> dbContextOptionsBuilder;
 			var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
-			switch (_options.DatabaseType?.ToLower())
+			switch (options.DatabaseType?.ToLower())
 			{
 				case "mysql":
 				{
 					dbContextOptionsBuilder = b =>
-						b.UseMySql(_options.ConnectionString,
+						b.UseMySql(options.ConnectionString,
 							sql => sql.MigrationsAssembly(migrationsAssembly));
 					break;
 				}
@@ -65,22 +66,24 @@ namespace DotnetSpider.Portal
 				default:
 				{
 					dbContextOptionsBuilder = b =>
-						b.UseSqlServer(_options.ConnectionString,
+						b.UseSqlServer(options.ConnectionString,
 							sql => sql.MigrationsAssembly(migrationsAssembly));
 					break;
 				}
 			}
 
-			var options = new PortalOptions(Configuration);
-			services.AddRabbitMQ(Configuration.GetSection("RabbitMQ"));
+
 			services.AddDbContext<PortalDbContext>(dbContextOptionsBuilder);
 			services.AddQuartz(x =>
 			{
 				x.UseMySqlConnector(options.ConnectionString);
 			});
 			services.AddHttpClient();
+			services.Configure<AgentCenterOptions>(Configuration);
+			services.AddHttpClient();
 			services.AddAgentCenter<MySqlAgentStore>();
 			services.AddStatistics<MySqlStatisticsStore>();
+			services.AddRabbitMQ(Configuration.GetSection("RabbitMQ"));
 			services.AddHostedService<QuartzService>();
 			services.AddHostedService<CleanDockerContainerService>();
 			services.AddSingleton<IActionResultTypeMapper, ActionResultTypeMapper>();
