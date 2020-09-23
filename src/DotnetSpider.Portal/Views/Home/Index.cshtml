@@ -1,41 +1,21 @@
-﻿<div class="row">
+﻿@{
+    ViewData["Title"] = "Home";
+}
+<div class="row" style="padding-top: 20px">
     <div class="col-md-3 col-sm-6 col-xs-12">
-        <div class="info-box">
-            <span class="info-box-icon bg-aqua">
-                <i class="ion ion-ios-gear-outline"></i>
-            </span>
-
-            <div class="info-box-content">
-                <span class="info-box-text">Agent</span>
-                <span class="info-box-number">@ViewData["Agent"]</span>
+        <div class="card bg-light">
+            <div class="card-body">
+                <h4 class="card-title">Agent</h4>
+                <p class="card-text">@ViewData["Agent"]</p>
             </div>
             <!-- /.info-box-content -->
         </div>
-        <!-- /.info-box -->
     </div>
-        <div class="col-md-3 col-sm-6 col-xs-12">
-            <div class="info-box">
-                <span class="info-box-icon bg-aqua">
-                    <i class="ion ion-ios-gear-outline"></i>
-                </span>
-
-                <div class="info-box-content">
-                    <span class="info-box-text">Online-Agent</span>
-                    <span class="info-box-number">@ViewData["OnlineAgent"]</span>
-                </div>
-                <!-- /.info-box-content -->
-            </div>
-            <!-- /.info-box -->
-        </div>
-    <!-- /.col -->
     <div class="col-md-3 col-sm-6 col-xs-12">
-        <div class="info-box">
-            <span class="info-box-icon bg-red">
-                <i class="fa fa-google-plus"></i>
-            </span>
-            <div class="info-box-content">
-                <span class="info-box-text">Repository</span>
-                <span class="info-box-number">@ViewData["Repository"]</span>
+        <div class="card bg-success">
+            <div class="card-body">
+                <h4 class="card-title">Online-Agent</h4>
+                <p class="card-text">@ViewData["OnlineAgent"]</p>
             </div>
             <!-- /.info-box-content -->
         </div>
@@ -47,33 +27,23 @@
     <div class="clearfix visible-sm-block"></div>
 
     <div class="col-md-3 col-sm-6 col-xs-12">
-        <div class="info-box">
-            <span class="info-box-icon bg-green">
-                <i class="ion ion-ios-cart-outline"></i>
-            </span>
-
-            <div class="info-box-content">
-                <span class="info-box-text">Spider</span>
-                <span class="info-box-number">@ViewData["Spider"]</span>
+        <div class="card bg-light">
+            <div class="card-body">
+                <h4 class="card-title">Spider</h4>
+                <p class="card-text">@ViewData["Spider"]</p>
             </div>
             <!-- /.info-box-content -->
         </div>
-        <!-- /.info-box -->
     </div>
     <!-- /.col -->
     <div class="col-md-3 col-sm-6 col-xs-12">
-        <div class="info-box">
-            <span class="info-box-icon bg-yellow">
-                <i class="ion ion-ios-people-outline"></i>
-            </span>
-
-            <div class="info-box-content">
-                <span class="info-box-text">Running-Spider</span>
-                <span class="info-box-number">@ViewData["RunningSpider"]</span>
+        <div class="card bg-success">
+            <div class="card-body">
+                <h4 class="card-title">Running-Spider</h4>
+                <p class="card-text">@ViewData["RunningSpider"]</p>
             </div>
             <!-- /.info-box-content -->
         </div>
-        <!-- /.info-box -->
     </div>
     <!-- /.col -->
 </div>
