@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using DotnetSpider.Http;
 using DotnetSpider.Scheduler.Component;
@@ -18,7 +19,7 @@ namespace DotnetSpider.Scheduler
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		public QueueDfsScheduler() : base(new FakeDuplicateRemover())
+		public QueueDfsScheduler(HashAlgorithm hashAlgorithm) : base(new FakeDuplicateRemover(), hashAlgorithm)
 		{
 		}
 

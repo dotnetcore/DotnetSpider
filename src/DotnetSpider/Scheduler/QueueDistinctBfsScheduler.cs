@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using DotnetSpider.Http;
 using DotnetSpider.Scheduler.Component;
@@ -16,7 +17,8 @@ namespace DotnetSpider.Scheduler
 			new List<Request>();
 
 
-		public QueueDistinctBfsScheduler(IDuplicateRemover duplicateRemover) : base(duplicateRemover)
+		public QueueDistinctBfsScheduler(IDuplicateRemover duplicateRemover, HashAlgorithm hashAlgorithm)
+			: base(duplicateRemover, hashAlgorithm)
 		{
 		}
 

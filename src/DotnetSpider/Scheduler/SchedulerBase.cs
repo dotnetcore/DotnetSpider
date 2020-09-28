@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using DotnetSpider.Http;
 using DotnetSpider.Scheduler.Component;
@@ -8,10 +9,12 @@ namespace DotnetSpider.Scheduler
     public abstract class SchedulerBase : IScheduler
     {
         protected readonly IDuplicateRemover DuplicateRemover;
+        protected readonly HashAlgorithm HashAlgorithm;
 
-        protected SchedulerBase(IDuplicateRemover duplicateRemover)
+        protected SchedulerBase(IDuplicateRemover duplicateRemover, HashAlgorithm hashAlgorithm)
         {
-            DuplicateRemover = duplicateRemover;
+	        DuplicateRemover = duplicateRemover;
+	        HashAlgorithm = hashAlgorithm;
         }
 
         /// <summary>
@@ -58,7 +61,7 @@ namespace DotnetSpider.Scheduler
             var count = 0;
             foreach (var request in requests)
             {
-                request.Hash = request.ComputeHash();
+                request.Hash = request.ComputeHash(HashAlgorithm);
                 if (!await DuplicateRemover.IsDuplicateAsync(request))
                 {
                     await PushWhenNoDuplicate(request);

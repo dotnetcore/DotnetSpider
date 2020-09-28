@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using DotnetSpider.Downloader;
 using DotnetSpider.Extensions;
 using DotnetSpider.Infrastructure;
@@ -258,7 +259,7 @@ namespace DotnetSpider.Http
 			}
 		}
 
-		public virtual string ComputeHash()
+		public virtual string ComputeHash(HashAlgorithm algorithm)
 		{
 			// Agent 不需要添加的原因是，每当 Request 再次添加到 Scheduler 前 Requested +1 已经导致 Hash 变化
 			var bytes = new
@@ -269,7 +270,7 @@ namespace DotnetSpider.Http
 				RequestedTimes,
 				Content = Content?.ToArray()
 			}.Serialize();
-			return bytes.GetMurmurHash();
+			return algorithm.ComputeHash(bytes).ToBase64String();
 		}
 
 		public override string ToString()

@@ -1,4 +1,5 @@
 using System;
+using System.Security.Cryptography;
 using DotnetSpider.Agent;
 using DotnetSpider.AgentCenter;
 using DotnetSpider.AgentCenter.Store;
@@ -41,6 +42,14 @@ namespace DotnetSpider
 			return builder;
 		}
 
+		public static Builder UseMd5CryptoService(this Builder builder)
+		{
+			builder.ConfigureServices(x =>
+			{
+				x.AddSingleton<HashAlgorithm>(z => new MD5CryptoServiceProvider());
+			});
+			return builder;
+		}
 
 		/// <summary>
 		/// 只有本地爬虫才能配置下载器，分布式爬虫的下载器注册是在下载器代理中
