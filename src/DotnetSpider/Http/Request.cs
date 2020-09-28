@@ -292,7 +292,8 @@ namespace DotnetSpider.Http
 				Content = Content?.ToArray(),
 				Policy = Policy,
 				RequestedTimes = RequestedTimes,
-				Hash = Hash
+				Hash = Hash,
+				Timeout = Timeout
 			};
 			foreach (var kv in Properties)
 			{
