@@ -18,7 +18,7 @@ namespace DotnetSpider.Agent
 				services.Configure(configure);
 			}
 
-			services.TryAddSingleton<IDownloader, TDownloader>();
+			services.AddSingleton<IDownloader, TDownloader>();
 			services.AddHostedService<AgentService>();
 			return services;
 		}

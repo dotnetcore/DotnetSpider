@@ -99,10 +99,10 @@ namespace DotnetSpider.Http
 		public RequestPolicy Policy { get; set; }
 
 		[IgnoreMember]
-		public string RedialRegExp
+		public string PPPoERegex
 		{
-			get => GetProperty(Consts.RedialRegexExpression);
-			set => SetProperty(Consts.RedialRegexExpression, value);
+			get => GetProperty(Consts.PPPoERegex);
+			set => SetProperty(Consts.PPPoERegex, value);
 		}
 
 		/// <summary>

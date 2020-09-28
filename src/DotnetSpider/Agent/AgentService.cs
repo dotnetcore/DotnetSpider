@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -9,6 +10,7 @@ using DotnetSpider.Extensions;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
 using DotnetSpider.Message.Agent;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

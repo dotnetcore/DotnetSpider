@@ -32,7 +32,7 @@ namespace DotnetSpider.Tests
 				Downloader = DownloaderNames.HttpClient,
 				UserAgent = "UserAgent",
 				Timestamp = 1000,
-				RedialRegExp = "RedialRegExp"
+				PPPoERegex = "PPPoERegex"
 			};
 			var list = new List<byte>();
 			for (int i = 0; i < 2000; ++i)
@@ -51,7 +51,7 @@ namespace DotnetSpider.Tests
 			Assert.Equal(DownloaderNames.HttpClient, r1.Downloader);
 			Assert.Equal("UserAgent", r1.UserAgent);
 			Assert.Equal(1000, r1.Timestamp);
-			Assert.Equal("RedialRegExp", r1.RedialRegExp);
+			Assert.Equal("PPPoERegex", r1.PPPoERegex);
 			Assert.Equal(2000, ((ByteArrayContent)r1.GetContentObject()).Bytes.Length);
 		}
 
@@ -67,7 +67,7 @@ namespace DotnetSpider.Tests
 				Downloader = DownloaderNames.HttpClient,
 				UserAgent = "UserAgent",
 				Timestamp = 1000,
-				RedialRegExp = "RedialRegExp"
+				PPPoERegex = "PPPoERegex"
 			};
 
 
@@ -82,7 +82,7 @@ namespace DotnetSpider.Tests
 			Assert.Equal(DownloaderNames.HttpClient, r1.Downloader);
 			Assert.Equal("UserAgent", r1.UserAgent);
 			Assert.Equal(1000, r1.Timestamp);
-			Assert.Equal("RedialRegExp", r1.RedialRegExp);
+			Assert.Equal("PPPoERegex", r1.PPPoERegex);
 			var content = (StringContent)r1.GetContentObject();
 			Assert.Equal("{}", content.Content);
 			Assert.Equal("UTF-8", content.EncodingName);
@@ -102,7 +102,7 @@ namespace DotnetSpider.Tests
 				Downloader = DownloaderNames.HttpClient,
 				UserAgent = "UserAgent",
 				Timestamp = 1000,
-				RedialRegExp = "RedialRegExp"
+				PPPoERegex = "PPPoERegex"
 			};
 			var list = new List<byte>();
 			for (int i = 0; i < 2000; ++i)
@@ -121,7 +121,7 @@ namespace DotnetSpider.Tests
 			Assert.Equal(DownloaderNames.HttpClient, r1.Downloader);
 			Assert.Equal("UserAgent", r1.UserAgent);
 			Assert.Equal(1000, r1.Timestamp);
-			Assert.Equal("RedialRegExp", r1.RedialRegExp);
+			Assert.Equal("PPPoERegex", r1.PPPoERegex);
 			Assert.Equal(2000, ((ByteArrayContent)r1.GetContentObject()).Bytes.Length);
 		}
 
@@ -137,7 +137,7 @@ namespace DotnetSpider.Tests
 				Downloader = DownloaderNames.HttpClient,
 				UserAgent = "UserAgent",
 				Timestamp = 1000,
-				RedialRegExp = "RedialRegExp"
+				PPPoERegex = "PPPoERegex"
 			};
 
 
@@ -151,7 +151,7 @@ namespace DotnetSpider.Tests
 			Assert.Equal(DownloaderNames.HttpClient, r1.Downloader);
 			Assert.Equal("UserAgent", r1.UserAgent);
 			Assert.Equal(1000, r1.Timestamp);
-			Assert.Equal("RedialRegExp", r1.RedialRegExp);
+			Assert.Equal("PPPoERegex", r1.PPPoERegex);
 			var content = (StringContent)r1.GetContentObject();
 			Assert.Equal("{}", content.Content);
 			Assert.Equal("UTF-8", content.EncodingName);

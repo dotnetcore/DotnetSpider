@@ -34,7 +34,7 @@ namespace DotnetSpider.Downloader
 		/// <returns></returns>
 		public Task<string> DetectAsync(Request request, string response)
 		{
-			var pattern = request.GetHeader(Consts.RedialRegexExpression);
+			var pattern = request.PPPoERegex;
 			if (IsActive && !string.IsNullOrWhiteSpace(pattern))
 			{
 				var match = Regex.Match(response, pattern);

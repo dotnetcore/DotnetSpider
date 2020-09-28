@@ -4,8 +4,10 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using DotnetSpider.Agent;
 using DotnetSpider.AgentCenter;
 using DotnetSpider.AgentCenter.Store;
+using DotnetSpider.Downloader;
 using DotnetSpider.Extensions;
 using DotnetSpider.Infrastructure;
 using DotnetSpider.MessageQueue;
@@ -162,10 +164,11 @@ namespace DotnetSpider
 				}
 
 				services.AddHttpClient();
+				services.AddHostedService<PrintArgumentService>();
+				services.AddAgent<HttpClientDownloader>();
 				services.AddTransient<HttpMessageHandlerBuilder, ProxyHttpMessageHandlerBuilder>();
 				services.TryAddSingleton<IStatisticsClient, StatisticsClient>();
 				services.TryAddSingleton<DependenceServices>();
-				services.AddHostedService<PrintArgumentService>();
 				services.TryAddSingleton<HashAlgorithm>(x => MurmurHash.Create32());
 			}).UseDefaultServiceProvider((context, options) =>
 			{

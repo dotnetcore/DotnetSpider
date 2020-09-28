@@ -51,7 +51,7 @@ namespace DotnetSpider
 		/// </summary>
 		protected string Name { get; private set; }
 
-		protected readonly ILogger Logger;
+		protected ILogger Logger { get; private set; }
 
 		protected bool IsDistributed => _services.MessageQueue.IsDistributed;
 
@@ -61,8 +61,9 @@ namespace DotnetSpider
 		)
 		{
 			Logger = logger;
-			_services = services;
 			Options = options.Value;
+
+			_services = services;
 			_requestedQueue = new RequestedQueue();
 			_requestSuppliers = new List<IRequestSupplier>();
 			_dataFlows = new List<IDataFlow>();
@@ -124,27 +125,30 @@ namespace DotnetSpider
 		public override async Task StopAsync(CancellationToken cancellationToken)
 		{
 			Logger.LogInformation($"{Id} stopping");
+
 			_consumer?.Close();
+			_services.MessageQueue.CloseQueue(Id);
 
 			await base.StopAsync(cancellationToken);
 
-			foreach (var dataFlow in _dataFlows)
-			{
-				dataFlow.Dispose();
-			}
+			Dispose();
 
-			_services.MessageQueue.CloseQueue(Id);
 			Logger.LogInformation($"{Id} stopped");
 		}
 
+		/// <summary>
+		/// 配置请求(从 Scheduler 中出队的)
+		/// </summary>
+		/// <param name="request"></param>
 		protected virtual void ConfigureRequest(Request request)
 		{
 		}
 
-		protected virtual void AddRequestSupplier(IRequestSupplier requestSupplier)
+		protected virtual Spider AddRequestSupplier(IRequestSupplier requestSupplier)
 		{
 			requestSupplier.NotNull(nameof(requestSupplier));
 			_requestSuppliers.Add(requestSupplier);
+			return this;
 		}
 
 		protected virtual Spider AddDataFlow(IDataFlow dataFlow)
@@ -171,7 +175,7 @@ namespace DotnetSpider
 				return 0;
 			}
 
-			return await AddRequestsAsync((IEnumerable<Request>)requests);
+			return await AddRequestsAsync(requests.AsEnumerable());
 		}
 
 		protected async Task<int> AddRequestsAsync(IEnumerable<Request> requests)
@@ -185,11 +189,11 @@ namespace DotnetSpider
 
 			foreach (var request in requests)
 			{
-				if (request.Downloader.Contains("ADSL") &&
-				    string.IsNullOrWhiteSpace(request.GetHeader(Consts.RedialRegexExpression)))
+				if (request.Downloader.Contains("PPPoE") &&
+				    string.IsNullOrWhiteSpace(request.PPPoERegex))
 				{
 					throw new ArgumentException(
-						$"Request {request.Url}, {request.Hash} set to use ADSL but RedialRegExp is empty");
+						$"Request {request.Url}, {request.Hash} set to use PPPoE but PPPoERegex is empty");
 				}
 
 				request.RequestedTimes += 1;
@@ -210,6 +214,7 @@ namespace DotnetSpider
 				}
 
 				request.Owner = Id;
+
 				list.Add(request);
 			}
 
@@ -231,8 +236,8 @@ namespace DotnetSpider
 			Logger.LogInformation($"Initialize {Id}");
 			await _services.StatisticsClient.StartAsync(Id, Name);
 			await InitializeAsync(stoppingToken);
-			await LoadRequestFromSuppliers(stoppingToken);
 			await InitializeDataFlowsAsync();
+			await LoadRequestFromSuppliers(stoppingToken);
 			await _services.StatisticsClient.IncreaseTotalAsync(Id, _services.Scheduler.Total);
 			await RegisterConsumerAsync(stoppingToken);
 			await RunAsync(stoppingToken);
@@ -306,6 +311,7 @@ namespace DotnetSpider
 					Logger.LogError($"{Id} receive error message {JsonConvert.SerializeObject(message)}");
 				}
 			};
+
 			await _services.MessageQueue.ConsumeAsync(_consumer, stoppingToken);
 		}
 
@@ -355,12 +361,15 @@ namespace DotnetSpider
 					var printFlag = 0;
 					while (!stoppingToken.IsCancellationRequested)
 					{
-						printFlag += tuple.Interval;
-						if (printFlag >= 5000)
+						if (!IsDistributed)
 						{
-							printFlag = 0;
+							printFlag += tuple.Interval;
+							if (printFlag >= 5000)
+							{
+								printFlag = 0;
 
-							await _services.StatisticsClient.PrintAsync(Id);
+								await _services.StatisticsClient.PrintAsync(Id);
+							}
 						}
 
 						if (_requestedQueue.Count > Options.RequestedQueueCount)
@@ -557,19 +566,26 @@ namespace DotnetSpider
 
 		public override void Dispose()
 		{
+			DisposeSafely(_requestedQueue);
+			foreach (var dataFlow in _dataFlows)
+			{
+				DisposeSafely(dataFlow);
+			}
+
+			DisposeSafely(_services);
+
+			base.Dispose();
+		}
+
+		private void DisposeSafely(IDisposable obj)
+		{
 			try
 			{
-				_requestedQueue.Dispose();
-				foreach (var dataFlow in _dataFlows)
-				{
-					dataFlow.Dispose();
-				}
-
-				_services.Dispose();
+				obj?.Dispose();
 			}
-			finally
+			catch (Exception e)
 			{
-				base.Dispose();
+				Logger.LogWarning($"Dispose {obj} failed: {e}");
 			}
 		}
 	}

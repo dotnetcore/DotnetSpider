@@ -26,7 +26,7 @@ namespace DotnetSpider.Sample.samples
 			{
 				options.Speed = 1;
 			});
-			builder.UseDownloader<HttpClientDownloader>();
+			// builder.UseDownloader<HttpClientDownloader>();
 			builder.UseSerilog();
 			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
 			await builder.Build().RunAsync();

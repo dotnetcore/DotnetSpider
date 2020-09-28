@@ -8,7 +8,7 @@ namespace DotnetSpider
 		/// <summary>
 		/// 请求队列数限制
 		/// </summary>
-		public int RequestedQueueCount { get; set; } = 500;
+		public int RequestedQueueCount { get; set; } = 1000;
 
 		/// <summary>
 		/// 请求链接深度限制
@@ -23,7 +23,7 @@ namespace DotnetSpider
 		/// <summary>
 		/// 当队列中无链接超时后退出爬虫
 		/// </summary>
-		public int EmptySleepTime { get; set; } = 30;
+		public int EmptySleepTime { get; set; } = 60;
 
 		/// <summary>
 		/// 爬虫采集速度，1 表示 1 秒钟一个请求，0.5 表示 1 秒钟 0.5 个请求，5 表示 1 秒钟发送 5 个请求
