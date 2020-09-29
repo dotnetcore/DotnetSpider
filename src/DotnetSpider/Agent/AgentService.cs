@@ -106,12 +106,15 @@ namespace DotnetSpider.Agent
 			}
 			else if (message is Request request)
 			{
-				var response = await _downloader.DownloadAsync(request);
-				response.Agent = _options.AgentId;
-				await _messageQueue.PublishAsBytesAsync(string.Format(TopicNames.Spider, request.Owner.ToUpper()),
-					response);
-				_logger.LogInformation(
-					$"{_options.AgentName} {request.Owner} download {request.Url}, {request.Hash} completed");
+				Task.Factory.StartNew(async () =>
+				{
+					var response = await _downloader.DownloadAsync(request);
+					response.Agent = _options.AgentId;
+					await _messageQueue.PublishAsBytesAsync(string.Format(TopicNames.Spider, request.Owner.ToUpper()),
+						response);
+					_logger.LogInformation(
+						$"{_options.AgentName} {request.Owner} download {request.Url}, {request.Hash} completed");
+				}).ConfigureAwait(false).GetAwaiter();
 			}
 			else
 			{

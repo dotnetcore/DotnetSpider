@@ -9,7 +9,7 @@ namespace DotnetSpider.DataFlow.Storage
 	/// <summary>
 	/// 实体存储器
 	/// </summary>
-	public abstract class EntityStorageBase : AbstractDataFlow
+	public abstract class EntityStorageBase : DataFlowBase
 	{
 		private readonly Type _baseType = typeof(IEntity);
 		protected abstract Task StoreAsync(DataContext context, Dictionary<Type, List<dynamic>> dict);

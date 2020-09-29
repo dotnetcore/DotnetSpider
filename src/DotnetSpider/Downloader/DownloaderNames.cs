@@ -8,5 +8,6 @@ namespace DotnetSpider.Downloader
 		public const string Puppeteer = "DOTNET_SPIDER_PuppeteerDownloader";
 		public const string PPPoEPuppeteer = "DOTNET_SPIDER_PPPoEPuppeteerDownloader";
 		public const string File = "DOTNET_SPIDER_FileDownloader";
+		public const string Empty = "DOTNET_SPIDER_EmptyDownloader";
 	}
 }

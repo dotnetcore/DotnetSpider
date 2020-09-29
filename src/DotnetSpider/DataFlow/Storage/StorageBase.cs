@@ -6,7 +6,7 @@ namespace DotnetSpider.DataFlow.Storage
     /// <summary>
     /// 存储器
     /// </summary>
-    public abstract class StorageBase : AbstractDataFlow
+    public abstract class StorageBase : DataFlowBase
     {
         public override async Task HandleAsync(DataContext context)
         {

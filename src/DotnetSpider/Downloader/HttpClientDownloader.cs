@@ -28,6 +28,7 @@ namespace DotnetSpider.Downloader
 		{
 			Response response = null;
 			HttpClientEntry httpClientEntry = null;
+			HttpResponseMessage httpResponseMessage = null;
 			try
 			{
 				var httpRequest = GenerateHttpRequestMessage(request);
@@ -35,7 +36,7 @@ namespace DotnetSpider.Downloader
 
 				var stopwatch = new Stopwatch();
 				stopwatch.Start();
-				var httpResponseMessage = await httpClientEntry.HttpClient.SendAsync(httpRequest);
+			 	httpResponseMessage = await httpClientEntry.HttpClient.SendAsync(httpRequest);
 				stopwatch.Stop();
 
 				response = await HandleAsync(request, httpResponseMessage);
@@ -79,6 +80,8 @@ namespace DotnetSpider.Downloader
 			}
 			finally
 			{
+				DisposeSafely(httpResponseMessage);
+
 				Release(response, httpClientEntry);
 			}
 		}
@@ -166,6 +169,18 @@ namespace DotnetSpider.Downloader
 			}
 
 			return httpRequestMessage;
+		}
+
+		private void DisposeSafely(IDisposable obj)
+		{
+			try
+			{
+				obj?.Dispose();
+			}
+			catch (Exception e)
+			{
+				Logger.LogWarning($"Dispose {obj} failed: {e}");
+			}
 		}
 	}
 }

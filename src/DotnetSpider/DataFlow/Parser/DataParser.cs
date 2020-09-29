@@ -16,7 +16,7 @@ namespace DotnetSpider.DataFlow.Parser
 	/// <summary>
 	/// 数据解析器
 	/// </summary>
-	public abstract class DataParser : AbstractDataFlow
+	public abstract class DataParser : DataFlowBase
 	{
 		private readonly List<Func<DataContext, IEnumerable<Request>>> _followRequestQueriers;
 		private readonly List<Func<Request, bool>> _requiredValidator;
