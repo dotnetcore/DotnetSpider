@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using DotnetSpider.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Http;
 
 namespace DotnetSpider.Proxy
@@ -35,8 +37,7 @@ namespace DotnetSpider.Proxy
 			{
 				var handler = new HttpClientHandler
 				{
-					AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
-					ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true
+					AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
 				};
 
 				if (Name.StartsWith(Consts.ProxyPrefix))
@@ -55,7 +56,10 @@ namespace DotnetSpider.Proxy
 
 		private void SetServerCertificateCustomValidationCallback(HttpClientHandler handler)
 		{
-			if (Environment.GetEnvironmentVariable("IGNORE_SSL_ERROR")?.ToLower() == "true")
+			var hostBuilderContext = Services.GetService<HostBuilderContext>();
+			var ignoreSslError = hostBuilderContext.Properties["IGNORE_SSL_ERROR"]?.ToString().ToLower() == "true"
+			                     || Environment.GetEnvironmentVariable("IGNORE_SSL_ERROR")?.ToLower() == "true";
+			if (ignoreSslError)
 			{
 				handler.ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true;
 			}

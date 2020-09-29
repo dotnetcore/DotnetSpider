@@ -13,18 +13,21 @@ namespace DotnetSpider
 		public IMessageQueue MessageQueue { get; }
 		public IStatisticsClient StatisticsClient { get; }
 		public IHostApplicationLifetime ApplicationLifetime { get; }
+		public HostBuilderContext HostBuilderContext { get; }
 
 		public DependenceServices(IServiceProvider serviceProvider,
 			IScheduler scheduler,
 			IMessageQueue messageQueue,
 			IStatisticsClient statisticsClient,
-			IHostApplicationLifetime applicationLifetime)
+			IHostApplicationLifetime applicationLifetime,
+			HostBuilderContext builderContext)
 		{
 			ServiceProvider = serviceProvider;
 			Scheduler = scheduler;
 			MessageQueue = messageQueue;
 			StatisticsClient = statisticsClient;
 			ApplicationLifetime = applicationLifetime;
+			HostBuilderContext = builderContext;
 		}
 
 		public void Dispose()

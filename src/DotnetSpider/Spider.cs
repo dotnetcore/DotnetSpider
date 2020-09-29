@@ -33,6 +33,7 @@ namespace DotnetSpider
 		private MessageQueue.AsyncMessageConsumer<byte[]> _consumer;
 		private readonly DependenceServices _services;
 
+
 		protected event Action<Request[]> OnTimeout;
 
 		protected event Action<Request, Response> OnError;
@@ -189,6 +190,13 @@ namespace DotnetSpider
 
 			foreach (var request in requests)
 			{
+				var defaultDownloader = _services.HostBuilderContext.Properties["DefaultDownloader"]?.ToString();
+				if (string.IsNullOrWhiteSpace(request.Downloader)
+				    && !string.IsNullOrWhiteSpace(defaultDownloader))
+				{
+					request.Downloader = defaultDownloader;
+				}
+
 				if (request.Downloader.Contains("PPPoE") &&
 				    string.IsNullOrWhiteSpace(request.PPPoERegex))
 				{

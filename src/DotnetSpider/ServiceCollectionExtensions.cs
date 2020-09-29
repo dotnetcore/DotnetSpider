@@ -51,6 +51,12 @@ namespace DotnetSpider
 			return builder;
 		}
 
+		public static Builder IgnoreServerCertificateError(this Builder builder)
+		{
+			builder.Properties["IGNORE_SSL_ERROR"] = "true";
+			return builder;
+		}
+
 		/// <summary>
 		/// 只有本地爬虫才能配置下载器，分布式爬虫的下载器注册是在下载器代理中
 		/// </summary>
@@ -60,6 +66,8 @@ namespace DotnetSpider
 		public static Builder UseDownloader<TDownloader>(this Builder builder)
 			where TDownloader : class, IDownloader
 		{
+			builder.Properties["DefaultDownloader"] = $"DOTNET_SPIDER_{typeof(TDownloader).Name}";
+
 			builder.ConfigureServices(x =>
 			{
 				x.AddAgent<TDownloader>(opts =>
