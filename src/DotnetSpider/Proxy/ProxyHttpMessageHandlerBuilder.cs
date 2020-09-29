@@ -33,26 +33,32 @@ namespace DotnetSpider.Proxy
 		{
 			if (PrimaryHandler == null)
 			{
+				var handler = new HttpClientHandler
+				{
+					AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+					ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true
+				};
+
 				if (Name.StartsWith(Consts.ProxyPrefix))
 				{
 					var uri = new Uri(Name.Replace(Consts.ProxyPrefix, ""));
-					var proxy = new WebProxy(uri)
-					{
-						Credentials = new NetworkCredential()
-					};
-					PrimaryHandler = new HttpClientHandler
-					{
-						AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
-						Proxy = proxy,
-					};
+					var proxy = new WebProxy(uri) {Credentials = new NetworkCredential()};
+					handler = new HttpClientHandler {Proxy = proxy};
 				}
-				else
-				{
-					PrimaryHandler = new HttpClientHandler();
-				}
+
+				SetServerCertificateCustomValidationCallback(handler);
+				PrimaryHandler = handler;
 			}
 
 			return CreateHandlerPipeline(PrimaryHandler, AdditionalHandlers);
+		}
+
+		private void SetServerCertificateCustomValidationCallback(HttpClientHandler handler)
+		{
+			if (Environment.GetEnvironmentVariable("IGNORE_SSL_ERROR")?.ToLower() == "true")
+			{
+				handler.ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true;
+			}
 		}
 	}
 }

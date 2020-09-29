@@ -99,27 +99,6 @@ namespace DotnetSpider.Downloader
 
 		protected virtual Task<HttpClientEntry> CreateAsync(Request request)
 		{
-			// var host = new Uri(request.Url).Host;
-			// string clientName;
-			// ProxyEntry proxy = null;
-			// if (_proxyService != null)
-			// {
-			// 	proxy = await _proxyService.GetAsync(request.Timeout);
-			// 	if (proxy == null)
-			// 	{
-			// 		throw new SpiderException("获取代理失败");
-			// 	}
-			//
-			// 	clientName = $"{Consts.ProxyPrefix}{proxy.Uri}";
-			// }
-			// else
-			// {
-			// 	clientName = host;
-			// }
-			//
-			// var httpClient = _httpClientFactory.CreateClient(clientName);
-			// return (httpClient, proxy);
-
 			var host = new Uri(request.Url).Host;
 			var httpClient = HttpClientFactory.CreateClient(host);
 			return Task.FromResult(new HttpClientEntry(httpClient, null));
