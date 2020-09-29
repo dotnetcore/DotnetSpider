@@ -190,7 +190,10 @@ namespace DotnetSpider
 
 			foreach (var request in requests)
 			{
-				var defaultDownloader = _services.HostBuilderContext.Properties["DefaultDownloader"]?.ToString();
+				var defaultDownloader = _services.HostBuilderContext.Properties.ContainsKey("DefaultDownloader")
+					? _services.HostBuilderContext.Properties["DefaultDownloader"]?.ToString()
+					: DownloaderNames.HttpClient;
+
 				if (string.IsNullOrWhiteSpace(request.Downloader)
 				    && !string.IsNullOrWhiteSpace(defaultDownloader))
 				{

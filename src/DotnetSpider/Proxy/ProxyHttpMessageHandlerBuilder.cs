@@ -13,6 +13,8 @@ namespace DotnetSpider.Proxy
 	{
 		private string _name;
 
+		public const string IgnoreSslError = "IGNORE_SSL_ERROR";
+
 		public ProxyHttpMessageHandlerBuilder(IServiceProvider services)
 		{
 			Services = services;
@@ -57,7 +59,8 @@ namespace DotnetSpider.Proxy
 		private void SetServerCertificateCustomValidationCallback(HttpClientHandler handler)
 		{
 			var hostBuilderContext = Services.GetService<HostBuilderContext>();
-			var ignoreSslError = hostBuilderContext.Properties["IGNORE_SSL_ERROR"]?.ToString().ToLower() == "true"
+			var ignoreSslError = (hostBuilderContext.Properties.ContainsKey(IgnoreSslError) &&
+			                      hostBuilderContext.Properties["IGNORE_SSL_ERROR"]?.ToString().ToLower() == "true")
 			                     || Environment.GetEnvironmentVariable("IGNORE_SSL_ERROR")?.ToLower() == "true";
 			if (ignoreSslError)
 			{
