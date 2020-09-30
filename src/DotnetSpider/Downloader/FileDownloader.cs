@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -11,27 +10,22 @@ namespace DotnetSpider.Downloader
 	{
 		public Task<Response> DownloadAsync(Request request)
 		{
-			if (Uri.TryCreate(request.Url, UriKind.RelativeOrAbsolute, out Uri uri))
+			var file = request.RequestUri.AbsoluteUri.Replace("file://", "");
+
+			var response = new Response {RequestHash = request.Hash};
+			if (!File.Exists(file))
 			{
-				var file = uri.AbsoluteUri.Replace("file://", "");
-
-				var response = new Response {RequestHash = request.Hash};
-				if (!File.Exists(file))
-				{
-					response.StatusCode = HttpStatusCode.NotFound;
-				}
-
-				var stopwatch = new Stopwatch();
-				stopwatch.Start();
-				response.TargetUrl = request.Url;
-				response.Content = new ResponseContent {Data = File.ReadAllBytes(file)};
-				stopwatch.Stop();
-				response.StatusCode = HttpStatusCode.OK;
-				response.ElapsedMilliseconds = (int)stopwatch.ElapsedMilliseconds;
-				return Task.FromResult(response);
+				response.StatusCode = HttpStatusCode.NotFound;
 			}
 
-			return Task.FromResult(new Response {StatusCode = HttpStatusCode.NotFound, RequestHash = request.Hash});
+			var stopwatch = new Stopwatch();
+			stopwatch.Start();
+			response.TargetUrl = request.RequestUri.ToString();
+			response.Content = new ByteArrayContent(File.ReadAllBytes(file));
+			stopwatch.Stop();
+			response.StatusCode = HttpStatusCode.OK;
+			response.ElapsedMilliseconds = (int)stopwatch.ElapsedMilliseconds;
+			return Task.FromResult(response);
 		}
 
 		public string Name => DownloaderNames.File;

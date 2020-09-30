@@ -1,4 +1,3 @@
-using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -23,7 +22,7 @@ namespace DotnetSpider.Downloader
 
 		protected override async Task<HttpClientEntry> CreateAsync(Request request)
 		{
-			var host = new Uri(request.Url).Host;
+			var host = request.RequestUri.Host;
 			string clientName;
 			ProxyEntry proxy = null;
 			if (_proxyService != null)

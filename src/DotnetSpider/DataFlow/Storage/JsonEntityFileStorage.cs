@@ -25,7 +25,7 @@ namespace DotnetSpider.DataFlow.Storage
             return new JsonEntityFileStorage();
         }
 
-        protected override async Task StorageAsync(DataContext context, TableMetadata tableMetadata, IList data)
+        protected override async Task StorageAsync(DataFlowContext context, TableMetadata tableMetadata, IList data)
         {
             var streamWriter = _streamWriters.GetOrAdd(tableMetadata.TypeName,
                 s => OpenWrite(context, tableMetadata, "json"));

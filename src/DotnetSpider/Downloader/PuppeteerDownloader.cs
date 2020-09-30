@@ -17,12 +17,14 @@ namespace DotnetSpider.Downloader
 
 		public Task<Response> DownloadAsync(Request request)
 		{
-			return Task.FromResult(new Response
+			var response = new Response
 			{
 				RequestHash = request.Hash,
-				StatusCode = HttpStatusCode.BadGateway,
-				Content = new ResponseContent {Data = Encoding.UTF8.GetBytes("Not impl")}
-			});
+				StatusCode = HttpStatusCode.Gone,
+				Content = new ByteArrayContent(
+					Encoding.UTF8.GetBytes("Not impl"))
+			};
+			return Task.FromResult(response);
 		}
 
 		public string Name => DownloaderNames.Puppeteer;

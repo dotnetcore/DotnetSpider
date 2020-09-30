@@ -15,6 +15,10 @@ namespace DotnetSpider.DataFlow
         /// <returns></returns>
         Task InitAsync();
 
+        /// <summary>
+        /// 设置日志
+        /// </summary>
+        /// <param name="logger"></param>
         void SetLogger(ILogger logger);
 
         /// <summary>
@@ -22,6 +26,6 @@ namespace DotnetSpider.DataFlow
         /// </summary>
         /// <param name="context">处理上下文</param>
         /// <returns></returns>
-        Task HandleAsync(DataContext context);
+        Task HandleAsync(DataFlowContext context);
     }
 }

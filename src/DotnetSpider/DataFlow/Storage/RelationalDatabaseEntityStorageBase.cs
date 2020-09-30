@@ -103,7 +103,7 @@ namespace DotnetSpider.DataFlow.Storage
 		/// </summary>
 		public bool IgnoreCase { get; set; } = true;
 
-		protected override async Task StoreAsync(DataContext context, Dictionary<Type, List<dynamic>> dict)
+		protected override async Task StoreAsync(DataFlowContext context, Dictionary<Type, List<dynamic>> dict)
 		{
 			using var conn = TryCreateDbConnection();
 

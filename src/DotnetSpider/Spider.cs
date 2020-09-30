@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
@@ -204,7 +203,7 @@ namespace DotnetSpider
 				    string.IsNullOrWhiteSpace(request.PPPoERegex))
 				{
 					throw new ArgumentException(
-						$"Request {request.Url}, {request.Hash} set to use PPPoE but PPPoERegex is empty");
+						$"Request {request.RequestUri}, {request.Hash} set to use PPPoE but PPPoERegex is empty");
 				}
 
 				request.RequestedTimes += 1;
@@ -263,10 +262,9 @@ namespace DotnetSpider
 			_consumer = new MessageQueue.AsyncMessageConsumer<byte[]>(topic);
 			_consumer.Received += async bytes =>
 			{
-				var message = await bytes.DeserializeAsync(stoppingToken);
+				var message = await GetMessageAsync(bytes);
 				if (message == null)
 				{
-					Logger.LogWarning("{Id} received empty message");
 					return;
 				}
 
@@ -296,7 +294,7 @@ namespace DotnetSpider
 							if (IsDistributed)
 							{
 								Logger.LogInformation(
-									$"{Id} download {request.Url}, {request.Hash} via {request.Agent} success");
+									$"{Id} download {request.RequestUri}, {request.Hash} via {request.Agent} success");
 							}
 
 							await _services.StatisticsClient.IncreaseAgentSuccessAsync(response.Agent,
@@ -307,9 +305,8 @@ namespace DotnetSpider
 						{
 							await _services.StatisticsClient.IncreaseAgentFailureAsync(response.Agent,
 								response.ElapsedMilliseconds);
-							var exception = Encoding.UTF8.GetString(response.Content.Data);
 							Logger.LogError(
-								$"{Id} download {request.Url}, {request.Hash} status code: {response.StatusCode} failed: {exception}");
+								$"{Id} download {request.RequestUri}, {request.Hash} status code: {response.StatusCode} failed: {response.ReasonPhrase}");
 							// 每次调用添加会导致 Requested + 1, 因此失败多次的请求最终会被过滤不再加到调度队列
 							await AddRequestsAsync(request);
 
@@ -326,12 +323,25 @@ namespace DotnetSpider
 			await _services.MessageQueue.ConsumeAsync(_consumer, stoppingToken);
 		}
 
+		private async Task<object> GetMessageAsync(byte[] bytes)
+		{
+			try
+			{
+				return await bytes.DeserializeAsync();
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"Deserialize message failed: {e}");
+				return null;
+			}
+		}
+
 		private async Task HandleResponseAsync(Request request, Response response, byte[] responseBytes)
 		{
 			try
 			{
 				using var scope = _services.ServiceProvider.CreateScope();
-				var context = new DataContext(scope.ServiceProvider, Options, request, response);
+				var context = new DataFlowContext(scope.ServiceProvider, Options, request, response);
 				context.AddData(Consts.ResponseBytes, responseBytes);
 				context.AddData(Consts.SpiderId, Id);
 
@@ -406,7 +416,7 @@ namespace DotnetSpider
 							foreach (var request in timeoutRequests)
 							{
 								Logger.LogWarning(
-									$"{Id} request {request.Url}, {request.Hash} timeout");
+									$"{Id} request {request.RequestUri}, {request.Hash} timeout");
 							}
 
 							await AddRequestsAsync(timeoutRequests);
@@ -526,7 +536,7 @@ namespace DotnetSpider
 					}
 					else
 					{
-						Logger.LogWarning($"{Id} enqueue request: {request.Url}, {request.Hash} failed");
+						Logger.LogWarning($"{Id} enqueue request: {request.RequestUri}, {request.Hash} failed");
 					}
 				}
 			}

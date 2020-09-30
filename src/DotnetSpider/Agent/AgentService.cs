@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -10,7 +9,6 @@ using DotnetSpider.Extensions;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
 using DotnetSpider.Message.Agent;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -45,21 +43,22 @@ namespace DotnetSpider.Agent
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
 			_logger.LogInformation(
-				_messageQueue.IsDistributed ? $"Agent {_options.AgentId} starting" : "Agent starting");
+				_messageQueue.IsDistributed
+					? $"Agent {_options.AgentId}, {_options.AgentName} is starting"
+					: "Agent is starting");
 
+			// 分布式才需要注册
 			if (_messageQueue.IsDistributed)
 			{
-				_logger.LogInformation($"Register agent: {_options.AgentId}, {_options.AgentName}");
+				await _messageQueue.PublishAsBytesAsync(TopicNames.AgentCenter,
+					new Register
+					{
+						AgentId = _options.AgentId,
+						AgentName = _options.AgentName,
+						TotalMemory = SystemInformation.TotalMemory,
+						ProcessorCount = Environment.ProcessorCount
+					});
 			}
-
-			await _messageQueue.PublishAsBytesAsync(TopicNames.AgentCenter,
-				new Register
-				{
-					AgentId = _options.AgentId,
-					AgentName = _options.AgentName,
-					TotalMemory = SystemInformation.TotalMemory,
-					ProcessorCount = Environment.ProcessorCount
-				});
 
 			var topic = _downloader.Name;
 
@@ -68,16 +67,23 @@ namespace DotnetSpider.Agent
 			// httpclient 这是指定下载器
 			await RegisterAgentAsync(topic, stoppingToken);
 			await RegisterAgentAsync(string.Format(TopicNames.Spider, _options.AgentId), stoppingToken);
-			await Task.Factory.StartNew(async () =>
-			{
-				while (!stoppingToken.IsCancellationRequested)
-				{
-					await HeartbeatAsync();
-					await Task.Delay(5000, stoppingToken);
-				}
-			}, stoppingToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
-			_logger.LogInformation(_messageQueue.IsDistributed ? $"Agent {_options.AgentId} started" : "Agent started");
+			// 分布式才需要发送心跳
+			if (_messageQueue.IsDistributed)
+			{
+				await Task.Factory.StartNew(async () =>
+				{
+					while (!stoppingToken.IsCancellationRequested)
+					{
+						await HeartbeatAsync();
+						await Task.Delay(5000, stoppingToken);
+					}
+				}, stoppingToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+			}
+
+			_logger.LogInformation(_messageQueue.IsDistributed
+				? $"Agent {_options.AgentId}, {_options.AgentName} started"
+				: "Agent started");
 		}
 
 		private async Task RegisterAgentAsync(string topic, CancellationToken stoppingToken)
@@ -110,34 +116,26 @@ namespace DotnetSpider.Agent
 				{
 					var response = await _downloader.DownloadAsync(request);
 					response.Agent = _options.AgentId;
+
 					await _messageQueue.PublishAsBytesAsync(string.Format(TopicNames.Spider, request.Owner.ToUpper()),
 						response);
 
-					if (_messageQueue.IsDistributed)
-					{
-						_logger.LogInformation(
-							$"Agent {_options.AgentName} download {request.Url}, {request.Hash} for {request.Owner} completed");
-					}
-					else
-					{
-						_logger.LogInformation(
-							$"{request.Owner} download {request.Url}, {request.Hash} completed");
-					}
+					_logger.LogInformation(
+						_messageQueue.IsDistributed
+							? $"Agent {_options.AgentName} download {request.RequestUri}, {request.Hash} for {request.Owner} completed"
+							: $"{request.Owner} download {request.RequestUri}, {request.Hash} completed");
 				}).ConfigureAwait(false).GetAwaiter();
 			}
 			else
 			{
-				var log = Encoding.UTF8.GetString(JsonSerializer.SerializeToUtf8Bytes(message));
-				_logger.LogWarning($"Not supported message: {log}");
+				var msg = Encoding.UTF8.GetString(JsonSerializer.SerializeToUtf8Bytes(message));
+				_logger.LogWarning($"Not supported message: {msg}");
 			}
 		}
 
 		private async Task HeartbeatAsync()
 		{
-			if (_messageQueue.IsDistributed)
-			{
-				_logger.LogInformation($"Heartbeat: {_options.AgentId}, {_options.AgentName}");
-			}
+			_logger.LogInformation($"Heartbeat {_options.AgentId}, {_options.AgentName}");
 
 			await _messageQueue.PublishAsBytesAsync(TopicNames.AgentCenter,
 				new Heartbeat
@@ -152,13 +150,15 @@ namespace DotnetSpider.Agent
 		public override async Task StopAsync(CancellationToken cancellationToken)
 		{
 			_logger.LogInformation(
-				_messageQueue.IsDistributed ? $"Agent {_options.AgentId} stopping" : "Agent stopping");
+				_messageQueue.IsDistributed ? $"Agent {_options.AgentId} is stopping" : "Agent is stopping");
+
 			foreach (var consumer in _consumers)
 			{
 				consumer.Close();
 			}
 
 			await base.StopAsync(cancellationToken);
+
 			_logger.LogInformation(_messageQueue.IsDistributed ? $"Agent {_options.AgentId} stopped" : "Agent stopped");
 		}
 	}

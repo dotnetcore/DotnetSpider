@@ -41,7 +41,7 @@ namespace DotnetSpider.Agent
 								o.AgentName = o.AgentId;
 							});
 							var configuration = builder.GetConfiguration();
-							x.AddRabbitMQ(configuration.GetSection("RabbitMQ"));
+							x.AddRabbitMQ(configuration);
 						});
 						await builder.Build().RunAsync();
 					}

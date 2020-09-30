@@ -9,7 +9,6 @@ namespace DotnetSpider.Downloader
 {
 	public class EmptyDownloader : IDownloader
 	{
-		private readonly byte[] _content = Encoding.UTF8.GetBytes("");
 		private int _downloadCount;
 
 		protected ILogger Logger { get; }
@@ -27,12 +26,13 @@ namespace DotnetSpider.Downloader
 				Logger.LogInformation($"download {_downloadCount} already");
 			}
 
-			return Task.FromResult(new Response
+			var response = new Response
 			{
 				RequestHash = request.Hash,
 				StatusCode = HttpStatusCode.OK,
-				Content = new ResponseContent {Data = _content}
-			});
+				Content = new ByteArrayContent(Encoding.UTF8.GetBytes(""))
+			};
+			return Task.FromResult(response);
 		}
 
 		public string Name => DownloaderNames.Empty;

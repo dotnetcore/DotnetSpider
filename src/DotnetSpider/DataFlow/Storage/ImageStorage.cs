@@ -19,9 +19,9 @@ namespace DotnetSpider.DataFlow.Storage
 			return Task.CompletedTask;
 		}
 
-		protected override Task StoreAsync(DataContext context)
+		protected override Task StoreAsync(DataFlowContext context)
 		{
-			var fileName = new Uri(context.Request.Url).AbsolutePath;
+			var fileName = context.Request.RequestUri.AbsolutePath;
 			if (_imageSuffixes.Any(x => fileName.EndsWith(x)))
 			{
 				var path = Path.Combine(AppContext.BaseDirectory, "data", context.Request.Owner, "image");
@@ -37,7 +37,7 @@ namespace DotnetSpider.DataFlow.Storage
 						}
 					}
 
-					File.WriteAllBytes(path, context.Response.Content.Data);
+					File.WriteAllBytes(path, context.Response.Content.Bytes);
 				}
 			}
 

@@ -10,7 +10,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using MySqlConnector;
 using Serilog;
 
 namespace DotnetSpider.Sample.samples
@@ -59,7 +58,7 @@ create table if not exists cnblogs2.news2
 ");
 			}
 
-			protected override async Task StoreAsync(DataContext context)
+			protected override async Task StoreAsync(DataFlowContext context)
 			{
 				var typeName = typeof(News).FullName;
 				var data = (News)context.GetData(typeName);

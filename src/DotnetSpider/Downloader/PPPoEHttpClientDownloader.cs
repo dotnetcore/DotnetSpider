@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DotnetSpider.Http;
 using Microsoft.Extensions.Logging;
+using ByteArrayContent = DotnetSpider.Http.ByteArrayContent;
 
 namespace DotnetSpider.Downloader
 {
@@ -34,16 +35,13 @@ namespace DotnetSpider.Downloader
 			if (!string.IsNullOrWhiteSpace(validResult))
 			{
 				Logger.LogError(
-					$"{request.Url} download failed, because content contains {validResult}");
+					$"{request.RequestUri} download failed, because content contains {validResult}");
 				response = new Response
 				{
 					RequestHash = request.Hash,
 					StatusCode = HttpStatusCode.BadGateway,
-					Content = new ResponseContent
-					{
-						Data = Encoding.UTF8.GetBytes(
-							$"Redial agent because content contains {validResult}")
-					}
+					Content = new ByteArrayContent(
+						Encoding.UTF8.GetBytes($"Redial agent because content contains {validResult}"))
 				};
 			}
 

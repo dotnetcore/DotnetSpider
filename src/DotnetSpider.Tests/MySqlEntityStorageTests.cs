@@ -10,7 +10,6 @@ using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Http;
 using DotnetSpider.MySql;
 using MySql.Data.MySqlClient;
-using MySqlConnector;
 using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
@@ -81,7 +80,7 @@ namespace DotnetSpider.Tests
 				// 如果实体的 Schema 没有配置表名，则使用类名
 				await conn.ExecuteAsync($"drop table if exists createtableentity1;");
 				var storage = CreateStorage(StorageMode.Insert);
-				var context = new DataContext(null, new SpiderOptions(),
+				var context = new DataFlowContext(null, new SpiderOptions(),
 					new Request(), new Response());
 				var typeName = typeof(CreateTableEntity1);
 				var entity = new CreateTableEntity1();
@@ -109,7 +108,7 @@ namespace DotnetSpider.Tests
 				// 如果实体的 Schema 没有配置表名，则使用类名
 				await conn.ExecuteAsync($"drop table if exists createtablenotablename;");
 				var storage = CreateStorage(StorageMode.Insert);
-				var context = new DataContext(null, new SpiderOptions(),
+				var context = new DataFlowContext(null, new SpiderOptions(),
 					new Request(), new Response());
 				var typeName = typeof(CreateTableEntity2);
 				var entity = new CreateTableEntity2();
@@ -143,7 +142,7 @@ namespace DotnetSpider.Tests
 					var storage = CreateStorage(StorageMode.Insert);
 					await storage.InitAsync();
 
-					var context = new DataContext(null, new SpiderOptions(),
+					var context = new DataFlowContext(null, new SpiderOptions(),
 						new Request(), new Response());
 					var typeName = typeof(CreateTableEntity3);
 					var entity = new CreateTableEntity3();
@@ -176,7 +175,7 @@ namespace DotnetSpider.Tests
 				await conn.ExecuteAsync(
 					$"drop table if exists {Escape}test{Escape}.{Escape}createtablemultiprimay{Escape};");
 				var storage = CreateStorage(StorageMode.Insert);
-				var context = new DataContext(null, new SpiderOptions(),
+				var context = new DataFlowContext(null, new SpiderOptions(),
 					new Request(), new Response());
 				var typeName = typeof(CreateTableEntity8);
 				var entity = new CreateTableEntity8();
@@ -220,7 +219,7 @@ namespace DotnetSpider.Tests
 					$"drop table if exists {Escape}test{Escape}.{Escape}createtableprimay{Escape};");
 				{
 					var storage = CreateStorage(StorageMode.Insert);
-					var context = new DataContext(null, new SpiderOptions(),
+					var context = new DataFlowContext(null, new SpiderOptions(),
 						new Request(), new Response());
 					var typeName = typeof(CreateTableEntity4);
 					var entity = new CreateTableEntity4();
@@ -263,7 +262,7 @@ namespace DotnetSpider.Tests
 
 				{
 					var storage = CreateStorage(StorageMode.Insert);
-					var context = new DataContext(null, new SpiderOptions(),
+					var context = new DataFlowContext(null, new SpiderOptions(),
 						new Request(), new Response());
 					var typeName = typeof(CreateTableEntity5);
 					var entity = new CreateTableEntity5();
@@ -320,7 +319,7 @@ namespace DotnetSpider.Tests
 
 				{
 					var storage = CreateStorage(StorageMode.InsertIgnoreDuplicate);
-					var context = new DataContext(null, new SpiderOptions(),
+					var context = new DataFlowContext(null, new SpiderOptions(),
 						new Request(), new Response());
 					var typeName = typeof(CreateTableEntity4);
 					var entity = new CreateTableEntity4();
@@ -362,7 +361,7 @@ namespace DotnetSpider.Tests
 
 				{
 					var storage = CreateStorage(StorageMode.InsertAndUpdate);
-					var context = new DataContext(null, new SpiderOptions(),
+					var context = new DataFlowContext(null, new SpiderOptions(),
 						new Request(), new Response());
 					var typeName = typeof(CreateTableEntity4);
 					var entity = new CreateTableEntity4();
@@ -403,7 +402,7 @@ namespace DotnetSpider.Tests
 					$"drop table if exists {Escape}test{Escape}.{Escape}createtableprimay{Escape};");
 				{
 					var storage = CreateStorage(StorageMode.InsertIgnoreDuplicate);
-					var context = new DataContext(null, new SpiderOptions(),
+					var context = new DataFlowContext(null, new SpiderOptions(),
 						new Request(), new Response());
 					var typeName = typeof(CreateTableEntity4);
 					var entity = new CreateTableEntity4();
@@ -413,7 +412,7 @@ namespace DotnetSpider.Tests
 
 					await storage.HandleAsync(context);
 
-					var dfc2 = new DataContext(null, new SpiderOptions(),
+					var dfc2 = new DataFlowContext(null, new SpiderOptions(),
 						new Request(), new Response());
 
 					var now = DateTime.Now;
@@ -461,7 +460,7 @@ namespace DotnetSpider.Tests
 
 				{
 					var storage = CreateStorage(StorageMode.InsertIgnoreDuplicate);
-					var context = new DataContext(null, new SpiderOptions(),
+					var context = new DataFlowContext(null, new SpiderOptions(),
 						new Request(), new Response());
 					var typeName = typeof(CreateTableEntity6);
 					var entity = new CreateTableEntity6();
@@ -470,7 +469,7 @@ namespace DotnetSpider.Tests
 					context.AddData(typeName, items);
 					await storage.HandleAsync(context);
 
-					var dfc2 = new DataContext(null, new SpiderOptions(),
+					var dfc2 = new DataFlowContext(null, new SpiderOptions(),
 						new Request(), new Response());
 					var now = DateTime.Now;
 					dfc2.AddData(typeName,
@@ -523,7 +522,7 @@ namespace DotnetSpider.Tests
 					var storage =
 						(RelationalDatabaseEntityStorageBase)CreateStorage(StorageMode.InsertIgnoreDuplicate);
 					storage.UseTransaction = true;
-					var context = new DataContext(null, new SpiderOptions(),
+					var context = new DataFlowContext(null, new SpiderOptions(),
 						new Request(), new Response());
 					var typeName = typeof(CreateTableEntity4);
 					var entity = new CreateTableEntity4();
@@ -564,7 +563,7 @@ namespace DotnetSpider.Tests
 				{
 					var storage = (RelationalDatabaseEntityStorageBase)CreateStorage(StorageMode.Insert);
 					storage.IgnoreCase = false;
-					var context = new DataContext(null, new SpiderOptions(),
+					var context = new DataFlowContext(null, new SpiderOptions(),
 						new Request(), new Response());
 					var typeName = typeof(CreateTableEntity7);
 					var entity = new CreateTableEntity7();
@@ -599,7 +598,7 @@ namespace DotnetSpider.Tests
 				{
 					var storage = CreateStorage(StorageMode.Insert);
 
-					var context = new DataContext(null, new SpiderOptions(),
+					var context = new DataFlowContext(null, new SpiderOptions(),
 						new Request(), new Response());
 					var typeName = typeof(CreateTableEntity5);
 					var entity = new CreateTableEntity9();

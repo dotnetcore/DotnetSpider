@@ -1,4 +1,6 @@
 using System;
+using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.AgentCenter.Store;
@@ -7,7 +9,6 @@ using DotnetSpider.Message.Agent;
 using DotnetSpider.MessageQueue;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using IMessageQueue = DotnetSpider.MessageQueue.IMessageQueue;
 
 namespace DotnetSpider.AgentCenter
@@ -33,7 +34,7 @@ namespace DotnetSpider.AgentCenter
 		{
 			try
 			{
-				_logger.LogInformation("Agent register service starting");
+				_logger.LogInformation("Agent center service is starting");
 
 				await _agentStore.EnsureDatabaseAndTableCreatedAsync();
 
@@ -62,7 +63,7 @@ namespace DotnetSpider.AgentCenter
 					{
 						if (_distributed)
 						{
-							_logger.LogInformation($"Heartbeat: {heartbeat.AgentId}, {heartbeat.AgentName}");
+							_logger.LogInformation($"Receive heartbeat: {heartbeat.AgentId}, {heartbeat.AgentName}");
 						}
 
 						await _agentStore.HeartbeatAsync(new AgentHeartbeat(heartbeat.AgentId, heartbeat.AgentName,
@@ -70,11 +71,12 @@ namespace DotnetSpider.AgentCenter
 					}
 					else
 					{
-						_logger.LogWarning($"Not supported message: {JsonConvert.SerializeObject(message)}");
+						var msg = Encoding.UTF8.GetString(JsonSerializer.SerializeToUtf8Bytes(message));
+						_logger.LogWarning($"Not supported message: {msg}");
 					}
 				};
 				await _messageQueue.ConsumeAsync(_consumer, stoppingToken);
-				_logger.LogInformation("Agent register service started");
+				_logger.LogInformation("Agent center service started");
 			}
 			catch (Exception e)
 			{

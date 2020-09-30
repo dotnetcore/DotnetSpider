@@ -6,7 +6,7 @@ using DotnetSpider.Infrastructure;
 
 namespace DotnetSpider.Statistics.Store
 {
-    public class MemoryStatisticsStore : IStatisticsStore
+    public class DefaultStatisticsStore : IStatisticsStore
     {
         private readonly Dictionary<string, dynamic> _dict =
             new Dictionary<string, dynamic>();

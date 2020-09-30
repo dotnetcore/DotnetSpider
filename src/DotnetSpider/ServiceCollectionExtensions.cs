@@ -1,16 +1,10 @@
 using System;
-using System.Security.Cryptography;
 using DotnetSpider.Agent;
-using DotnetSpider.AgentCenter;
-using DotnetSpider.AgentCenter.Store;
 using DotnetSpider.Downloader;
 using DotnetSpider.Infrastructure;
-using DotnetSpider.MessageQueue;
 using DotnetSpider.Proxy;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Scheduler.Component;
-using DotnetSpider.Statistics;
-using DotnetSpider.Statistics.Store;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
@@ -42,11 +36,12 @@ namespace DotnetSpider
 			return builder;
 		}
 
-		public static Builder UseMd5CryptoService(this Builder builder)
+		// ReSharper disable once InconsistentNaming
+		public static Builder UseMD5HashAlgorithmService(this Builder builder)
 		{
 			builder.ConfigureServices(x =>
 			{
-				x.AddSingleton<HashAlgorithm>(z => new MD5CryptoServiceProvider());
+				x.AddSingleton<IHashAlgorithmService, MD5HashAlgorithmService>();
 			});
 			return builder;
 		}

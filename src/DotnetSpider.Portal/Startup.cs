@@ -2,7 +2,6 @@
 using System.Reflection;
 using AutoMapper;
 using DotnetSpider.AgentCenter;
-using DotnetSpider.MySql;
 using DotnetSpider.MySql.AgentCenter;
 using DotnetSpider.Portal.BackgroundService;
 using DotnetSpider.Portal.Common;
@@ -20,10 +19,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Quartz;
 using Quartz.AspNetCore;
 using Quartz.AspNetCore.MySqlConnector;
-using Quartz.Impl.Matchers;
 using ServiceProvider = DotnetSpider.Portal.Common.ServiceProvider;
 
 namespace DotnetSpider.Portal

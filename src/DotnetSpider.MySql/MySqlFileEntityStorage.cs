@@ -9,7 +9,6 @@ using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Infrastructure;
 using MySql.Data.MySqlClient;
-using MySqlConnector;
 
 namespace DotnetSpider.MySql
 {
@@ -52,7 +51,7 @@ namespace DotnetSpider.MySql
         }
 
 
-        protected override async Task StorageAsync(DataContext context, TableMetadata tableMetadata, IList data)
+        protected override async Task StorageAsync(DataFlowContext context, TableMetadata tableMetadata, IList data)
         {
             var writer = _streamWriters.GetOrAdd(tableMetadata.TypeName,
                 s => OpenWrite(context, tableMetadata, "sql"));

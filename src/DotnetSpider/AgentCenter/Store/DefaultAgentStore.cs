@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace DotnetSpider.AgentCenter.Store
 {
-    public class MemoryAgentStore : IAgentStore
+    public class DefaultAgentStore : IAgentStore
     {
         private readonly Dictionary<string, AgentInfo> _agentDict = new Dictionary<string, AgentInfo>();
 

@@ -24,7 +24,7 @@ namespace DotnetSpider.Sample.samples
 		{
 			var builder = Builder.CreateDefaultBuilder<EntitySpider>(options =>
 			{
-				options.Speed = 1;
+				options.Speed = 20;
 			});
 			builder.UseDownloader<HttpClientDownloader>();
 			builder.UseSerilog();
@@ -45,11 +45,11 @@ namespace DotnetSpider.Sample.samples
 			AddDataFlow(GetDefaultStorage());
 			await AddRequestsAsync(
 				new Request(
-					"https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}})
+					"https://news.cnblogs.com/n/page/1/", new Dictionary<string, object> {{"网站", "博客园"}})
 				{
 					Downloader = DownloaderNames.File
 				},
-				new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}}));
+				new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, object> {{"网站", "博客园"}}));
 		}
 
 		protected override (string Id, string Name) GetIdAndName()

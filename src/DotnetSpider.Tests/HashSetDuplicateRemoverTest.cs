@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using DotnetSpider.Http;
+using DotnetSpider.Infrastructure;
 using DotnetSpider.Scheduler.Component;
 using Murmur;
 using Xunit;
@@ -10,15 +11,15 @@ namespace DotnetSpider.Tests
 {
 	public class HashSetDuplicateRemoverTests
 	{
-		private static readonly HashAlgorithm hashAlgorithm = Murmur32.Create();
-
 		[Fact(DisplayName = "HashSetDuplicate")]
 		public async Task HashSetDuplicate()
 		{
+			var hashAlgorithm = new MurmurHashAlgorithmService();
 			var scheduler = new HashSetDuplicateRemover();
 
 			var ownerId = Guid.NewGuid().ToString("N");
-			var r1 = new Request("http://www.a.com") {Owner = ownerId, Accept = "asdfasdfasdf"};
+			var r1 = new Request("http://www.a.com") {Owner = ownerId};
+			r1.Headers.Accept = ("asdfasdfasdf");
 			r1.Hash = r1.ComputeHash(hashAlgorithm);
 			var isDuplicate = await scheduler.IsDuplicateAsync(r1);
 
@@ -41,6 +42,7 @@ namespace DotnetSpider.Tests
 		[Fact(DisplayName = "ParallelHashSetDuplicate")]
 		public async Task ParallelHashSetDuplicate()
 		{
+			var hashAlgorithm = new MurmurHashAlgorithmService();
 			var ownerId = Guid.NewGuid().ToString("N");
 			var scheduler = new HashSetDuplicateRemover();
 			var r1 = new Request("http://www.a.com") {Owner = ownerId};

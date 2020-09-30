@@ -43,7 +43,7 @@ namespace DotnetSpider.HBase
 			_rest = uri.ToString();
 		}
 
-		protected override async Task StoreAsync(DataContext context)
+		protected override async Task StoreAsync(DataFlowContext context)
 		{
 			var id = context.Request.Owner;
 			var table = $"dotnet_spider:response_{id}";
@@ -80,12 +80,12 @@ namespace DotnetSpider.HBase
 				}
 				catch (Exception ex)
 				{
-					Logger.LogError($"Store {context.Request.Url} response to HBase failed [{i}]: {ex}");
+					Logger.LogError($"Store {context.Request.RequestUri} response to HBase failed [{i}]: {ex}");
 				}
 			}
 		}
 
-		private void EnsureDatabaseAndTableCreated(DataContext context, string table)
+		private void EnsureDatabaseAndTableCreated(DataFlowContext context, string table)
 		{
 			var httpClient = context.ServiceProvider.GetRequiredService<IHttpClientFactory>().CreateClient(_rest);
 			Logger.LogInformation($"Create table: {table}");

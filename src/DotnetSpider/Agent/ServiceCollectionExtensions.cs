@@ -1,7 +1,6 @@
 using System;
 using DotnetSpider.Downloader;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace DotnetSpider.Agent
 {
@@ -22,31 +21,5 @@ namespace DotnetSpider.Agent
 			services.AddHostedService<AgentService>();
 			return services;
 		}
-
-		// public static IHostBuilder UseAgent<TDownloader>(this IHostBuilder builder)
-		// 	where TDownloader : class, IDownloader
-		// {
-		// 	builder.ConfigureServices(x =>
-		// 	{
-		// 		var configuration = builder.GetConfiguration();
-		// 		if (configuration != null)
-		// 		{
-		// 			x.Configure<AgentOptions>(configuration);
-		// 		}
-		//
-		// 		x.AddAgent<TDownloader>();
-		// 	});
-		// 	return builder;
-		// }
-		//
-		// public static IHostBuilder UseAgent<TDownloader>(this IHostBuilder builder, Action<AgentOptions> configure)
-		// 	where TDownloader : class, IDownloader
-		// {
-		// 	builder.ConfigureServices(x =>
-		// 	{
-		// 		x.AddAgent<TDownloader>(configure);
-		// 	});
-		// 	return builder;
-		// }
 	}
 }

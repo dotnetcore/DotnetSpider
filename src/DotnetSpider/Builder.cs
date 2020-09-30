@@ -90,8 +90,8 @@ namespace DotnetSpider
 			builder.ConfigureServices(services =>
 			{
 				services.AddMessageQueue();
-				services.AddStatistics<MemoryStatisticsStore>();
-				services.AddAgentCenter<MemoryAgentStore>();
+				services.AddStatistics<DefaultStatisticsStore>();
+				services.AddAgentCenter<DefaultAgentStore>();
 			});
 			return builder;
 		}
@@ -169,7 +169,7 @@ namespace DotnetSpider
 				services.AddTransient<HttpMessageHandlerBuilder, ProxyHttpMessageHandlerBuilder>();
 				services.TryAddSingleton<IStatisticsClient, StatisticsClient>();
 				services.TryAddSingleton<DependenceServices>();
-				services.TryAddSingleton<HashAlgorithm>(x => MurmurHash.Create32());
+				services.TryAddSingleton<IHashAlgorithmService, MurmurHashAlgorithmService>();
 			}).UseDefaultServiceProvider((context, options) =>
 			{
 				var flag = context.HostingEnvironment.IsDevelopment();

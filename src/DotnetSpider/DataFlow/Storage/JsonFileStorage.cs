@@ -17,7 +17,7 @@ namespace DotnetSpider.DataFlow.Storage
             return new JsonFileStorage();
         }
 
-        protected override async Task StoreAsync(DataContext context)
+        protected override async Task StoreAsync(DataFlowContext context)
         {
             var file = Path.Combine(GetDataFolder(context.Request.Owner),
                 $"{context.Request.Hash}.json");

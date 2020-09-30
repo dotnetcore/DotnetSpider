@@ -8,7 +8,7 @@ namespace DotnetSpider.DataFlow.Storage
     /// </summary>
     public abstract class StorageBase : DataFlowBase
     {
-        public override async Task HandleAsync(DataContext context)
+        public override async Task HandleAsync(DataFlowContext context)
         {
             if (context.IsEmpty)
             {
@@ -19,6 +19,6 @@ namespace DotnetSpider.DataFlow.Storage
             await StoreAsync(context);
         }
 
-        protected abstract Task StoreAsync(DataContext context);
+        protected abstract Task StoreAsync(DataFlowContext context);
     }
 }

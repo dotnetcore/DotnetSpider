@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using DotnetSpider.Http;
+using DotnetSpider.Infrastructure;
 using DotnetSpider.Selector;
 
 namespace DotnetSpider.DataFlow
@@ -10,7 +11,7 @@ namespace DotnetSpider.DataFlow
 	/// <summary>
 	/// 数据流处理器上下文
 	/// </summary>
-	public class DataContext
+	public class DataFlowContext
 	{
 		private readonly Dictionary<string, dynamic> _properties = new Dictionary<string, dynamic>();
 		private readonly Dictionary<object, dynamic> _data = new Dictionary<object, dynamic>();
@@ -43,7 +44,7 @@ namespace DotnetSpider.DataFlow
 		/// <param name="response">下载器返回的结果</param>
 		/// <param name="options"></param>
 		/// <param name="serviceProvider"></param>
-		public DataContext(IServiceProvider serviceProvider,
+		public DataFlowContext(IServiceProvider serviceProvider,
 			SpiderOptions options,
 			Request request,
 			Response response
@@ -58,10 +59,7 @@ namespace DotnetSpider.DataFlow
 
 		public void AddFollowRequests(params Request[] requests)
 		{
-			if (requests != null)
-			{
-				FollowRequests.AddRange(requests);
-			}
+			AddFollowRequests(requests.AsEnumerable());
 		}
 
 		public void AddFollowRequests(IEnumerable<Request> requests)
@@ -74,15 +72,24 @@ namespace DotnetSpider.DataFlow
 
 		public void AddFollowRequests(IEnumerable<string> uris)
 		{
-			if (uris != null)
+			if (uris == null)
 			{
-				FollowRequests.AddRange(uris.Select(CreateNewRequest));
+				return;
 			}
+
+			AddFollowRequests(uris.Select(CreateNewRequest));
 		}
 
-		public Request CreateNewRequest(string uri)
+		public Request CreateNewRequest(string url)
 		{
-			return Request.Create(uri);
+			url.NotNullOrWhiteSpace(nameof(url));
+			var request = Request.Clone();
+			request.RequestedTimes = 0;
+			request.Depth += 1;
+			request.Hash = null;
+			request.Timestamp = DateTimeHelper.Timestamp;
+			request.RequestUri = new Uri(url, UriKind.RelativeOrAbsolute);
+			return request;
 		}
 
 		/// <summary>

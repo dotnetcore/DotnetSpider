@@ -55,9 +55,9 @@ namespace DotnetSpider.Sample.samples
 				AddFollowRequestQuerier(Selectors.XPath("."));
 			}
 
-			protected override Task Parse(DataContext context)
+			protected override Task ParseAsync(DataFlowContext context)
 			{
-				context.AddData("URL", context.Request.Url);
+				context.AddData("URL", context.Request.RequestUri);
 				context.AddData("Title", context.Selectable.XPath(".//title")?.Value);
 				return Task.CompletedTask;
 			}

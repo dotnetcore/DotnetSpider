@@ -2,7 +2,9 @@
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using DotnetSpider.Extensions;
 using DotnetSpider.Http;
+using DotnetSpider.Infrastructure;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Scheduler.Component;
 using Murmur;
@@ -12,12 +14,12 @@ namespace DotnetSpider.Tests
 {
 	public class QueueSchedulerTests
 	{
-		private static readonly HashAlgorithm hashAlgorithm = Murmur32.Create();
+		private static readonly IHashAlgorithmService _hashAlgorithm = new MurmurHashAlgorithmService();
 
 		[Fact(DisplayName = "ParallelEnqueueAndDequeueQueueBfs")]
 		public void ParallelEnqueueAndDequeueQueueBfs()
 		{
-			var scheduler = new QueueDistinctBfsScheduler(new HashSetDuplicateRemover(), hashAlgorithm);
+			var scheduler = new QueueDistinctBfsScheduler(new HashSetDuplicateRemover(), _hashAlgorithm);
 			var ownerId = Guid.NewGuid().ToString("N");
 			Parallel.For(0, 1000, new ParallelOptions {MaxDegreeOfParallelism = 20}, async i =>
 			{
@@ -25,10 +27,7 @@ namespace DotnetSpider.Tests
 				await scheduler.EnqueueAsync(new[] {new Request("http://www.a.com") {Owner = ownerId}});
 				await scheduler.EnqueueAsync(new[] {new Request("http://www.a.com") {Owner = ownerId}});
 				await scheduler.EnqueueAsync(new[] {new Request("http://www.b.com") {Owner = ownerId}});
-				await scheduler.EnqueueAsync(new[]
-				{
-					new Request($"http://www.{i.ToString()}.com", null) {Owner = ownerId}
-				});
+				await scheduler.EnqueueAsync(new[] {new Request($"http://www.{i.ToString()}.com") {Owner = ownerId}});
 			});
 			Parallel.For(0, 1000, new ParallelOptions {MaxDegreeOfParallelism = 20},
 				async i => { await scheduler.DequeueAsync(); });
@@ -40,14 +39,14 @@ namespace DotnetSpider.Tests
 		public async Task EnqueueAndDequeueQueueBfs()
 		{
 			var ownerId = Guid.NewGuid().ToString("N");
-			var scheduler = new QueueDistinctBfsScheduler(new HashSetDuplicateRemover(), hashAlgorithm);
+			var scheduler = new QueueDistinctBfsScheduler(new HashSetDuplicateRemover(), _hashAlgorithm);
 			await scheduler.EnqueueAsync(new[] {new Request("http://www.a.com") {Owner = ownerId}});
 			await scheduler.EnqueueAsync(new[] {new Request("http://www.b.com") {Owner = ownerId}});
 			await scheduler.EnqueueAsync(new[] {new Request("http://www.a.com") {Owner = ownerId}});
 			await scheduler.EnqueueAsync(new[] {new Request("http://www.a.com") {Owner = ownerId}});
 
 			var request = (await scheduler.DequeueAsync()).First();
-			Assert.Equal("http://www.a.com/", request.Url.ToString());
+			Assert.Equal("http://www.a.com/", request.RequestUri.ToString());
 			Assert.Equal(2, scheduler.Total);
 		}
 
@@ -55,21 +54,21 @@ namespace DotnetSpider.Tests
 		public async Task EnqueueAndDequeueQueueDfs()
 		{
 			var ownerId = Guid.NewGuid().ToString("N");
-			var scheduler = new QueueDistinctDfsScheduler(new HashSetDuplicateRemover(), hashAlgorithm);
+			var scheduler = new QueueDistinctDfsScheduler(new HashSetDuplicateRemover(), _hashAlgorithm);
 			await scheduler.EnqueueAsync(new[] {new Request("http://www.a.com") {Owner = ownerId}});
 			await scheduler.EnqueueAsync(new[] {new Request("http://www.a.com") {Owner = ownerId}});
 			await scheduler.EnqueueAsync(new[] {new Request("http://www.a.com") {Owner = ownerId}});
 			await scheduler.EnqueueAsync(new[] {new Request("http://www.b.com") {Owner = ownerId}});
 
 			var request = (await scheduler.DequeueAsync()).First();
-			Assert.Equal("http://www.b.com/", request.Url.ToString());
+			Assert.Equal("http://www.b.com/", request.RequestUri.ToString());
 			Assert.Equal(2, scheduler.Total);
 		}
 
 		[Fact(DisplayName = "ParallelEnqueueAndDequeueQueueDfs")]
 		public Task ParallelEnqueueAndDequeueQueueDfs()
 		{
-			var scheduler = new QueueDistinctDfsScheduler(new HashSetDuplicateRemover(), hashAlgorithm);
+			var scheduler = new QueueDistinctDfsScheduler(new HashSetDuplicateRemover(), _hashAlgorithm);
 			var ownerId = Guid.NewGuid().ToString("N");
 			Parallel.For(0, 1000, new ParallelOptions {MaxDegreeOfParallelism = 10}, async i =>
 			{
@@ -77,10 +76,7 @@ namespace DotnetSpider.Tests
 				await scheduler.EnqueueAsync(new[] {new Request("http://www.a.com") {Owner = ownerId}});
 				await scheduler.EnqueueAsync(new[] {new Request("http://www.a.com") {Owner = ownerId}});
 				await scheduler.EnqueueAsync(new[] {new Request("http://www.b.com") {Owner = ownerId}});
-				await scheduler.EnqueueAsync(new[]
-				{
-					new Request($"http://www.{i.ToString()}.com", null) {Owner = ownerId}
-				});
+				await scheduler.EnqueueAsync(new[] {new Request($"http://www.{i.ToString()}.com") {Owner = ownerId}});
 			});
 			Parallel.For(0, 1000, new ParallelOptions {MaxDegreeOfParallelism = 20},
 				async i => { await scheduler.DequeueAsync(); });

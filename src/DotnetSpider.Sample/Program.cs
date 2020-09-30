@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Sample.samples;
 using Serilog;
@@ -10,6 +12,9 @@ namespace DotnetSpider.Sample
 	{
 		static async Task Main(string[] args)
 		{
+			ThreadPool.SetMaxThreads(255, 255);
+			ThreadPool.SetMinThreads(255, 255);
+
 			Log.Logger = new LoggerConfiguration()
 				.MinimumLevel.Information()
 				.MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Warning)

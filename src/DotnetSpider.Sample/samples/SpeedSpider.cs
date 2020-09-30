@@ -1,15 +1,10 @@
-using System;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
-using DotnetSpider.DataFlow.Parser;
-using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Downloader;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
 using DotnetSpider.Scheduler.Component;
-using DotnetSpider.Selector;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -60,7 +55,7 @@ namespace DotnetSpider.Sample.samples
 		{
 			private int _downloadCount;
 
-			public override Task HandleAsync(DataContext context)
+			public override Task HandleAsync(DataFlowContext context)
 			{
 				Interlocked.Increment(ref _downloadCount);
 				if ((_downloadCount % 100) == 0)

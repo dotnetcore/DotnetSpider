@@ -51,7 +51,7 @@ namespace DotnetSpider.Mongo
         /// </summary>
         public string ConnectionString { get; }
 
-        protected override async Task StoreAsync(DataContext context, Dictionary<Type, List<dynamic>> dict)
+        protected override async Task StoreAsync(DataFlowContext context, Dictionary<Type, List<dynamic>> dict)
         {
             foreach (var kv in dict)
             {

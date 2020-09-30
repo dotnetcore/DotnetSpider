@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using DotnetSpider.Http;
+using DotnetSpider.Infrastructure;
 using DotnetSpider.Scheduler.Component;
 
 namespace DotnetSpider.Scheduler
@@ -19,7 +20,7 @@ namespace DotnetSpider.Scheduler
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		public QueueDfsScheduler(HashAlgorithm hashAlgorithm) : base(new FakeDuplicateRemover(), hashAlgorithm)
+		public QueueDfsScheduler(IHashAlgorithmService hashAlgorithm) : base(new FakeDuplicateRemover(), hashAlgorithm)
 		{
 		}
 

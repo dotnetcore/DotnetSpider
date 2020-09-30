@@ -51,7 +51,7 @@ namespace DotnetSpider.Sample.samples
 
 		protected class MyConsoleStorage : StorageBase
 		{
-			protected override Task StoreAsync(DataContext context)
+			protected override Task StoreAsync(DataFlowContext context)
 			{
 				var typeName = typeof(News).FullName;
 				var data = context.GetData(typeName);
@@ -71,15 +71,15 @@ namespace DotnetSpider.Sample.samples
 				// AddRequiredValidator("news\\.cnblogs\\.com/n/page");
 				AddRequiredValidator((request =>
 				{
-					var host = new Uri(request.Url).Host;
+					var host = request.RequestUri.Host;
 					var regex = host + "/$";
-					return Regex.IsMatch(request.Url.ToString(), regex);
+					return Regex.IsMatch(request.RequestUri.ToString(), regex);
 				}));
 				// if you want to collect every pages
 				// AddFollowRequestQuerier(Selectors.XPath(".//div[@class='pager']"));
 			}
 
-			protected override Task Parse(DataContext context)
+			protected override Task ParseAsync(DataFlowContext context)
 			{
 				var newsList = context.Selectable.SelectList(Selectors.XPath(".//div[@class='news_block']"));
 				foreach (var news in newsList)
@@ -92,10 +92,10 @@ namespace DotnetSpider.Sample.samples
 					if (!string.IsNullOrWhiteSpace(url))
 					{
 						var request = context.CreateNewRequest(url);
-						request.SetProperty("title", title);
-						request.SetProperty("url", url);
-						request.SetProperty("summary", summary);
-						request.SetProperty("views", views);
+						request.Properties.Add("title", title);
+						request.Properties.Add("url", url);
+						request.Properties.Add("summary", summary);
+						request.Properties.Add("views", views);
 
 						context.AddFollowRequests(request);
 					}
@@ -112,16 +112,16 @@ namespace DotnetSpider.Sample.samples
 				AddRequiredValidator("news\\.cnblogs\\.com/n/\\d+");
 			}
 
-			protected override Task Parse(DataContext context)
+			protected override Task ParseAsync(DataFlowContext context)
 			{
 				var typeName = typeof(News).FullName;
 				context.AddData(typeName,
 					new News
 					{
-						Url = context.Request.Url.ToString(),
-						Title = context.Request.Properties["title"]?.Trim(),
-						Summary = context.Request.Properties["summary"]?.Trim(),
-						Views = int.Parse(context.Request.Properties["views"]),
+						Url = context.Request.RequestUri.ToString(),
+						Title = context.Request.Properties["title"]?.ToString()?.Trim(),
+						Summary = context.Request.Properties["summary"]?.ToString()?.Trim(),
+						Views = int.Parse(context.Request.Properties["views"]?.ToString()?.Trim() ?? "0"),
 						Content = context.Selectable.Select(Selectors.XPath(".//div[@id='news_body']")).Value
 							?.Trim()
 					});

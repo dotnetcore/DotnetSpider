@@ -36,12 +36,12 @@ namespace DotnetSpider.Tests
 		public async Task ParseEntity()
 		{
 			var request = new Request("https://list.jd.com/list.html?cat=9987,653,655",
-				new Dictionary<string, string> {{"cat", "手机"}, {"cat3", "110"}});
-			var dataContext = new DataContext(null, new SpiderOptions(), request,
-				new Response {Content = new ResponseContent {Data = File.ReadAllBytes("Jd.html")}});
+				new Dictionary<string, object> {{"cat", "手机"}, {"cat3", "110"}});
+			var dataContext = new DataFlowContext(null, new SpiderOptions(), request,
+				new Response {Content = new ByteArrayContent(File.ReadAllBytes("Jd.html"))});
 
 			var parser = new DataParser<Product>();
-			parser.SetHtmlSelectableBuilder();
+			parser.UseHtmlSelectableBuilder();
 			await parser.HandleAsync(dataContext);
 
 			var results = (List<Product>)dataContext.GetData(typeof(Product));
@@ -80,11 +80,11 @@ namespace DotnetSpider.Tests
 		{
 			var request = new Request("http://abcd.com");
 			var dataContext =
-				new DataContext(null, new SpiderOptions(), request,
-					new Response {Content = new ResponseContent {Data = Encoding.UTF8.GetBytes(Html)}});
+				new DataFlowContext(null, new SpiderOptions(), request,
+					new Response {Content = new ByteArrayContent(Encoding.UTF8.GetBytes(Html))});
 
 			var parser = new DataParser<N>();
-			parser.SetHtmlSelectableBuilder();
+			parser.UseHtmlSelectableBuilder();
 
 			await parser.HandleAsync(dataContext);
 
@@ -101,8 +101,8 @@ namespace DotnetSpider.Tests
 		{
 			var request = new Request("http://abcd.com");
 			var dataContext =
-				new DataContext(null, new SpiderOptions(), request,
-					new Response {Content = new ResponseContent {Data = Encoding.UTF8.GetBytes(Html)}});
+				new DataFlowContext(null, new SpiderOptions(), request,
+					new Response {Content = new ByteArrayContent(Encoding.UTF8.GetBytes(Html))});
 
 			var parser = new DataParser<E>();
 

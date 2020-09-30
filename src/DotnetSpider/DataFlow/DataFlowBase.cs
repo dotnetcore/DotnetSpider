@@ -33,7 +33,7 @@ namespace DotnetSpider.DataFlow
 		/// </summary>
 		/// <param name="context">处理上下文</param>
 		/// <returns></returns>
-		public abstract Task HandleAsync(DataContext context);
+		public abstract Task HandleAsync(DataFlowContext context);
 
 		/// <summary>
 		/// 释放

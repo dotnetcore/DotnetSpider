@@ -49,9 +49,9 @@ namespace DotnetSpider.DataFlow.Storage
             return path;
         }
 
-        protected abstract Task StorageAsync(DataContext context, TableMetadata tableMetadata, IList data);
+        protected abstract Task StorageAsync(DataFlowContext context, TableMetadata tableMetadata, IList data);
 
-        protected override async Task StoreAsync(DataContext context, Dictionary<Type, List<dynamic>> dict)
+        protected override async Task StoreAsync(DataFlowContext context, Dictionary<Type, List<dynamic>> dict)
         {
             foreach (var kv in dict)
             {
@@ -69,13 +69,13 @@ namespace DotnetSpider.DataFlow.Storage
         /// <param name="tableMetadata">表元数据</param>
         /// <param name="extension">文件扩展名</param>
         /// <returns></returns>
-        protected virtual string GetDataFile(DataContext context, TableMetadata tableMetadata, string extension)
+        protected virtual string GetDataFile(DataFlowContext context, TableMetadata tableMetadata, string extension)
         {
             return Path.Combine(GetDataFolder(context.Request.Owner),
                 $"{GenerateFileName(tableMetadata)}.{extension}");
         }
 
-        protected virtual StreamWriter OpenWrite(DataContext context, TableMetadata tableMetadata, string extension)
+        protected virtual StreamWriter OpenWrite(DataFlowContext context, TableMetadata tableMetadata, string extension)
         {
             var path = GetDataFile(context, tableMetadata, extension);
             var folder = Path.GetDirectoryName(path);

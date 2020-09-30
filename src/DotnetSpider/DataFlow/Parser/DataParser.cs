@@ -18,24 +18,24 @@ namespace DotnetSpider.DataFlow.Parser
 	/// </summary>
 	public abstract class DataParser : DataFlowBase
 	{
-		private readonly List<Func<DataContext, IEnumerable<Request>>> _followRequestQueriers;
+		private readonly List<Func<DataFlowContext, IEnumerable<Request>>> _followRequestQueriers;
 		private readonly List<Func<Request, bool>> _requiredValidator;
 
 		/// <summary>
 		/// 选择器的生成方法
 		/// </summary>
-		public Func<DataContext, ISelectable> SelectableBuilder { get; protected set; }
+		public Func<DataFlowContext, ISelectable> SelectableBuilder { get; protected set; }
 
 		/// <summary>
 		/// 数据解析
 		/// </summary>
 		/// <param name="context">处理上下文</param>
 		/// <returns></returns>
-		protected abstract Task Parse(DataContext context);
+		protected abstract Task ParseAsync(DataFlowContext context);
 
 		protected DataParser()
 		{
-			_followRequestQueriers = new List<Func<DataContext, IEnumerable<Request>>>();
+			_followRequestQueriers = new List<Func<DataFlowContext, IEnumerable<Request>>>();
 			_requiredValidator = new List<Func<Request, bool>>();
 		}
 
@@ -63,10 +63,10 @@ namespace DotnetSpider.DataFlow.Parser
 
 		public void AddRequiredValidator(string pattern)
 		{
-			_requiredValidator.Add(request => Regex.IsMatch(request.Url.ToString(), pattern));
+			_requiredValidator.Add(request => Regex.IsMatch(request.RequestUri.ToString(), pattern));
 		}
 
-		protected virtual void AddParsedResult<T>(DataContext context, IEnumerable<T> results)
+		protected virtual void AddParsedResult<T>(DataFlowContext context, IEnumerable<T> results)
 			where T : EntityBase<T>, new()
 		{
 			if (results != null)
@@ -86,21 +86,18 @@ namespace DotnetSpider.DataFlow.Parser
 			}
 		}
 
-		internal void SetHtmlSelectableBuilder()
+		internal void UseHtmlSelectableBuilder()
 		{
-			ISelectable Builder(DataContext context)
+			SelectableBuilder = context =>
 			{
 				var text = context.Response.ReadAsString().TrimStart();
-				return GetHtmlSelectable(context, text);
-			}
-
-			SelectableBuilder = Builder;
+				return CreateHtmlSelectable(context, text);
+			};
 		}
 
-		private ISelectable GetHtmlSelectable(DataContext context, string text)
+		private ISelectable CreateHtmlSelectable(DataFlowContext context, string text)
 		{
-			var request = context.Request;
-			var uri = new Uri(request.Url);
+			var uri = context.Request.RequestUri;
 			var domain = uri.Port == 80 || uri.Port == 443
 				? $"{uri.Scheme}://{uri.Host}"
 				: $"{uri.Scheme}://{uri.Host}:{uri.Port}";
@@ -112,14 +109,15 @@ namespace DotnetSpider.DataFlow.Parser
 		/// </summary>
 		/// <param name="context">处理上下文</param>
 		/// <returns></returns>
-		public override async Task HandleAsync(DataContext context)
+		public override async Task HandleAsync(DataFlowContext context)
 		{
 			context.NotNull(nameof(context));
 			context.Response.NotNull(nameof(context.Response));
 
 			if (!IsValidRequest(context.Request))
 			{
-				Logger.LogInformation($"{GetType().Name} ignore request {context.Request.Url}");
+				Logger.LogInformation(
+					$"{GetType().Name} ignore parse request {context.Request.RequestUri}, {context.Request.Hash}");
 				return;
 			}
 
@@ -135,7 +133,7 @@ namespace DotnetSpider.DataFlow.Parser
 					var text = context.Response.ReadAsString().TrimStart();
 					if (text.StartsWith("<!DOCTYPE html>") || text.StartsWith("<html>"))
 					{
-						context.Selectable = GetHtmlSelectable(context, text);
+						context.Selectable = CreateHtmlSelectable(context, text);
 					}
 					else
 					{
@@ -152,7 +150,7 @@ namespace DotnetSpider.DataFlow.Parser
 				}
 			}
 
-			await Parse(context);
+			await ParseAsync(context);
 
 			var requests = new List<Request>();
 

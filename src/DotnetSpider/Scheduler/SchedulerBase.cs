@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using DotnetSpider.Http;
+using DotnetSpider.Infrastructure;
 using DotnetSpider.Scheduler.Component;
 
 namespace DotnetSpider.Scheduler
@@ -9,9 +10,9 @@ namespace DotnetSpider.Scheduler
     public abstract class SchedulerBase : IScheduler
     {
         protected readonly IDuplicateRemover DuplicateRemover;
-        protected readonly HashAlgorithm HashAlgorithm;
+        protected readonly IHashAlgorithmService HashAlgorithm;
 
-        protected SchedulerBase(IDuplicateRemover duplicateRemover, HashAlgorithm hashAlgorithm)
+        protected SchedulerBase(IDuplicateRemover duplicateRemover, IHashAlgorithmService hashAlgorithm)
         {
 	        DuplicateRemover = duplicateRemover;
 	        HashAlgorithm = hashAlgorithm;

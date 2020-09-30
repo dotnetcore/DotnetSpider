@@ -20,11 +20,12 @@ namespace DotnetSpider.Infrastructure
         public Task StartAsync(CancellationToken cancellationToken)
         {
             var properties = typeof(SpiderOptions).GetProperties();
+            _logger.LogInformation("========================================================================================================");
             foreach (var property in properties)
             {
-                _logger.LogInformation($"Argument: {property.Name}, {property.GetValue(_options)}");
+                _logger.LogInformation($"{property.Name}: {property.GetValue(_options)}");
             }
-
+            _logger.LogInformation("========================================================================================================");
             return Task.CompletedTask;
         }
 

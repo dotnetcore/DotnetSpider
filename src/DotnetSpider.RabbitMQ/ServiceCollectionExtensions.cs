@@ -35,7 +35,7 @@ namespace DotnetSpider.RabbitMQ
 
 		public static IServiceCollection AddRabbitMQ(this IServiceCollection services, IConfiguration configuration)
 		{
-			services.Configure<RabbitMQOptions>(configuration);
+			services.Configure<RabbitMQOptions>(configuration.GetSection("RabbitMQ"));
 			services.TryAddSingleton<IMessageQueue, RabbitMQMessageQueue>();
 			return services;
 		}

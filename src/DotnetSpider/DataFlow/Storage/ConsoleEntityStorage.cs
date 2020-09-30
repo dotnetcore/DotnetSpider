@@ -14,8 +14,8 @@ namespace DotnetSpider.DataFlow.Storage
         {
             return new ConsoleEntityStorage();
         }
-        
-        protected override Task StoreAsync(DataContext context, Dictionary<Type, List<dynamic>> dict)
+
+        protected override Task StoreAsync(DataFlowContext context, Dictionary<Type, List<dynamic>> dict)
         {
             foreach (var kv in dict)
             {

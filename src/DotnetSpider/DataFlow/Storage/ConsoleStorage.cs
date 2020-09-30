@@ -16,7 +16,7 @@ namespace DotnetSpider.DataFlow.Storage
 			return new ConsoleStorage();
 		}
 
-		protected override Task StoreAsync(DataContext context)
+		protected override Task StoreAsync(DataFlowContext context)
 		{
 			var items = context.GetData().Where(x => !ReferenceEquals(x.Key, Consts.ResponseBytes));
 

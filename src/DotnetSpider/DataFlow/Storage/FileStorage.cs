@@ -17,12 +17,12 @@ namespace DotnetSpider.DataFlow.Storage
 			return new FileStorage();
 		}
 
-		protected override async Task StoreAsync(DataContext context)
+		protected override async Task StoreAsync(DataFlowContext context)
 		{
 			var file = Path.Combine(GetDataFolder(context.Request.Owner),
 				$"{context.Request.Hash}.dat");
 			using var writer = OpenWrite(file);
-			await writer.WriteLineAsync("RequestUri:\t" + context.Request.Url);
+			await writer.WriteLineAsync("RequestUri:\t" + context.Request.RequestUri);
 			var items = context.GetData().Where(x => !ReferenceEquals(x.Key, Consts.ResponseBytes));
 			await writer.WriteLineAsync("Data:\t" + JsonConvert.SerializeObject(items));
 		}

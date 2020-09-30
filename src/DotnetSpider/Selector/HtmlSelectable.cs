@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
 using HtmlAgilityPack;
 
@@ -41,12 +42,13 @@ namespace DotnetSpider.Selector
 			var sourceLinks = SelectList(Selectors.XPath("./descendant-or-self::*/@src"))
 				?.Select(x => x.Value);
 
+
 			var results = new HashSet<string>();
 			if (links != null)
 			{
 				foreach (var link in links)
 				{
-					if (Uri.TryCreate(link, UriKind.RelativeOrAbsolute, out _))
+					if (Uri.TryCreate(link, UriKind.RelativeOrAbsolute, out var uri) && HttpUtilities.IsHttpUri(uri))
 					{
 						results.Add(link);
 					}
@@ -57,7 +59,7 @@ namespace DotnetSpider.Selector
 			{
 				foreach (var link in sourceLinks)
 				{
-					if (Uri.TryCreate(link, UriKind.RelativeOrAbsolute, out _))
+					if (Uri.TryCreate(link, UriKind.RelativeOrAbsolute, out var uri) && HttpUtilities.IsHttpUri(uri))
 					{
 						results.Add(link);
 					}

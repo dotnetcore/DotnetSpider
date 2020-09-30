@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using DotnetSpider.Http;
+using DotnetSpider.Infrastructure;
 using DotnetSpider.Scheduler.Component;
 
 namespace DotnetSpider.Scheduler
@@ -17,7 +18,7 @@ namespace DotnetSpider.Scheduler
 			new List<Request>();
 
 
-		public QueueDistinctDfsScheduler(IDuplicateRemover duplicateRemover, HashAlgorithm hashAlgorithm) : base(
+		public QueueDistinctDfsScheduler(IDuplicateRemover duplicateRemover, IHashAlgorithmService hashAlgorithm) : base(
 			duplicateRemover, hashAlgorithm)
 		{
 		}

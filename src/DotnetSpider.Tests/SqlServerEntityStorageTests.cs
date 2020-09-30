@@ -70,7 +70,7 @@ namespace DotnetSpider.Tests
 
                 {
                     var storage = CreateStorage(StorageMode.Insert);
-                    var dfc = new DataContext(null, null, null, null);
+                    var dfc = new DataFlowContext(null, null, null, null);
                     var typeName = typeof(CreateTableEntity1);
                     var entity = new CreateTableEntity1();
 
@@ -124,7 +124,7 @@ namespace DotnetSpider.Tests
 
                 {
                     var storage = CreateStorage(StorageMode.Insert);
-                    var dfc = new DataContext(null, null, null, null);
+                    var dfc = new DataFlowContext(null, null, null, null);
                     var typeName = typeof(CreateTableEntity2);
                     var entity = new CreateTableEntity2();
 
@@ -179,7 +179,7 @@ namespace DotnetSpider.Tests
 
                 {
                     var storage = CreateStorage(StorageMode.Insert);
-                    var dfc = new DataContext(null, null, null,null);
+                    var dfc = new DataFlowContext(null, null, null,null);
                     var typeName = typeof(CreateTableEntity3);
                     var entity = new CreateTableEntity3();
 
@@ -239,7 +239,7 @@ namespace DotnetSpider.Tests
 
                 {
                     var storage = CreateStorage(StorageMode.Insert);
-                    var dfc = new DataContext(null, null, null, null);
+                    var dfc = new DataFlowContext(null, null, null, null);
                     var typeName = typeof(CreateTableEntity4);
                     var entity = new CreateTableEntity4();
 
@@ -302,7 +302,7 @@ namespace DotnetSpider.Tests
 
                 {
                     var storage = CreateStorage(StorageMode.Insert);
-                    var dfc = new DataContext(null, null, null, null);
+                    var dfc = new DataFlowContext(null, null, null, null);
                     var typeName = typeof(CreateTableEntity5);
                     var entity = new CreateTableEntity5();
 
@@ -357,7 +357,7 @@ namespace DotnetSpider.Tests
 
                 {
                     var storage = CreateStorage(StorageMode.InsertIgnoreDuplicate);
-                    var dfc = new DataContext(null, null, null, null);
+                    var dfc = new DataFlowContext(null, null, null, null);
                     var typeName = typeof(CreateTableEntity4);
                     var entity = new CreateTableEntity4();
 
@@ -396,7 +396,7 @@ namespace DotnetSpider.Tests
 
                 {
                     var storage = CreateStorage(StorageMode.InsertAndUpdate);
-                    var dfc = new DataContext(null, null, null, null);
+                    var dfc = new DataFlowContext(null, null, null, null);
                     var typeName = typeof(CreateTableEntity4);
                     var entity = new CreateTableEntity4();
 
@@ -433,7 +433,7 @@ namespace DotnetSpider.Tests
 
                 {
                     var storage = CreateStorage(StorageMode.InsertIgnoreDuplicate);
-                    var dfc = new DataContext(null, null, null, null);
+                    var dfc = new DataFlowContext(null, null, null, null);
                     var typeName = typeof(CreateTableEntity4);
                     var entity = new CreateTableEntity4();
 
@@ -441,7 +441,7 @@ namespace DotnetSpider.Tests
                     dfc.AddData(typeName, items);
                     await storage.HandleAsync(dfc);
 
-                    var dfc2 = new DataContext(null, null, null, null);
+                    var dfc2 = new DataFlowContext(null, null, null, null);
 
                     var now = DateTime.Now;
                     dfc2.AddData(typeName,
@@ -513,7 +513,7 @@ namespace DotnetSpider.Tests
 
                 {
                     var storage = CreateStorage(StorageMode.InsertIgnoreDuplicate);
-                    var dfc = new DataContext(null, null, null, null);
+                    var dfc = new DataFlowContext(null, null, null, null);
                     var typeName = typeof(CreateTableEntity6);
                     var entity = new CreateTableEntity6();
 
@@ -521,7 +521,7 @@ namespace DotnetSpider.Tests
                     dfc.AddData(typeName, items);
                     await storage.HandleAsync(dfc);
 
-                    var dfc2 = new DataContext(null, null, null, null);
+                    var dfc2 = new DataFlowContext(null, null, null, null);
                     var now = DateTime.Now;
                     dfc2.AddData(typeName,
                         new List<CreateTableEntity6>
@@ -571,7 +571,7 @@ namespace DotnetSpider.Tests
                     var storage =
                         (RelationalDatabaseEntityStorageBase) CreateStorage(StorageMode.InsertIgnoreDuplicate);
                     storage.UseTransaction = true;
-                    var dfc = new DataContext(null, null, null, null);
+                    var dfc = new DataFlowContext(null, null, null, null);
                     var typeName = typeof(CreateTableEntity4);
                     var entity = new CreateTableEntity4();
 
@@ -632,7 +632,7 @@ namespace DotnetSpider.Tests
                 {
                     var storage = (RelationalDatabaseEntityStorageBase) CreateStorage(StorageMode.Insert);
                     storage.IgnoreCase = false;
-                    var dfc = new DataContext(null, null, null, null);
+                    var dfc = new DataFlowContext(null, null, null, null);
                     var typeName = typeof(CreateTableEntity7);
                     var entity = new CreateTableEntity7();
 

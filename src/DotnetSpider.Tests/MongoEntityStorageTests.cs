@@ -58,7 +58,7 @@ namespace DotnetSpider.Tests
 
             var mongoEntityStorage = new MongoEntityStorage(mongoClient.Object);
 
-            var dfc = new DataContext(null, null, null, null);
+            var dfc = new DataFlowContext(null, null, null, null);
             var typeName = typeof(CreateTableEntity1);
             var entity = new CreateTableEntity1();
 
@@ -77,7 +77,7 @@ namespace DotnetSpider.Tests
             var mongoClient = new Mock<IMongoClient>();
             var mongoEntityStorage = new MongoEntityStorage(mongoClient.Object);
 
-            var dfc = new DataContext(null, null, null, null);
+            var dfc = new DataFlowContext(null, null, null, null);
             mongoEntityStorage.SetLogger(NullLogger.Instance);
             await mongoEntityStorage.HandleAsync(dfc);
         }

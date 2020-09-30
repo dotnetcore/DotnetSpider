@@ -1,9 +1,13 @@
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using DotnetSpider.Downloader;
 using DotnetSpider.Extensions;
 using DotnetSpider.Http;
+using DotnetSpider.Infrastructure;
+using Murmur;
 using Xunit;
+using ObjectId = MongoDB.Bson.ObjectId;
 
 namespace DotnetSpider.Tests
 {
@@ -26,33 +30,31 @@ namespace DotnetSpider.Tests
 			var request = new Request("http://www.baidu.com")
 			{
 				Method = "PUT",
-				Accept = "Accept",
 				Agent = "Agent",
-				AutoRedirect = true,
 				Downloader = DownloaderNames.HttpClient,
-				UserAgent = "UserAgent",
 				Timestamp = 1000,
 				PPPoERegex = "PPPoERegex"
 			};
+			request.Headers.UserAgent = ("UserAgent");
+			request.Headers.Accept = ("Accept");
 			var list = new List<byte>();
 			for (int i = 0; i < 2000; ++i)
 			{
 				list.Add(byte.MinValue);
 			}
 
-			request.SetContent(new ByteArrayContent(list.ToArray()));
+			request.Content = (new ByteArrayContent(list.ToArray()));
 
 			var bytes = request.Serialize();
 			var r1 = await bytes.DeserializeAsync<Request>();
 			Assert.Equal("PUT", r1.Method);
-			Assert.Equal("Accept", r1.Accept);
+			Assert.Equal("Accept", r1.Headers.Accept);
 			// Assert.Equal("Agent", r1.Agent);
-			Assert.True(r1.AutoRedirect);
 			Assert.Equal(DownloaderNames.HttpClient, r1.Downloader);
-			Assert.Equal("UserAgent", r1.UserAgent);
+			Assert.Equal("UserAgent", r1.Headers.UserAgent);
 			Assert.Equal(1000, r1.Timestamp);
 			Assert.Equal("PPPoERegex", r1.PPPoERegex);
-			Assert.Equal(2000, ((ByteArrayContent)r1.GetContentObject()).Bytes.Length);
+			Assert.Equal(2000, ((ByteArrayContent)r1.Content as ByteArrayContent).Bytes.Length);
 		}
 
 		[Fact]
@@ -61,29 +63,27 @@ namespace DotnetSpider.Tests
 			var request = new Request("http://www.baidu.com")
 			{
 				Method = "PUT",
-				Accept = "Accept",
 				Agent = "Agent",
-				AutoRedirect = true,
 				Downloader = DownloaderNames.HttpClient,
-				UserAgent = "UserAgent",
 				Timestamp = 1000,
 				PPPoERegex = "PPPoERegex"
 			};
+			request.Headers.UserAgent = ("UserAgent");
+			request.Headers.Accept = ("Accept");
 
-
-			request.SetContent(new StringContent("{}", "application/json"));
+			request.Content = (new StringContent("{}", Encoding.UTF8, "application/json"));
 
 			var bytes = request.Serialize();
 			var r1 = await bytes.DeserializeAsync<Request>();
 			Assert.Equal("PUT", r1.Method);
-			Assert.Equal("Accept", r1.Accept);
+			Assert.Equal("UserAgent", r1.Headers.UserAgent);
+			Assert.Equal("Accept", r1.Headers.Accept);
 			// Assert.Equal("Agent", r1.Agent);
-			Assert.True(r1.AutoRedirect);
 			Assert.Equal(DownloaderNames.HttpClient, r1.Downloader);
-			Assert.Equal("UserAgent", r1.UserAgent);
+
 			Assert.Equal(1000, r1.Timestamp);
 			Assert.Equal("PPPoERegex", r1.PPPoERegex);
-			var content = (StringContent)r1.GetContentObject();
+			var content = (StringContent)r1.Content;
 			Assert.Equal("{}", content.Content);
 			Assert.Equal("UTF-8", content.EncodingName);
 			Assert.Equal("application/json", content.MediaType);
@@ -91,38 +91,50 @@ namespace DotnetSpider.Tests
 
 
 		[Fact]
+		public void SerializeAndDeserialize3()
+		{
+			var hashAlgorithm = new MurmurHashAlgorithmService();
+			var ownerId = ObjectId.GenerateNewId().ToString();
+			var r1 = new Request("http://www.a.com") {Owner = ownerId};
+			var h1 = r1.ComputeHash(hashAlgorithm);
+
+			var r2 = new Request("http://www.a.com") {Owner = ownerId};
+			var h2 = r1.ComputeHash(hashAlgorithm);
+			Assert.Equal(h1, h2);
+		}
+
+		[Fact]
 		public void DeepClone1()
 		{
 			var request = new Request("http://www.baidu.com")
 			{
 				Method = "PUT",
-				Accept = "Accept",
 				Agent = "Agent",
-				AutoRedirect = true,
 				Downloader = DownloaderNames.HttpClient,
-				UserAgent = "UserAgent",
 				Timestamp = 1000,
 				PPPoERegex = "PPPoERegex"
 			};
+			request.Headers.UserAgent = ("UserAgent");
+			request.Headers.Accept = ("Accept");
 			var list = new List<byte>();
 			for (int i = 0; i < 2000; ++i)
 			{
 				list.Add(byte.MinValue);
 			}
 
-			request.SetContent(new ByteArrayContent(list.ToArray()));
+			request.Content = (new ByteArrayContent(list.ToArray()));
 
 
 			var r1 = request.Clone();
 			Assert.Equal("PUT", r1.Method);
-			Assert.Equal("Accept", r1.Accept);
+
 			// Assert.Equal("Agent", r1.Agent);
-			Assert.True(r1.AutoRedirect);
 			Assert.Equal(DownloaderNames.HttpClient, r1.Downloader);
-			Assert.Equal("UserAgent", r1.UserAgent);
+			Assert.Equal("UserAgent", r1.Headers.UserAgent);
+			Assert.Equal("Accept", r1.Headers.Accept);
 			Assert.Equal(1000, r1.Timestamp);
 			Assert.Equal("PPPoERegex", r1.PPPoERegex);
-			Assert.Equal(2000, ((ByteArrayContent)r1.GetContentObject()).Bytes.Length);
+			Assert.Equal(2000, ((ByteArrayContent)r1.Content).Bytes.Length);
 		}
 
 		[Fact]
@@ -131,28 +143,26 @@ namespace DotnetSpider.Tests
 			var request = new Request("http://www.baidu.com")
 			{
 				Method = "PUT",
-				Accept = "Accept",
 				Agent = "Agent",
-				AutoRedirect = true,
 				Downloader = DownloaderNames.HttpClient,
-				UserAgent = "UserAgent",
 				Timestamp = 1000,
 				PPPoERegex = "PPPoERegex"
 			};
+			request.Headers.UserAgent = ("UserAgent");
+			request.Headers.Accept = ("Accept");
 
-
-			request.SetContent(new StringContent("{}", "application/json"));
+			request.Content = (new StringContent("{}", Encoding.UTF8, "application/json"));
 
 			var r1 = request.Clone();
 			Assert.Equal("PUT", r1.Method);
-			Assert.Equal("Accept", r1.Accept);
+			Assert.Equal("UserAgent", r1.Headers.UserAgent);
+			Assert.Equal("Accept", r1.Headers.Accept);
 			// Assert.Equal("Agent", r1.Agent);
-			Assert.True(r1.AutoRedirect);
 			Assert.Equal(DownloaderNames.HttpClient, r1.Downloader);
-			Assert.Equal("UserAgent", r1.UserAgent);
+
 			Assert.Equal(1000, r1.Timestamp);
 			Assert.Equal("PPPoERegex", r1.PPPoERegex);
-			var content = (StringContent)r1.GetContentObject();
+			var content = (StringContent)r1.Content;
 			Assert.Equal("{}", content.Content);
 			Assert.Equal("UTF-8", content.EncodingName);
 			Assert.Equal("application/json", content.MediaType);

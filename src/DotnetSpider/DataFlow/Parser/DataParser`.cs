@@ -84,7 +84,7 @@ namespace DotnetSpider.DataFlow.Parser
 
 			foreach (var pattern in patterns)
 			{
-				AddRequiredValidator(request => Regex.IsMatch(request.Url.ToString(), pattern));
+				AddRequiredValidator(request => Regex.IsMatch(request.RequestUri.ToString(), pattern));
 			}
 		}
 
@@ -95,7 +95,7 @@ namespace DotnetSpider.DataFlow.Parser
 			return t;
 		}
 
-		protected override Task Parse(DataContext context)
+		protected override Task ParseAsync(DataFlowContext context)
 		{
 			var selectable = context.Selectable;
 
@@ -182,7 +182,7 @@ namespace DotnetSpider.DataFlow.Parser
 			return Task.CompletedTask;
 		}
 
-		private T ParseObject(DataContext context, Dictionary<string, object> properties, ISelectable selectable,
+		private T ParseObject(DataFlowContext context, Dictionary<string, object> properties, ISelectable selectable,
 			int index)
 		{
 			var dataObject = new T();
@@ -234,7 +234,7 @@ namespace DotnetSpider.DataFlow.Parser
 			return ConfigureDataObject(dataObject);
 		}
 
-		private string GetEnvironment(DataContext context, Dictionary<string, object> properties, ValueSelector field,
+		private string GetEnvironment(DataFlowContext context, Dictionary<string, object> properties, ValueSelector field,
 			int index)
 		{
 			string value;
