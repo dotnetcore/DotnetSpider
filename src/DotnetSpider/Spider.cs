@@ -375,88 +375,85 @@ namespace DotnetSpider
 
 		private async Task RunAsync(CancellationToken stoppingToken)
 		{
-			await Task.Factory.StartNew(async () =>
+			try
 			{
-				try
+				var sleepTimeLimit = Options.EmptySleepTime * 1000;
+
+				var bucket = CreateBucket(Options.Speed);
+				var sleepTime = 0;
+				var batch = (int)Options.Batch;
+				var start = DateTime.Now;
+				var end = start;
+
+				PrintStatistics(stoppingToken);
+
+				while (!stoppingToken.IsCancellationRequested)
 				{
-					var sleepTimeLimit = Options.EmptySleepTime * 1000;
-
-					var bucket = CreateBucket(Options.Speed);
-					var sleepTime = 0;
-					var batch = (int)Options.Batch;
-					var start = DateTime.Now;
-					var end = start;
-
-					PrintStatistics(stoppingToken);
-
-					while (!stoppingToken.IsCancellationRequested)
+					if (_requestedQueue.Count > Options.RequestedQueueCount)
 					{
-						if (_requestedQueue.Count > Options.RequestedQueueCount)
-						{
-							sleepTime += 10;
+						sleepTime += 10;
 
-							if (await WaitForContinueAsync(sleepTime, sleepTimeLimit, (end - start).TotalSeconds,
-								$"{Id} too much requests enqueued"))
-							{
-								continue;
-							}
-							else
-							{
-								break;
-							}
-						}
-
-						if (await HandleTimeoutRequestAsync())
+						if (await WaitForContinueAsync(sleepTime, sleepTimeLimit, (end - start).TotalSeconds,
+							$"{Id} too much requests enqueued"))
 						{
 							continue;
 						}
-
-						var requests = (await _services.Scheduler.DequeueAsync(batch)).ToArray();
-
-						if (requests.Length > 0)
-						{
-							sleepTime = 0;
-
-							foreach (var request in requests)
-							{
-								ConfigureRequest(request);
-
-								while (bucket.ShouldThrottle(1, out var waitTimeMillis))
-								{
-									await Task.Delay(waitTimeMillis, default);
-								}
-
-								if (!await PublishRequestMessagesAsync(request))
-								{
-									Logger.LogError("Exit by publish request message failed");
-									break;
-								}
-							}
-
-							end = DateTime.Now;
-						}
 						else
 						{
-							OnSchedulerEmpty?.Invoke();
+							break;
+						}
+					}
 
-							sleepTime += 10;
+					if (await HandleTimeoutRequestAsync())
+					{
+						continue;
+					}
 
-							if (!await WaitForContinueAsync(sleepTime, sleepTimeLimit, (end - start).TotalSeconds))
+					var requests = (await _services.Scheduler.DequeueAsync(batch)).ToArray();
+
+					if (requests.Length > 0)
+					{
+						sleepTime = 0;
+
+						foreach (var request in requests)
+						{
+							ConfigureRequest(request);
+
+							while (bucket.ShouldThrottle(1, out var waitTimeMillis))
 							{
+								await Task.Delay(waitTimeMillis, default);
+							}
+
+							if (!await PublishRequestMessagesAsync(request))
+							{
+								Logger.LogError("Exit by publish request message failed");
 								break;
 							}
 						}
+
+						end = DateTime.Now;
+					}
+					else
+					{
+						OnSchedulerEmpty?.Invoke();
+
+						sleepTime += 10;
+
+						if (!await WaitForContinueAsync(sleepTime, sleepTimeLimit, (end - start).TotalSeconds))
+						{
+							break;
+						}
 					}
 				}
-				catch (Exception e)
-				{
-					Logger.LogError($"{Id} exited by exception: {e}");
-				}
-				finally
-				{
-					await ExitAsync();
-				}
-			}, stoppingToken);
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"{Id} exited by exception: {e}");
+			}
+			finally
+			{
+				await ExitAsync();
+			}
 		}
 
 		private async Task<bool> HandleTimeoutRequestAsync()
