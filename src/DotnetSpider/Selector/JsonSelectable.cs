@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using DotnetSpider.Infrastructure;
@@ -14,7 +15,7 @@ namespace DotnetSpider.Selector
             _token = token;
         }
 
-        public override IEnumerable<string> Links()
+        public override IEnumerable<Uri> Links()
         {
             throw new System.NotImplementedException();
         }

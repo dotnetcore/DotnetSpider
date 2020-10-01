@@ -7,11 +7,24 @@ using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Extensions;
 using DotnetSpider.Infrastructure;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.HBase
 {
+	public class HBaseOptions
+	{
+		private readonly IConfiguration _configuration;
+
+		public HBaseOptions(IConfiguration configuration)
+		{
+			_configuration = configuration;
+		}
+
+		public string HBaseRestServer => _configuration["HBase:RestServer"];
+	}
+
 	/// <summary>
 	/// Can't create namespace dotnet_spider by REST
 	/// So pls create it by HBase shell:
@@ -29,10 +42,11 @@ namespace DotnetSpider.HBase
 		/// <summary>
 		/// 根据配置返回存储器
 		/// </summary>
-		/// <param name="options">配置</param>
+		/// <param name="configuration">配置</param>
 		/// <returns></returns>
-		public static HBaseStorage CreateFromOptions(SpiderOptions options)
+		public static HBaseStorage CreateFromOptions(IConfiguration configuration)
 		{
+			var options = new HBaseOptions(configuration);
 			var storage = new HBaseStorage(options.HBaseRestServer);
 			return storage;
 		}

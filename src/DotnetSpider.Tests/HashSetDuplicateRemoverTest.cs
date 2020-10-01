@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
 using DotnetSpider.Scheduler.Component;
-using Murmur;
 using Xunit;
 
 namespace DotnetSpider.Tests

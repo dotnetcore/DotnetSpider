@@ -11,6 +11,7 @@ namespace DotnetSpider.AgentCenter.Store
 		/// <summary>
 		/// 节点标识
 		/// </summary>
+		// ReSharper disable once UnusedAutoPropertyAccessor.Local
 		public int Id { get; private set; }
 
 		/// <summary>

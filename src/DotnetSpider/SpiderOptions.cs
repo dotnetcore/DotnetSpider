@@ -1,6 +1,3 @@
-using DotnetSpider.DataFlow.Storage;
-using DotnetSpider.Infrastructure;
-
 namespace DotnetSpider
 {
 	public class SpiderOptions
@@ -31,38 +28,18 @@ namespace DotnetSpider
 		public double Speed { get; set; } = 1;
 
 		/// <summary>
+		/// 一次重请求队列获取多少个请求
+		/// </summary>
+		public uint Batch { get; set; } = 4;
+
+		/// <summary>
 		/// 去除外链
 		/// </summary>
 		public bool RemoveOutboundLinks { get; set; } = false;
 
 		/// <summary>
-		/// 存储所用的数据库连接字符串
-		/// </summary>
-		public string StorageConnectionString { get; set; }
-
-		/// <summary>
 		/// 存储器类型: FullTypeName, AssemblyName
 		/// </summary>
-		public string Storage { get; set; }
-
-		/// <summary>
-		/// 存储模式
-		/// </summary>
-		public StorageMode StorageMode { get; set; } = StorageMode.InsertIgnoreDuplicate;
-
-		/// <summary>
-		/// MySqlFile 文件类型
-		/// </summary>
-		public MySqlFileType MySqlFileType { get; set; }
-
-		/// <summary>
-		/// SqlServer 版本
-		/// </summary>
-		public SqlServerVersion SqlServerVersion { get; set; }
-
-		/// <summary>
-		/// HBase 的 RestServer 地址
-		/// </summary>
-		public string HBaseRestServer { get; set; }
+		public string Storage { get; set; } = "DotnetSpider.MySql.MySqlEntityStorage,DotnetSpider.MySql";
 	}
 }

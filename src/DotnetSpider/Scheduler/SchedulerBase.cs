@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;

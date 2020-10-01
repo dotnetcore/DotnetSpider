@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace DotnetSpider.DataFlow.Storage
@@ -18,9 +19,9 @@ namespace DotnetSpider.DataFlow.Storage
         /// <summary>
         /// 根据配置返回存储器
         /// </summary>
-        /// <param name="options">配置</param>
+        /// <param name="configuration">配置</param>
         /// <returns></returns>
-        public static JsonEntityFileStorage CreateFromOptions(SpiderOptions options)
+        public static JsonEntityFileStorage CreateFromOptions(IConfiguration configuration)
         {
             return new JsonEntityFileStorage();
         }

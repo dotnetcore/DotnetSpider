@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DotnetSpider.Infrastructure;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace DotnetSpider.DataFlow.Storage
@@ -11,7 +14,7 @@ namespace DotnetSpider.DataFlow.Storage
 	/// </summary>
 	public class ConsoleStorage : StorageBase
 	{
-		public static IDataFlow CreateFromOptions(SpiderOptions options)
+		public static IDataFlow CreateFromOptions(IConfiguration configuration)
 		{
 			return new ConsoleStorage();
 		}
@@ -20,7 +23,9 @@ namespace DotnetSpider.DataFlow.Storage
 		{
 			var items = context.GetData().Where(x => !ReferenceEquals(x.Key, Consts.ResponseBytes));
 
-			Console.WriteLine(JsonConvert.SerializeObject(items));
+			Console.ForegroundColor = ConsoleColor.Cyan;
+			Console.WriteLine($"{Environment.NewLine}DATA: {JsonConvert.SerializeObject(items)}{Environment.NewLine}");
+
 			return Task.CompletedTask;
 		}
 	}

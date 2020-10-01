@@ -19,7 +19,10 @@ namespace DotnetSpider.Sample.samples
 	{
 		public static async Task RunAsync()
 		{
-			var builder = Builder.CreateDefaultBuilder<BaseUsageSpider>();
+			var builder = Builder.CreateDefaultBuilder<BaseUsageSpider>(x =>
+			{
+				x.Speed = 5;
+			});
 			builder.UseSerilog();
 			builder.UseDownloader<HttpClientDownloader>();
 			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();

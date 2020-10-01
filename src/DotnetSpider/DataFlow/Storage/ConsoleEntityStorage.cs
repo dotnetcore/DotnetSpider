@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace DotnetSpider.DataFlow.Storage
@@ -10,7 +11,7 @@ namespace DotnetSpider.DataFlow.Storage
     /// </summary>
     public class ConsoleEntityStorage : EntityStorageBase
     {
-        public static IDataFlow CreateFromOptions(SpiderOptions options)
+        public static IDataFlow CreateFromOptions(IConfiguration configuration)
         {
             return new ConsoleEntityStorage();
         }

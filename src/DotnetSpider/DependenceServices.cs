@@ -1,6 +1,7 @@
 using System;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Statistics;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using IMessageQueue = DotnetSpider.MessageQueue.IMessageQueue;
 
@@ -15,11 +16,14 @@ namespace DotnetSpider
 		public IHostApplicationLifetime ApplicationLifetime { get; }
 		public HostBuilderContext HostBuilderContext { get; }
 
+		public IConfiguration Configuration { get; }
+
 		public DependenceServices(IServiceProvider serviceProvider,
 			IScheduler scheduler,
 			IMessageQueue messageQueue,
 			IStatisticsClient statisticsClient,
 			IHostApplicationLifetime applicationLifetime,
+			IConfiguration configuration,
 			HostBuilderContext builderContext)
 		{
 			ServiceProvider = serviceProvider;
@@ -28,6 +32,7 @@ namespace DotnetSpider
 			StatisticsClient = statisticsClient;
 			ApplicationLifetime = applicationLifetime;
 			HostBuilderContext = builderContext;
+			Configuration = configuration;
 		}
 
 		public void Dispose()

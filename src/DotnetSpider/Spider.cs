@@ -5,6 +5,7 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Bert.RateLimiters;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Downloader;
@@ -31,7 +32,6 @@ namespace DotnetSpider
 		private readonly RequestedQueue _requestedQueue;
 		private MessageQueue.AsyncMessageConsumer<byte[]> _consumer;
 		private readonly DependenceServices _services;
-
 
 		protected event Action<Request[]> OnTimeout;
 
@@ -62,6 +62,11 @@ namespace DotnetSpider
 		{
 			Logger = logger;
 			Options = options.Value;
+
+			if (Options.Speed > 500)
+			{
+				throw new SpiderException("Speed should not large than 500");
+			}
 
 			_services = services;
 			_requestedQueue = new RequestedQueue();
@@ -113,7 +118,7 @@ namespace DotnetSpider
 				throw new SpiderException($"Storage {type} didn't implement method CreateFromOptions");
 			}
 
-			var storage = method.Invoke(null, new object[] {Options});
+			var storage = method.Invoke(null, new object[] {_services.Configuration});
 			if (storage == null)
 			{
 				throw new SpiderException("Create default storage failed");
@@ -370,93 +375,77 @@ namespace DotnetSpider
 
 		private async Task RunAsync(CancellationToken stoppingToken)
 		{
-			var tuple = ComputeIntervalAndDequeueBatch(Options.Speed);
-			var sleepTimeLimit = Options.EmptySleepTime * 1000;
-			var start = DateTime.Now;
 			await Task.Factory.StartNew(async () =>
 			{
 				try
 				{
-					var pausedTime = 0;
+					var sleepTimeLimit = Options.EmptySleepTime * 1000;
+
+					var bucket = CreateBucket(Options.Speed);
 					var sleepTime = 0;
-					var printFlag = 0;
+					var batch = (int)Options.Batch;
+					var start = DateTime.Now;
+					var end = start;
+
+					PrintStatistics(stoppingToken);
+
 					while (!stoppingToken.IsCancellationRequested)
 					{
-						if (!IsDistributed)
-						{
-							printFlag += tuple.Interval;
-							if (printFlag >= 5000)
-							{
-								printFlag = 0;
-
-								await _services.StatisticsClient.PrintAsync(Id);
-							}
-						}
-
 						if (_requestedQueue.Count > Options.RequestedQueueCount)
 						{
-							if (pausedTime > sleepTimeLimit)
+							sleepTime += 10;
+
+							if (await WaitForContinueAsync(sleepTime, sleepTimeLimit, (end - start).TotalSeconds,
+								$"{Id} too much requests enqueued"))
 							{
-								Logger.LogInformation(
-									$"{Id} paused too much time");
-								break;
-							}
-
-							pausedTime += tuple.Interval;
-							Logger.LogInformation(
-								$"{Id} too much requests enqueued");
-							await Task.Delay(tuple.Interval, default);
-							continue;
-						}
-
-						pausedTime = 0;
-						var timeoutRequests = _requestedQueue.GetAllTimeoutList();
-						if (timeoutRequests.Length > 0)
-						{
-							foreach (var request in timeoutRequests)
-							{
-								Logger.LogWarning(
-									$"{Id} request {request.RequestUri}, {request.Hash} timeout");
-							}
-
-							await AddRequestsAsync(timeoutRequests);
-
-							OnTimeout?.Invoke(timeoutRequests);
-						}
-						else
-						{
-							var requests = (await _services.Scheduler.DequeueAsync(tuple.Batch)).ToArray();
-
-							if (requests.Length > 0)
-							{
-								sleepTime = 0;
+								continue;
 							}
 							else
 							{
-								sleepTime += tuple.Interval;
-								if (sleepTime > sleepTimeLimit)
-								{
-									var cost = (DateTime.Now - start).TotalSeconds;
-									Logger.LogInformation($"Exit: {cost} seconds");
-									break;
-								}
-
-								OnSchedulerEmpty?.Invoke();
+								break;
 							}
+						}
+
+						if (await HandleTimeoutRequestAsync())
+						{
+							continue;
+						}
+
+						var requests = (await _services.Scheduler.DequeueAsync(batch)).ToArray();
+
+						if (requests.Length > 0)
+						{
+							sleepTime = 0;
 
 							foreach (var request in requests)
 							{
 								ConfigureRequest(request);
+
+								while (bucket.ShouldThrottle(1, out var waitTimeMillis))
+								{
+									await Task.Delay(waitTimeMillis, default);
+								}
+
+								if (!await PublishRequestMessagesAsync(request))
+								{
+									Logger.LogError("Exit by publish request message failed");
+									break;
+								}
 							}
 
-							if (!await PublishRequestMessagesAsync(requests))
+							end = DateTime.Now;
+						}
+						else
+						{
+							OnSchedulerEmpty?.Invoke();
+
+							sleepTime += 10;
+
+							if (!await WaitForContinueAsync(sleepTime, sleepTimeLimit, (end - start).TotalSeconds))
 							{
-								Logger.LogError("Exit by publish request message failed");
 								break;
 							}
 						}
-
-						await Task.Delay(tuple.Interval, default);
 					}
 				}
 				catch (Exception e)
@@ -470,25 +459,79 @@ namespace DotnetSpider
 			}, stoppingToken);
 		}
 
+		private async Task<bool> HandleTimeoutRequestAsync()
+		{
+			var timeoutRequests = _requestedQueue.GetAllTimeoutList();
+			if (timeoutRequests.Length > 0)
+			{
+				foreach (var request in timeoutRequests)
+				{
+					Logger.LogWarning(
+						$"{Id} request {request.RequestUri}, {request.Hash} timeout");
+				}
+
+				await AddRequestsAsync(timeoutRequests);
+
+				OnTimeout?.Invoke(timeoutRequests);
+
+				return true;
+			}
+
+			return false;
+		}
+
+		private async Task<bool> WaitForContinueAsync(int sleepTime, int sleepTimeLimit, double totalSeconds,
+			string waitMessage = null)
+		{
+			if (sleepTime > sleepTimeLimit)
+			{
+				Logger.LogInformation($"Exit: {(int)totalSeconds} seconds");
+				return false;
+			}
+			else
+			{
+				if (!string.IsNullOrWhiteSpace(waitMessage))
+				{
+					Logger.LogInformation(waitMessage);
+				}
+
+				await Task.Delay(10, default);
+				return true;
+			}
+		}
+
+		private void PrintStatistics(CancellationToken stoppingToken)
+		{
+			if (!IsDistributed)
+			{
+				Task.Factory.StartNew(async () =>
+				{
+					while (!stoppingToken.IsCancellationRequested)
+					{
+						await Task.Delay(5000, stoppingToken);
+						await _services.StatisticsClient.PrintAsync(Id);
+					}
+				}, stoppingToken).ConfigureAwait(false).GetAwaiter();
+			}
+		}
+
 		private async Task ExitAsync()
 		{
 			await _services.StatisticsClient.ExitAsync(Id);
 			_services.ApplicationLifetime.StopApplication();
 		}
 
-		private static (int Interval, int Batch) ComputeIntervalAndDequeueBatch(double speed)
+		private static FixedTokenBucket CreateBucket(double speed)
 		{
 			if (speed >= 1)
 			{
-				var interval = 1000;
-				var batch = (int)speed;
-				return (interval, batch);
+				var defaultTimeUnit = (int)(1000 / speed);
+				return new FixedTokenBucket(1, 1, defaultTimeUnit);
 			}
 			else
 			{
-				var interval = (int)(1 / speed) * 1000;
-				var batch = 1;
-				return (interval, batch);
+				var defaultTimeUnit = (int)((1 / speed) * 1000);
+				return new FixedTokenBucket(1, 1, defaultTimeUnit);
 			}
 		}
 

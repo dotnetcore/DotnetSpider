@@ -45,11 +45,7 @@ namespace DotnetSpider.Sample.samples
 			AddDataFlow(GetDefaultStorage());
 			await AddRequestsAsync(
 				new Request(
-					"https://news.cnblogs.com/n/page/1/", new Dictionary<string, object> {{"网站", "博客园"}})
-				{
-					Downloader = DownloaderNames.File
-				},
-				new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, object> {{"网站", "博客园"}}));
+					"https://news.cnblogs.com/n/page/2/", new Dictionary<string, object> {{"网站", "博客园"}}));
 		}
 
 		protected override (string Id, string Name) GetIdAndName()

@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Security.Cryptography;
 using System.Text;
 using DotnetSpider.Downloader;
 using DotnetSpider.Extensions;
 using DotnetSpider.Infrastructure;
 using MessagePack;
+using Newtonsoft.Json;
 
 namespace DotnetSpider.Http
 {
@@ -87,6 +87,7 @@ namespace DotnetSpider.Http
 			}
 		}
 
+		[JsonIgnore]
 		public object Content
 		{
 			get => _content;
@@ -123,7 +124,7 @@ namespace DotnetSpider.Http
 
 		public IDictionary<string, object> Properties => _properties ??= new Dictionary<string, object>();
 
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		// ReSharper disable once InconsistentNaming
 		public string PPPoERegex
 		{
@@ -144,7 +145,7 @@ namespace DotnetSpider.Http
 		/// <summary>
 		/// 设置 Cookie
 		/// </summary>
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public string Cookie
 		{
 			get => Headers.Cookie;

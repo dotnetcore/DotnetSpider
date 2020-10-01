@@ -5,7 +5,6 @@ using DotnetSpider.Downloader;
 using DotnetSpider.Extensions;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
-using Murmur;
 using Xunit;
 using ObjectId = MongoDB.Bson.ObjectId;
 

@@ -2,6 +2,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using DotnetSpider.Infrastructure;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace DotnetSpider.DataFlow.Storage
@@ -12,7 +13,7 @@ namespace DotnetSpider.DataFlow.Storage
     /// </summary>
     public class JsonFileStorage : FileStorageBase
     {
-        public static IDataFlow CreateFromOptions(SpiderOptions options)
+        public static IDataFlow CreateFromOptions(IConfiguration configuration)
         {
             return new JsonFileStorage();
         }

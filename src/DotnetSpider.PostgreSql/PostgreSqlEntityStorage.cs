@@ -5,11 +5,28 @@ using System.Text;
 using Dapper;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Storage;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
 namespace DotnetSpider.PostgreSql
 {
+	public class PostgreOptions
+	{
+		private readonly IConfiguration _configuration;
+
+		public PostgreOptions(IConfiguration configuration)
+		{
+			_configuration = configuration;
+		}
+
+		public StorageMode Mode => string.IsNullOrWhiteSpace(_configuration["Postgre:Mode"])
+			? StorageMode.Insert
+			: (StorageMode)Enum.Parse(typeof(StorageMode), _configuration["Postgre:Mode"]);
+
+		public string ConnectionString => _configuration["ConnectionString"];
+	}
+
 	/// <summary>
 	/// PostgreSql 保存解析(实体)结果
 	/// </summary>
@@ -18,11 +35,12 @@ namespace DotnetSpider.PostgreSql
 		/// <summary>
 		/// 根据配置返回存储器¬
 		/// </summary>
-		/// <param name="options">配置</param>
+		/// <param name="configuration">配置</param>
 		/// <returns></returns>
-		public static IDataFlow CreateFromOptions(SpiderOptions options)
+		public static IDataFlow CreateFromOptions(IConfiguration configuration)
 		{
-			return new PostgreSqlEntityStorage(options.StorageMode, options.StorageConnectionString);
+			var options = new PostgreOptions(configuration);
+			return new PostgreSqlEntityStorage(options.Mode, options.ConnectionString);
 		}
 
 		/// <summary>

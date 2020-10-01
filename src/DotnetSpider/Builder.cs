@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using DotnetSpider.Agent;
 using DotnetSpider.AgentCenter;
 using DotnetSpider.AgentCenter.Store;
@@ -21,7 +20,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
-using Murmur;
 
 namespace DotnetSpider
 {

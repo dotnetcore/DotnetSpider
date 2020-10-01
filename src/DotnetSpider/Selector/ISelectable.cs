@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Selector
@@ -29,7 +30,7 @@ namespace DotnetSpider.Selector
         /// 查找所有的链接
         /// </summary>
         /// <returns>查询接口</returns>
-        IEnumerable<string> Links();
+        IEnumerable<Uri> Links();
 
         /// <summary>
         /// 通过JsonPath查找结果

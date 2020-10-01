@@ -91,7 +91,7 @@ namespace DotnetSpider.Sample.samples
 
 					if (!string.IsNullOrWhiteSpace(url))
 					{
-						var request = context.CreateNewRequest(url);
+						var request = context.CreateNewRequest(new Uri(url));
 						request.Properties.Add("title", title);
 						request.Properties.Add("url", url);
 						request.Properties.Add("summary", summary);

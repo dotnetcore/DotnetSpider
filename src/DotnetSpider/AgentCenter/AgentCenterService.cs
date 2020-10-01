@@ -86,11 +86,11 @@ namespace DotnetSpider.AgentCenter
 
 		public override async Task StopAsync(CancellationToken cancellationToken)
 		{
-			_logger.LogInformation("Agent register service stopping");
+			_logger.LogInformation("Agent center service is stopping");
 			_consumer?.Close();
 
 			await base.StopAsync(cancellationToken);
-			_logger.LogInformation("Agent register service stopped");
+			_logger.LogInformation("Agent center service stopped");
 		}
 	}
 }

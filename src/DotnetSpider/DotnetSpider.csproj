@@ -5,6 +5,7 @@
     <PackageId>DotnetSpider</PackageId>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Bert.RateLimiters" Version="1.0.15" />
     <PackageReference Include="MessagePack" Version="2.1.194" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.8" />

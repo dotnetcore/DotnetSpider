@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Selector
@@ -12,7 +13,7 @@ namespace DotnetSpider.Selector
         /// 查找所有的链接
         /// </summary>
         /// <returns>查询接口</returns>
-        public abstract IEnumerable<string> Links();
+        public abstract IEnumerable<Uri> Links();
 
         public abstract SelectableType Type { get; }
 
@@ -52,7 +53,7 @@ namespace DotnetSpider.Selector
         /// </summary>
         /// <param name="pattern">正则表达式</param>
         /// <param name="options"></param>
-        /// <param name="group">分组</param>
+        /// <param name="replacement"></param>
         /// <returns>查询接口</returns>
         public virtual ISelectable Regex(string pattern, RegexOptions options = RegexOptions.None, string replacement = "$0")
         {

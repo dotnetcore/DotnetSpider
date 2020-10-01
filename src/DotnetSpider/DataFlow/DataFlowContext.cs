@@ -70,7 +70,7 @@ namespace DotnetSpider.DataFlow
 			}
 		}
 
-		public void AddFollowRequests(IEnumerable<string> uris)
+		public void AddFollowRequests(IEnumerable<Uri> uris)
 		{
 			if (uris == null)
 			{
@@ -80,15 +80,15 @@ namespace DotnetSpider.DataFlow
 			AddFollowRequests(uris.Select(CreateNewRequest));
 		}
 
-		public Request CreateNewRequest(string url)
+		public Request CreateNewRequest(Uri uri)
 		{
-			url.NotNullOrWhiteSpace(nameof(url));
+			uri.NotNull(nameof(uri));
 			var request = Request.Clone();
 			request.RequestedTimes = 0;
 			request.Depth += 1;
 			request.Hash = null;
 			request.Timestamp = DateTimeHelper.Timestamp;
-			request.RequestUri = new Uri(url, UriKind.RelativeOrAbsolute);
+			request.RequestUri = uri;
 			return request;
 		}
 

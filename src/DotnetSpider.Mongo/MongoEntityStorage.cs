@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Storage;
+using Microsoft.Extensions.Configuration;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -13,73 +14,86 @@ using MongoDB.Driver;
 
 namespace DotnetSpider.Mongo
 {
-    /// <summary>
-    /// MongoDB 保存解析(实体)结果 TODO: 是否要考虑存储模式：插入，新的插入旧的更新，更新 ETC
-    /// </summary>
-    public class MongoEntityStorage : EntityStorageBase
-    {
-        private readonly IMongoClient _client;
+	public class MongoOptions
+	{
+		private readonly IConfiguration _configuration;
 
-        private readonly ConcurrentDictionary<Type, TableMetadata> _tableMetadatas =
-            new ConcurrentDictionary<Type, TableMetadata>();
+		public MongoOptions(IConfiguration configuration)
+		{
+			_configuration = configuration;
+		}
 
-        private readonly ConcurrentDictionary<string, IMongoDatabase> _cache =
-            new ConcurrentDictionary<string, IMongoDatabase>();
+		public string ConnectionString => _configuration["Mongo:ConnectionString"];
+	}
 
-        public static IDataFlow CreateFromOptions(SpiderOptions options)
-        {
-            return new MongoEntityStorage(options.StorageConnectionString);
-        }
+	/// <summary>
+	/// MongoDB 保存解析(实体)结果 TODO: 是否要考虑存储模式：插入，新的插入旧的更新，更新 ETC
+	/// </summary>
+	public class MongoEntityStorage : EntityStorageBase
+	{
+		private readonly IMongoClient _client;
 
-        /// <summary>
-        /// 构造方法
-        /// </summary>
-        /// <param name="connectionString">连接字符串</param>
-        public MongoEntityStorage(string connectionString)
-        {
-            ConnectionString = connectionString;
-            _client = new MongoClient(connectionString);
-        }
+		private readonly ConcurrentDictionary<Type, TableMetadata> _tableMetadatas =
+			new ConcurrentDictionary<Type, TableMetadata>();
 
-        internal MongoEntityStorage(IMongoClient mongoClient)
-        {
-            _client = mongoClient;
-        }
+		private readonly ConcurrentDictionary<string, IMongoDatabase> _cache =
+			new ConcurrentDictionary<string, IMongoDatabase>();
 
-        /// <summary>
-        /// 连接字符串
-        /// </summary>
-        public string ConnectionString { get; }
+		public static IDataFlow CreateFromOptions(IConfiguration configuration)
+		{
+			var options = new MongoOptions(configuration);
+			return new MongoEntityStorage(options.ConnectionString);
+		}
 
-        protected override async Task StoreAsync(DataFlowContext context, Dictionary<Type, List<dynamic>> dict)
-        {
-            foreach (var kv in dict)
-            {
-                var list = (IList) kv.Value;
-                var tableMetadata = _tableMetadatas.GetOrAdd(kv.Key,
-                    type => ((IEntity) list[0]).GetTableMetadata());
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="connectionString">连接字符串</param>
+		public MongoEntityStorage(string connectionString)
+		{
+			ConnectionString = connectionString;
+			_client = new MongoClient(connectionString);
+		}
 
-                if (string.IsNullOrWhiteSpace(tableMetadata.Schema.Database))
-                {
-                    throw new ArgumentException("Database of schema should not be empty or null");
-                }
+		internal MongoEntityStorage(IMongoClient mongoClient)
+		{
+			_client = mongoClient;
+		}
 
-                if (!_cache.ContainsKey(tableMetadata.Schema.Database))
-                {
-                    _cache.TryAdd(tableMetadata.Schema.Database, _client.GetDatabase(tableMetadata.Schema.Database));
-                }
+		/// <summary>
+		/// 连接字符串
+		/// </summary>
+		public string ConnectionString { get; }
 
-                var db = _cache[tableMetadata.Schema.Database];
-                var collection = db.GetCollection<BsonDocument>(tableMetadata.Schema.Table);
+		protected override async Task StoreAsync(DataFlowContext context, Dictionary<Type, List<dynamic>> dict)
+		{
+			foreach (var kv in dict)
+			{
+				var list = (IList)kv.Value;
+				var tableMetadata = _tableMetadatas.GetOrAdd(kv.Key,
+					type => ((IEntity)list[0]).GetTableMetadata());
 
-                var bsonDocs = new List<BsonDocument>();
-                foreach (var data in list)
-                {
-                    bsonDocs.Add(data.ToBsonDocument());
-                }
+				if (string.IsNullOrWhiteSpace(tableMetadata.Schema.Database))
+				{
+					throw new ArgumentException("Database of schema should not be empty or null");
+				}
 
-                await collection.InsertManyAsync(bsonDocs);
-            }
-        }
-    }
+				if (!_cache.ContainsKey(tableMetadata.Schema.Database))
+				{
+					_cache.TryAdd(tableMetadata.Schema.Database, _client.GetDatabase(tableMetadata.Schema.Database));
+				}
+
+				var db = _cache[tableMetadata.Schema.Database];
+				var collection = db.GetCollection<BsonDocument>(tableMetadata.Schema.Table);
+
+				var bsonDocs = new List<BsonDocument>();
+				foreach (var data in list)
+				{
+					bsonDocs.Add(data.ToBsonDocument());
+				}
+
+				await collection.InsertManyAsync(bsonDocs);
+			}
+		}
+	}
 }

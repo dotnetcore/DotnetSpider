@@ -16,6 +16,6 @@ namespace DotnetSpider.DataFlow.Parser
         /// <summary>
         /// 设置 Take 的方向, 默认是从头部取
         /// </summary>
-        public bool TakeByDescending { get; set; } = false;
+        public bool TakeByDescending { get; set; }
     }
 }
