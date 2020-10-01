@@ -1,4 +1,3 @@
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using DotnetSpider.Http;
@@ -13,42 +12,26 @@ namespace DotnetSpider.Downloader
 		private readonly IProxyService _proxyService;
 
 		public ProxyHttpClientDownloader(IHttpClientFactory httpClientFactory,
-			ILogger<ProxyHttpClientDownloader> logger, IProxyService proxyService) : base(httpClientFactory, logger)
+			ILogger<ProxyHttpClientDownloader> logger,
+			IProxyService proxyService) : base(httpClientFactory, logger)
 		{
+			proxyService.NotNull(nameof(proxyService));
+
 			_proxyService = proxyService;
 		}
 
 		public override string Name => DownloaderNames.ProxyHttpClient;
 
-		protected override async Task<HttpClientEntry> CreateAsync(Request request)
+		protected override async Task<HttpClient> CreateClientAsync(Request request)
 		{
-			var host = request.RequestUri.Host;
-			string clientName;
-			ProxyEntry proxy = null;
-			if (_proxyService != null)
+			var proxy = await _proxyService.GetAsync(request.Timeout);
+			if (proxy == null)
 			{
-				proxy = await _proxyService.GetAsync(request.Timeout);
-				if (proxy == null)
-				{
-					throw new SpiderException("获取代理失败");
-				}
-
-				// todo: uri should contains user/password
-				clientName = $"{Consts.ProxyPrefix}{proxy.Uri}";
-			}
-			else
-			{
-				clientName = host;
+				throw new SpiderException("获取代理失败");
 			}
 
-			var httpClient = HttpClientFactory.CreateClient(clientName);
-			return new HttpClientEntry(httpClient, proxy);
-		}
-
-		protected override void Release(Response response, HttpClientEntry httpClientEntry)
-		{
-			_proxyService.ReturnAsync(httpClientEntry.Resource,
-				response?.StatusCode ?? HttpStatusCode.NotFound);
+			var httpClient = HttpClientFactory.CreateClient($"{Consts.ProxyPrefix}{proxy}");
+			return httpClient;
 		}
 	}
 }

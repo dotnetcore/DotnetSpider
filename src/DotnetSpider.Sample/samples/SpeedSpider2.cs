@@ -5,6 +5,7 @@ using DotnetSpider.DataFlow;
 using DotnetSpider.Downloader;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
+using DotnetSpider.Scheduler;
 using DotnetSpider.Scheduler.Component;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

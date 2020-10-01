@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -14,7 +15,10 @@ namespace DotnetSpider.Http
 				response.Headers.Add(header.Key, header.Value?.ToString());
 			}
 
-			response.Version = httpResponseMessage.Version;
+			response.Version = httpResponseMessage.Version == null
+				? HttpVersion.Version11
+				: httpResponseMessage.Version;
+
 			response.Headers.TransferEncodingChunked = httpResponseMessage.Headers.TransferEncodingChunked;
 
 			response.Content = new ByteArrayContent(await httpResponseMessage.Content.ReadAsByteArrayAsync());

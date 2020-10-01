@@ -4,20 +4,16 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using DotnetSpider.Agent;
-using DotnetSpider.AgentCenter;
-using DotnetSpider.AgentCenter.Store;
 using DotnetSpider.Downloader;
 using DotnetSpider.Extensions;
 using DotnetSpider.Infrastructure;
 using DotnetSpider.MessageQueue;
-using DotnetSpider.Proxy;
 using DotnetSpider.Statistics;
 using DotnetSpider.Statistics.Store;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
 
@@ -89,7 +85,7 @@ namespace DotnetSpider
 			{
 				services.AddMessageQueue();
 				services.AddStatistics<DefaultStatisticsStore>();
-				services.AddAgentCenter<DefaultAgentStore>();
+				// services.AddAgentCenter<DefaultAgentStore>();
 			});
 			return builder;
 		}
@@ -164,7 +160,6 @@ namespace DotnetSpider
 				services.AddHttpClient();
 				services.AddHostedService<PrintArgumentService>();
 				services.AddAgent<HttpClientDownloader>();
-				services.AddTransient<HttpMessageHandlerBuilder, ProxyHttpMessageHandlerBuilder>();
 				services.TryAddSingleton<IStatisticsClient, StatisticsClient>();
 				services.TryAddSingleton<DependenceServices>();
 				services.TryAddSingleton<IHashAlgorithmService, MurmurHashAlgorithmService>();

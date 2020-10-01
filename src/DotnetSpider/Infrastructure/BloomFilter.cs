@@ -18,14 +18,13 @@ namespace DotnetSpider.Infrastructure
 		private readonly int _expectedNumberOfFilterElements; // expected (maximum) number of elements to be added
 		private int _numberOfAddedElements; // number of elements actually added to the Bloom filter
 		private readonly int _k; // number of hash functions
-
-		static readonly Encoding Charset = Encoding.UTF8; // encoding used for storing hash values as strings
+		private static readonly Encoding _charset = Encoding.UTF8; // encoding used for storing hash values as strings
 
 		/// <summary>
 		/// The digest method is reused between instances
 		/// </summary>
 		/// <remarks>MD5 gives good enough accuracy in most circumstances. Change to SHA1 if it's needed</remarks>
-		static readonly KeyedHashAlgorithm DigestFunction = new HMACSHA1();
+		private static readonly KeyedHashAlgorithm _keyedHashAlgorithm = new HMACSHA1();
 
 		/// <summary>
 		/// Constructs an empty Bloom filter. The total length of the Bloom filter will be
@@ -55,8 +54,9 @@ namespace DotnetSpider.Infrastructure
 				bitSetSize / (double)expectedNumberOElements,
 				expectedNumberOElements,
 				(int)Math.Round(bitSetSize / (double)expectedNumberOElements * Math.Log(2.0))
-			  )
-		{ }
+			)
+		{
+		}
 
 		/// <summary>
 		/// Constructs an empty Bloom filter with a given false positive probability. The number of bits per
@@ -70,8 +70,9 @@ namespace DotnetSpider.Infrastructure
 				Math.Ceiling(-(Math.Log(falsePositiveProbability) / Math.Log(2))) / Math.Log(2), // c = k / ln(2)
 				expectedNumberOfElements,
 				(int)Math.Ceiling(-(Math.Log(falsePositiveProbability) / Math.Log(2))) // k = ceil(-log_2(false prob.))
-			  )
-		{ }
+			)
+		{
+		}
 
 		/// <summary>
 		/// Construct a new Bloom filter based on existing Bloom filter data.
@@ -80,7 +81,8 @@ namespace DotnetSpider.Infrastructure
 		/// <param name="expectedNumberOfFilterElements">defines the maximum number of elements the filter is expected to contain.</param>
 		/// <param name="actualNumberOfFilterElements">specifies how many elements have been inserted into the <code>filterData</code> BitArray.</param>
 		/// <param name="filterData">a BitArray representing an existing Bloom filter.</param>
-		public BloomFilter(int bitSetSize, int expectedNumberOfFilterElements, int actualNumberOfFilterElements, BitArray filterData)
+		public BloomFilter(int bitSetSize, int expectedNumberOfFilterElements, int actualNumberOfFilterElements,
+			BitArray filterData)
 			: this(bitSetSize, expectedNumberOfFilterElements)
 		{
 			_bitSet = filterData;
@@ -105,7 +107,7 @@ namespace DotnetSpider.Infrastructure
 		/// <returns>digest as long.</returns>
 		public static int CreateHash(string val)
 		{
-			return CreateHash(val, Charset);
+			return CreateHash(val, _charset);
 		}
 
 		/// <summary>
@@ -135,11 +137,11 @@ namespace DotnetSpider.Infrastructure
 			while (k < hashes)
 			{
 				byte[] digest;
-				lock (DigestFunction)
+				lock (_keyedHashAlgorithm)
 				{
-					DigestFunction.Key = salt;
+					_keyedHashAlgorithm.Key = salt;
 					salt[0]++;
-					digest = DigestFunction.ComputeHash(data);
+					digest = _keyedHashAlgorithm.ComputeHash(data);
 				}
 
 				for (var i = 0; i < digest.Length / 4 && k < hashes; i++)
@@ -150,10 +152,12 @@ namespace DotnetSpider.Infrastructure
 						h <<= 8;
 						h |= digest[j] & 0xFF;
 					}
+
 					result[k] = h;
 					k++;
 				}
 			}
+
 			return result;
 		}
 
@@ -168,27 +172,33 @@ namespace DotnetSpider.Infrastructure
 			{
 				return false;
 			}
+
 			if (GetType() != obj.GetType())
 			{
 				return false;
 			}
+
 			var other = (BloomFilter)obj;
 			if (_expectedNumberOfFilterElements != other._expectedNumberOfFilterElements)
 			{
 				return false;
 			}
+
 			if (_k != other._k)
 			{
 				return false;
 			}
+
 			if (_bitSetSize != other._bitSetSize)
 			{
 				return false;
 			}
+
 			if (_bitSet != other._bitSet && (_bitSet == null || !Equals(_bitSet, other._bitSet)))
 			{
 				return false;
 			}
+
 			return true;
 		}
 
@@ -234,7 +244,6 @@ namespace DotnetSpider.Infrastructure
 			// (1 - e^(-k * n / m)) ^ k
 			return Math.Pow(1 - Math.Exp(-_k * numberOfElements
 			                             / _bitSetSize), _k);
-
 		}
 
 		/// <summary>
@@ -255,10 +264,7 @@ namespace DotnetSpider.Infrastructure
 		/// of the Bloom filter and the expected number of inserted elements.
 		/// </summary>
 		/// <returns>optimal k.</returns>
-		public int GetK()
-		{
-			return _k;
-		}
+		public int K => _k;
 
 		/// <summary>
 		/// Sets all bits to false in the Bloom filter.
@@ -276,7 +282,7 @@ namespace DotnetSpider.Infrastructure
 		/// <param name="element">is an element to register in the Bloom filter.</param>
 		public void Add(object element)
 		{
-			Add(Charset.GetBytes(element.ToString()));
+			Add(_charset.GetBytes(element.ToString()));
 		}
 
 		/// <summary>
@@ -290,6 +296,7 @@ namespace DotnetSpider.Infrastructure
 			{
 				_bitSet.Set(Math.Abs(hash % _bitSetSize), true);
 			}
+
 			_numberOfAddedElements++;
 		}
 
@@ -326,7 +333,7 @@ namespace DotnetSpider.Infrastructure
 		/// <returns>true if the element could have been inserted into the Bloom filter.</returns>
 		public bool Contains(object element)
 		{
-			return Contains(Charset.GetBytes(element.ToString()));
+			return Contains(_charset.GetBytes(element.ToString()));
 		}
 
 		/// <summary>
@@ -464,8 +471,10 @@ namespace DotnetSpider.Infrastructure
 
 			while (enumA.MoveNext() && enumB.MoveNext())
 			{
-				if (enumB.Current != null && enumA.Current != null && (bool)enumA.Current != (bool)enumB.Current) return false;
+				if (enumB.Current != null && enumA.Current != null && (bool)enumA.Current != (bool)enumB.Current)
+					return false;
 			}
+
 			return true;
 		}
 	}

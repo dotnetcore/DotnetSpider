@@ -75,7 +75,6 @@ namespace DotnetSpider.Portal
 			{
 				x.UseMySqlConnector(options.ConnectionString);
 			});
-			services.AddHttpClient();
 			services.Configure<AgentCenterOptions>(Configuration);
 			services.AddHttpClient();
 			services.AddAgentCenter<MySqlAgentStore>();

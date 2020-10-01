@@ -22,51 +22,56 @@ namespace DotnetSpider.Downloader
 
 		public async Task<Response> DownloadAsync(Request request)
 		{
-			Response response = null;
-			HttpClientEntry httpClientEntry = null;
 			HttpResponseMessage httpResponseMessage = null;
 			try
 			{
-				var httpRequest = request.ToHttpRequestMessage();
-				httpClientEntry = await CreateAsync(request);
+				var httpRequestMessage = request.ToHttpRequestMessage();
+
+				var httpClient = await CreateClientAsync(request);
 
 				var stopwatch = new Stopwatch();
 				stopwatch.Start();
 
-				httpResponseMessage = await httpClientEntry.HttpClient.SendAsync(httpRequest);
+				httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
 				stopwatch.Stop();
 
-				response = await HandleAsync(request, httpResponseMessage);
+				var elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
+
+				var response = await HandleAsync(request, httpResponseMessage);
 				if (response != null)
 				{
+					response.Version = response.Version == null ? HttpVersion.Version11 : response.Version;
 					return response;
 				}
 
 				response = await httpResponseMessage.ToResponseAsync();
-				response.ElapsedMilliseconds = (int)stopwatch.ElapsedMilliseconds;
+				response.ElapsedMilliseconds = (int)elapsedMilliseconds;
 				response.RequestHash = request.Hash;
+				response.Version = httpResponseMessage.Version;
 
 				return response;
 			}
 			catch (Exception e)
 			{
 				Logger.LogError($"{request.RequestUri} download failed: {e}");
-				response = new Response
+				return new Response
 				{
-					RequestHash = request.Hash, StatusCode = HttpStatusCode.Gone, ReasonPhrase = e.ToString()
+					RequestHash = request.Hash,
+					StatusCode = HttpStatusCode.Gone,
+					ReasonPhrase = e.ToString(),
+					Version = HttpVersion.Version11
 				};
-				return response;
 			}
 			finally
 			{
 				DisposeSafely(httpResponseMessage);
-
-				Release(response, httpClientEntry);
 			}
 		}
 
-		protected virtual void Release(Response response, HttpClientEntry httpClientEntry)
+		protected virtual Task<HttpClient> CreateClientAsync(Request request)
 		{
+			var httpClient = HttpClientFactory.CreateClient(request.RequestUri.Host);
+			return Task.FromResult(httpClient);
 		}
 
 		protected virtual Task<Response> HandleAsync(Request request, HttpResponseMessage responseMessage)
@@ -75,13 +80,6 @@ namespace DotnetSpider.Downloader
 		}
 
 		public virtual string Name => DownloaderNames.HttpClient;
-
-		protected virtual Task<HttpClientEntry> CreateAsync(Request request)
-		{
-			var host = request.RequestUri.Host;
-			var httpClient = HttpClientFactory.CreateClient(host);
-			return Task.FromResult(new HttpClientEntry(httpClient, null));
-		}
 
 		private void DisposeSafely(IDisposable obj)
 		{

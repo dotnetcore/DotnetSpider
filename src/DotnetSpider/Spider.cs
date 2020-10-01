@@ -584,7 +584,7 @@ namespace DotnetSpider
 			return true;
 		}
 
-		private async Task LoadRequestFromSuppliers(CancellationToken stoppingToken)
+		protected async Task LoadRequestFromSuppliers(CancellationToken stoppingToken)
 		{
 			// 通过供应接口添加请求
 			foreach (var requestSupplier in _requestSuppliers)

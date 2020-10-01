@@ -29,16 +29,16 @@ namespace DotnetSpider.Infrastructure
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public bool Enqueue(Request request)
 		{
-			if (request.Timeout <= 2)
+			if (request.Timeout <= 2000)
 			{
-				throw new SpiderException("Timeout should not less than 2 second");
+				throw new SpiderException("Timeout should not less than 2000 milliseconds");
 			}
 
 			if (!_dict.ContainsKey(request.Hash))
 			{
 				_dict.Add(request.Hash, request);
 				_timer.NewTimeout(new TimeoutTask(this, request.Hash),
-					TimeSpan.FromSeconds(request.Timeout));
+					TimeSpan.FromMilliseconds(request.Timeout));
 				return true;
 			}
 

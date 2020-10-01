@@ -20,7 +20,4 @@
     <PackageReference Include="ZCJ.HashedWheelTimer" Version="0.10.2" />
     <PackageReference Include="murmurhash" Version="1.0.3" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Scheduler" />
-  </ItemGroup>
 </Project>

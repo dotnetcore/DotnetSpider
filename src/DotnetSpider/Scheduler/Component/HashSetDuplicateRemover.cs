@@ -10,7 +10,7 @@ namespace DotnetSpider.Scheduler.Component
     /// </summary>
     public class HashSetDuplicateRemover : IDuplicateRemover
     {
-        private readonly ConcurrentDictionary<string, object> _hashes = new ConcurrentDictionary<string, object>();
+        private readonly ConcurrentDictionary<string, object> _dict = new ConcurrentDictionary<string, object>();
 
         /// <summary>
         /// Check whether the request is duplicate.
@@ -22,18 +22,18 @@ namespace DotnetSpider.Scheduler.Component
             request.NotNull(nameof(request));
             request.Owner.NotNullOrWhiteSpace(nameof(request.Owner));
 
-            var isDuplicate = _hashes.TryAdd(request.Hash, null);
+            var isDuplicate = _dict.TryAdd(request.Hash, null);
             return Task.FromResult(!isDuplicate);
         }
 
-        public long Total => _hashes.Count;
+        public long Total => _dict.Count;
 
         /// <summary>
         /// 重置去重器
         /// </summary>
         public void ResetDuplicateCheck()
         {
-            _hashes.Clear();
+            _dict.Clear();
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace DotnetSpider.Scheduler.Component
         /// </summary>
         public void Dispose()
         {
-            _hashes.Clear();
+            _dict.Clear();
         }
     }
 }

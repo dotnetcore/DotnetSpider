@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
@@ -44,8 +43,7 @@ namespace DotnetSpider.Scheduler
 		/// </summary>
 		/// <param name="count">出队数</param>
 		/// <returns>请求</returns>
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		public override Task<IEnumerable<Request>> DequeueAsync(int count = 1)
+		protected override Task<IEnumerable<Request>> ImplDequeueAsync(int count = 1)
 		{
 			var requests = _requests.Take(count).ToArray();
 			if (requests.Length > 0)

@@ -28,14 +28,14 @@ namespace DotnetSpider.Proxy
             }
         }
 
-        public async Task<bool> IsAvailable(ProxyEntry proxy)
+        public async Task<bool> IsAvailable(Uri proxy)
         {
             if (proxy == null)
             {
                 return false;
             }
 
-            var httpClient = _httpClientFactory.CreateClient($"PROXY_{proxy.Uri}");
+            var httpClient = _httpClientFactory.CreateClient($"PROXY_{proxy}");
             httpClient.Timeout = new TimeSpan(0, 0, 3);
             try
             {
@@ -45,7 +45,7 @@ namespace DotnetSpider.Proxy
             }
             catch (Exception)
             {
-                _logger.LogWarning($"Proxy {proxy.Uri} is not available");
+                _logger.LogWarning($"Proxy {proxy} is not available");
                 return false;
             }
         }

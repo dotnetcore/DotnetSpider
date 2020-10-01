@@ -12,10 +12,5 @@ namespace DotnetSpider.Proxy
 		/// 一般代理供应商都会提供 API 请求返回可用的代理列表
 		/// </summary>
 		public string ProxySupplierUrl { get; set; }
-
-		/// <summary>
-		/// 是否使用代理
-		/// </summary>
-		public bool UseProxy { get; set; }
 	}
 }

@@ -60,13 +60,15 @@ namespace DotnetSpider.Agent
 					});
 			}
 
-			var topic = _downloader.Name;
-
 			// 节点注册对应的 topic 才会收到下载的请求
 			// agent_{id} 这是用于指定节点下载
 			// httpclient 这是指定下载器
-			await RegisterAgentAsync(topic, stoppingToken);
-			await RegisterAgentAsync(string.Format(TopicNames.Spider, _options.AgentId), stoppingToken);
+			await RegisterAgentAsync(_downloader.Name, stoppingToken);
+
+			if (_messageQueue.IsDistributed)
+			{
+				await RegisterAgentAsync(string.Format(TopicNames.Spider, _options.AgentId), stoppingToken);
+			}
 
 			// 分布式才需要发送心跳
 			if (_messageQueue.IsDistributed)
@@ -96,10 +98,9 @@ namespace DotnetSpider.Agent
 
 		private async Task HandleMessageAsync(byte[] bytes)
 		{
-			var message = await bytes.DeserializeAsync();
+			var message = await GetMessageAsync(bytes);
 			if (message == null)
 			{
-				_logger.LogWarning("Received empty message");
 				return;
 			}
 
@@ -115,10 +116,15 @@ namespace DotnetSpider.Agent
 				Task.Factory.StartNew(async () =>
 				{
 					var response = await _downloader.DownloadAsync(request);
+					if (response == null)
+					{
+						return;
+					}
+
 					response.Agent = _options.AgentId;
 
-					await _messageQueue.PublishAsBytesAsync(string.Format(TopicNames.Spider, request.Owner.ToUpper()),
-						response);
+					var topic = string.Format(TopicNames.Spider, request.Owner.ToUpper());
+					await _messageQueue.PublishAsBytesAsync(topic, response);
 
 					_logger.LogInformation(
 						_messageQueue.IsDistributed
@@ -160,6 +166,19 @@ namespace DotnetSpider.Agent
 			await base.StopAsync(cancellationToken);
 
 			_logger.LogInformation(_messageQueue.IsDistributed ? $"Agent {_options.AgentId} stopped" : "Agent stopped");
+		}
+
+		private async Task<object> GetMessageAsync(byte[] bytes)
+		{
+			try
+			{
+				return await bytes.DeserializeAsync();
+			}
+			catch (Exception e)
+			{
+				_logger.LogError($"Deserialize message failed: {e}");
+				return null;
+			}
 		}
 	}
 }

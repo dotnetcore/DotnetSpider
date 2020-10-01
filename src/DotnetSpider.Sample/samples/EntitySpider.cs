@@ -9,6 +9,7 @@ using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Downloader;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
+using DotnetSpider.Scheduler;
 using DotnetSpider.Scheduler.Component;
 using DotnetSpider.Selector;
 using Microsoft.Extensions.Hosting;
@@ -24,10 +25,11 @@ namespace DotnetSpider.Sample.samples
 		{
 			var builder = Builder.CreateDefaultBuilder<EntitySpider>(options =>
 			{
-				options.Speed = 20;
+				options.Speed = 1;
 			});
 			builder.UseDownloader<HttpClientDownloader>();
 			builder.UseSerilog();
+			// builder.UseProxy<FakeProxySupplier, FakeProxyValidator>();
 			builder.IgnoreServerCertificateError();
 			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
 			await builder.Build().RunAsync();
@@ -43,9 +45,12 @@ namespace DotnetSpider.Sample.samples
 		{
 			AddDataFlow(new DataParser<CnblogsEntry>());
 			AddDataFlow(GetDefaultStorage());
-			await AddRequestsAsync(
-				new Request(
-					"https://news.cnblogs.com/n/page/2/", new Dictionary<string, object> {{"网站", "博客园"}}));
+			for (var i = 1; i < 99; ++i)
+			{
+				await AddRequestsAsync(
+					new Request(
+						"https://news.cnblogs.com/n/page/" + i, new Dictionary<string, object> {{"网站", "博客园"}}));
+			}
 		}
 
 		protected override (string Id, string Name) GetIdAndName()

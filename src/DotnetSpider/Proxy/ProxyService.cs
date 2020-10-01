@@ -10,9 +10,25 @@ namespace DotnetSpider.Proxy
 {
 	public class ProxyService : IProxyService
 	{
+		private class ProxyEntry
+		{
+			public Uri Uri { get; private set; }
+
+			/// <summary>
+			/// 使用此代理下载数据的失败次数
+			/// </summary>
+			public int FailedNum { get; set; }
+
+			public ProxyEntry(Uri uri)
+			{
+				Uri = uri;
+			}
+		}
+
 		private readonly ConcurrentQueue<ProxyEntry> _queue;
-		private readonly ConcurrentDictionary<string, ProxyEntry> _dict;
+		private readonly ConcurrentDictionary<Uri, ProxyEntry> _dict;
 		private readonly IProxyValidator _proxyValidator;
+
 		private readonly HashedWheelTimer _timer = new HashedWheelTimer(TimeSpan.FromSeconds(1)
 			, ticksPerWheel: 100000
 			, maxPendingTimeouts: 0);
@@ -21,34 +37,12 @@ namespace DotnetSpider.Proxy
 		{
 			_proxyValidator = proxyValidator;
 			_queue = new ConcurrentQueue<ProxyEntry>();
-			_dict = new ConcurrentDictionary<string, ProxyEntry>();
+			_dict = new ConcurrentDictionary<Uri, ProxyEntry>();
 		}
 
-		public async Task<ProxyEntry> GetAsync(int seconds)
+		public async Task ReturnAsync(Uri proxy, HttpStatusCode statusCode)
 		{
-			var waitCount = seconds * 10;
-			for (var i = 0; i < waitCount; ++i)
-			{
-				var proxy = Get();
-				if (proxy != null)
-				{
-					return proxy;
-				}
-
-				await Task.Delay(100);
-			}
-
-			return null;
-		}
-
-		public async Task ReturnAsync(ProxyEntry proxy, HttpStatusCode statusCode)
-		{
-			if (proxy == null)
-			{
-				return;
-			}
-
-			if (_dict.TryGetValue(proxy.Uri, out var p))
+			if (_dict.TryGetValue(proxy, out var p))
 			{
 				if (statusCode.IsSuccessStatusCode())
 				{
@@ -65,7 +59,7 @@ namespace DotnetSpider.Proxy
 					return;
 				}
 
-				if (_proxyValidator != null && p.FailedNum % 3 == 0 && await _proxyValidator.IsAvailable(proxy))
+				if (_proxyValidator != null && p.FailedNum % 3 == 0 && await _proxyValidator.IsAvailable(p.Uri))
 				{
 					_dict.TryRemove(p.Uri, out _);
 					return;
@@ -75,23 +69,40 @@ namespace DotnetSpider.Proxy
 			}
 		}
 
-		public async Task AddAsync(IEnumerable<ProxyEntry> proxies)
+		public async Task AddAsync(IEnumerable<Uri> proxies)
 		{
 			foreach (var proxy in proxies)
 			{
-				if (await _proxyValidator.IsAvailable(proxy) && _dict.TryAdd(proxy.Uri, proxy))
+				if (await _proxyValidator.IsAvailable(proxy) && _dict.TryAdd(proxy, new ProxyEntry(proxy)))
 				{
-					_queue.Enqueue(proxy);
+					_queue.Enqueue(_dict[proxy]);
 				}
 			}
 		}
 
-		private ProxyEntry Get()
+		public async Task<Uri> GetAsync(int seconds)
+		{
+			var waitCount = seconds * 10;
+			for (var i = 0; i < waitCount; ++i)
+			{
+				var proxy = Get();
+				if (proxy != null)
+				{
+					return proxy;
+				}
+
+				await Task.Delay(100);
+			}
+
+			return null;
+		}
+
+		public Uri Get()
 		{
 			if (_queue.TryDequeue(out var proxy))
 			{
-				_timer.NewTimeout(new ReturnProxyTask(this, proxy), TimeSpan.FromSeconds(30));
-				return proxy;
+				_timer.NewTimeout(new ReturnProxyTask(this, proxy.Uri), TimeSpan.FromSeconds(30));
+				return proxy.Uri;
 			}
 			else
 			{
@@ -101,18 +112,18 @@ namespace DotnetSpider.Proxy
 
 		private class ReturnProxyTask : ITimerTask
 		{
-			private readonly ProxyEntry _httpProxy;
+			private readonly Uri _proxy;
 			private readonly IProxyService _pool;
 
-			public ReturnProxyTask(IProxyService pool, ProxyEntry httpProxy)
+			public ReturnProxyTask(IProxyService pool, Uri proxy)
 			{
 				_pool = pool;
-				_httpProxy = httpProxy;
+				_proxy = proxy;
 			}
 
 			public async Task RunAsync(ITimeout timeout)
 			{
-				await _pool.ReturnAsync(_httpProxy, HttpStatusCode.OK);
+				await _pool.ReturnAsync(_proxy, HttpStatusCode.OK);
 			}
 		}
 	}

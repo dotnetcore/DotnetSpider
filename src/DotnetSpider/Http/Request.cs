@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using DotnetSpider.Downloader;
 using DotnetSpider.Extensions;
 using DotnetSpider.Infrastructure;
 using MessagePack;
@@ -41,7 +40,7 @@ namespace DotnetSpider.Http
 		/// <summary>
 		/// 请求的 Timeout 时间
 		/// </summary>
-		public int Timeout { get; set; } = 30;
+		public int Timeout { get; set; } = 30000;
 
 		/// <summary>
 		/// 下载代理标识
@@ -51,7 +50,7 @@ namespace DotnetSpider.Http
 		/// <summary>
 		/// 下载代理类型
 		/// </summary>
-		public string Downloader { get; set; } = DownloaderNames.HttpClient;
+		public string Downloader { get; set; }
 
 		/// <summary>
 		/// 链接的深度
