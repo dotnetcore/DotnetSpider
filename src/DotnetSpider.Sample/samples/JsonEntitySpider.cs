@@ -5,6 +5,7 @@ using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Downloader;
 using DotnetSpider.Http;
+using DotnetSpider.Infrastructure;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Scheduler.Component;
 using DotnetSpider.Selector;
@@ -36,7 +37,7 @@ namespace DotnetSpider.Sample.samples
 			AddDataFlow(new DataParser<MyEntity>());
 			AddDataFlow(GetDefaultStorage());
 			await AddRequestsAsync(
-				new Request("file://samples/test.json") {Downloader = DownloaderNames.File});
+				new Request("file://samples/test.json") {Downloader = Const.Downloader.File});
 		}
 
 		[Schema("json", "data")]

@@ -10,7 +10,12 @@ namespace DotnetSpider.Proxy
 		public static Builder UseProxy<TProxySupplier>(this Builder builder)
 			where TProxySupplier : class, IProxySupplier
 		{
-			return builder.UseProxy<TProxySupplier, DefaultProxyValidator>();
+			builder.Properties["UserProxy"] = "true";
+			builder.ConfigureServices(x =>
+			{
+				x.AddProxy<TProxySupplier>();
+			});
+			return builder;
 		}
 
 		public static Builder UseProxy<TProxySupplier, TProxyValidator>(this Builder builder)
@@ -21,6 +26,20 @@ namespace DotnetSpider.Proxy
 			builder.ConfigureServices(x =>
 			{
 				x.AddProxy<TProxySupplier, TProxyValidator>();
+			});
+			return builder;
+		}
+
+		public static Builder UseProxy<TProxySupplier, TProxyValidator, THttpMessageHandlerBuilder>(
+			this Builder builder)
+			where TProxySupplier : class, IProxySupplier
+			where TProxyValidator : class, IProxyValidator
+			where THttpMessageHandlerBuilder : HttpMessageHandlerBuilder
+		{
+			builder.Properties["UserProxy"] = "true";
+			builder.ConfigureServices(x =>
+			{
+				x.AddProxy<TProxySupplier, TProxyValidator, THttpMessageHandlerBuilder>();
 			});
 			return builder;
 		}
@@ -37,12 +56,21 @@ namespace DotnetSpider.Proxy
 			where TProxySupplier : class, IProxySupplier
 			where TProxyValidator : class, IProxyValidator
 		{
+			serviceCollection.AddProxy<TProxySupplier, TProxyValidator, ProxyHttpMessageHandlerBuilder>();
+			return serviceCollection;
+		}
+
+		public static IServiceCollection AddProxy<TProxySupplier, TProxyValidator, THttpMessageHandlerBuilder>(
+			this IServiceCollection serviceCollection)
+			where TProxySupplier : class, IProxySupplier
+			where TProxyValidator : class, IProxyValidator
+			where THttpMessageHandlerBuilder : HttpMessageHandlerBuilder
+		{
 			serviceCollection.TryAddSingleton<IProxySupplier, TProxySupplier>();
 			serviceCollection.TryAddSingleton<IProxyValidator, TProxyValidator>();
 			serviceCollection.TryAddSingleton<IProxyService, ProxyService>();
 			serviceCollection.AddHostedService<ProxyBackgroundService>();
-			serviceCollection.AddTransient<HttpMessageHandlerBuilder, ProxyHttpMessageHandlerBuilder>();
-
+			serviceCollection.AddTransient<HttpMessageHandlerBuilder, THttpMessageHandlerBuilder>();
 			return serviceCollection;
 		}
 	}

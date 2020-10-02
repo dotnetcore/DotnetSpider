@@ -1,7 +1,5 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
-using DotnetSpider.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
@@ -19,7 +17,7 @@ namespace DotnetSpider.DataFlow.Storage
 
 		protected override Task StoreAsync(DataFlowContext context)
 		{
-			var items = context.GetData().Where(x => !ReferenceEquals(x.Key, Consts.ResponseBytes));
+			var items = context.GetData();
 
 			Console.ForegroundColor = ConsoleColor.Cyan;
 			Console.WriteLine($"{Environment.NewLine}DATA: {JsonConvert.SerializeObject(items)}{Environment.NewLine}");

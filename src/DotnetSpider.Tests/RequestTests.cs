@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using DotnetSpider.Downloader;
 using DotnetSpider.Extensions;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
@@ -30,7 +29,7 @@ namespace DotnetSpider.Tests
 			{
 				Method = "PUT",
 				Agent = "Agent",
-				Downloader = DownloaderNames.HttpClient,
+				Downloader = Const.Downloader.HttpClient,
 				Timestamp = 1000,
 				PPPoERegex = "PPPoERegex"
 			};
@@ -49,7 +48,7 @@ namespace DotnetSpider.Tests
 			Assert.Equal("PUT", r1.Method);
 			Assert.Equal("Accept", r1.Headers.Accept);
 			// Assert.Equal("Agent", r1.Agent);
-			Assert.Equal(DownloaderNames.HttpClient, r1.Downloader);
+			Assert.Equal(Const.Downloader.HttpClient, r1.Downloader);
 			Assert.Equal("UserAgent", r1.Headers.UserAgent);
 			Assert.Equal(1000, r1.Timestamp);
 			Assert.Equal("PPPoERegex", r1.PPPoERegex);
@@ -63,7 +62,7 @@ namespace DotnetSpider.Tests
 			{
 				Method = "PUT",
 				Agent = "Agent",
-				Downloader = DownloaderNames.HttpClient,
+				Downloader = Const.Downloader.HttpClient,
 				Timestamp = 1000,
 				PPPoERegex = "PPPoERegex"
 			};
@@ -78,7 +77,7 @@ namespace DotnetSpider.Tests
 			Assert.Equal("UserAgent", r1.Headers.UserAgent);
 			Assert.Equal("Accept", r1.Headers.Accept);
 			// Assert.Equal("Agent", r1.Agent);
-			Assert.Equal(DownloaderNames.HttpClient, r1.Downloader);
+			Assert.Equal(Const.Downloader.HttpClient, r1.Downloader);
 
 			Assert.Equal(1000, r1.Timestamp);
 			Assert.Equal("PPPoERegex", r1.PPPoERegex);
@@ -109,7 +108,7 @@ namespace DotnetSpider.Tests
 			{
 				Method = "PUT",
 				Agent = "Agent",
-				Downloader = DownloaderNames.HttpClient,
+				Downloader = Const.Downloader.HttpClient,
 				Timestamp = 1000,
 				PPPoERegex = "PPPoERegex"
 			};
@@ -128,7 +127,7 @@ namespace DotnetSpider.Tests
 			Assert.Equal("PUT", r1.Method);
 
 			// Assert.Equal("Agent", r1.Agent);
-			Assert.Equal(DownloaderNames.HttpClient, r1.Downloader);
+			Assert.Equal(Const.Downloader.HttpClient, r1.Downloader);
 			Assert.Equal("UserAgent", r1.Headers.UserAgent);
 			Assert.Equal("Accept", r1.Headers.Accept);
 			Assert.Equal(1000, r1.Timestamp);
@@ -143,7 +142,7 @@ namespace DotnetSpider.Tests
 			{
 				Method = "PUT",
 				Agent = "Agent",
-				Downloader = DownloaderNames.HttpClient,
+				Downloader = Const.Downloader.HttpClient,
 				Timestamp = 1000,
 				PPPoERegex = "PPPoERegex"
 			};
@@ -157,7 +156,7 @@ namespace DotnetSpider.Tests
 			Assert.Equal("UserAgent", r1.Headers.UserAgent);
 			Assert.Equal("Accept", r1.Headers.Accept);
 			// Assert.Equal("Agent", r1.Agent);
-			Assert.Equal(DownloaderNames.HttpClient, r1.Downloader);
+			Assert.Equal(Const.Downloader.HttpClient, r1.Downloader);
 
 			Assert.Equal(1000, r1.Timestamp);
 			Assert.Equal("PPPoERegex", r1.PPPoERegex);

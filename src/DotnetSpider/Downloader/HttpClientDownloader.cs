@@ -4,35 +4,45 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using DotnetSpider.Http;
+using DotnetSpider.Infrastructure;
+using DotnetSpider.Proxy;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Downloader
 {
 	public class HttpClientDownloader : IDownloader
 	{
+		private readonly IProxyService _proxyService;
+
 		protected IHttpClientFactory HttpClientFactory { get; }
 		protected ILogger Logger { get; }
+		protected bool UseProxy => _proxyService != null;
 
 		public HttpClientDownloader(IHttpClientFactory httpClientFactory,
+			IServiceProvider serviceProvider,
 			ILogger<HttpClientDownloader> logger)
 		{
 			HttpClientFactory = httpClientFactory;
 			Logger = logger;
+			_proxyService = serviceProvider.GetService<IProxyService>();
 		}
 
 		public async Task<Response> DownloadAsync(Request request)
 		{
 			HttpResponseMessage httpResponseMessage = null;
+			HttpRequestMessage httpRequestMessage = null;
 			try
 			{
-				var httpRequestMessage = request.ToHttpRequestMessage();
+				httpRequestMessage = request.ToHttpRequestMessage();
 
 				var httpClient = await CreateClientAsync(request);
 
 				var stopwatch = new Stopwatch();
 				stopwatch.Start();
 
-				httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+				httpResponseMessage = await SendAsync(httpClient, httpRequestMessage);
+
 				stopwatch.Stop();
 
 				var elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
@@ -64,14 +74,35 @@ namespace DotnetSpider.Downloader
 			}
 			finally
 			{
-				DisposeSafely(httpResponseMessage);
+				ObjectUtilities.DisposeSafely(Logger, httpResponseMessage, httpRequestMessage);
 			}
 		}
 
-		protected virtual Task<HttpClient> CreateClientAsync(Request request)
+		protected virtual async Task<HttpResponseMessage> SendAsync(HttpClient httpClient,
+			HttpRequestMessage httpRequestMessage)
 		{
-			var httpClient = HttpClientFactory.CreateClient(request.RequestUri.Host);
-			return Task.FromResult(httpClient);
+			return await httpClient.SendAsync(httpRequestMessage);
+		}
+
+		protected virtual async Task<HttpClient> CreateClientAsync(Request request)
+		{
+			string name;
+			if (UseProxy)
+			{
+				var proxy = await _proxyService.GetAsync(request.Timeout);
+				if (proxy == null)
+				{
+					throw new SpiderException("获取代理失败");
+				}
+
+				name = $"{Const.ProxyPrefix}{proxy}";
+			}
+			else
+			{
+				name = request.RequestUri.Host;
+			}
+
+			return HttpClientFactory.CreateClient(name);
 		}
 
 		protected virtual Task<Response> HandleAsync(Request request, HttpResponseMessage responseMessage)
@@ -79,18 +110,6 @@ namespace DotnetSpider.Downloader
 			return Task.FromResult((Response)null);
 		}
 
-		public virtual string Name => DownloaderNames.HttpClient;
-
-		private void DisposeSafely(IDisposable obj)
-		{
-			try
-			{
-				obj?.Dispose();
-			}
-			catch (Exception e)
-			{
-				Logger.LogWarning($"Dispose {obj} failed: {e}");
-			}
-		}
+		public virtual string Name => UseProxy ? Const.Downloader.ProxyHttpClient : Const.Downloader.HttpClient;
 	}
 }

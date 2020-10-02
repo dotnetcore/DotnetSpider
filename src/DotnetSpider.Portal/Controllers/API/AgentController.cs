@@ -78,7 +78,7 @@ namespace DotnetSpider.Portal.Controllers.API
 				return new FailedResult("Agent is not exists");
 			}
 
-			await _mq.PublishAsBytesAsync(string.Format(TopicNames.Spider, id.ToUpper()), new Exit {AgentId = id});
+			await _mq.PublishAsBytesAsync(string.Format(Const.Topic.Spider, id.ToUpper()), new Exit {AgentId = id});
 
 			using (var conn = _dbContext.Database.GetDbConnection())
 			{
@@ -98,7 +98,7 @@ namespace DotnetSpider.Portal.Controllers.API
 				return new FailedResult("Agent is not exists");
 			}
 
-			await _mq.PublishAsBytesAsync(string.Format(TopicNames.Spider, id.ToUpper()), new Exit {AgentId = id});
+			await _mq.PublishAsBytesAsync(string.Format(Const.Topic.Spider, id.ToUpper()), new Exit {AgentId = id});
 			return new ApiResult("OK");
 		}
 	}

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Extensions;
-using DotnetSpider.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -69,7 +68,7 @@ namespace DotnetSpider.HBase
 
 			var hash = context.Request.Hash;
 
-			var bytes = context.GetData(Consts.ResponseBytes);
+			var bytes = context.MessageBytes;
 			var data = Convert.ToBase64String(bytes);
 
 			var httpClient = context.ServiceProvider.GetRequiredService<IHttpClientFactory>().CreateClient(_rest);

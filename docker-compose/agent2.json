@@ -1,6 +1,6 @@
 {
   "RabbitMQ": {
-    "Exchange": "DOTNET_SPIDER",
+    "Exchange": "DotnetSpider",
     "Host": "192.168.124.200",
     "UserName": "user",
     "Password": "password"

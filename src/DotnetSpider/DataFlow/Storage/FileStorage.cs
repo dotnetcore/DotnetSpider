@@ -1,7 +1,5 @@
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using DotnetSpider.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
@@ -24,7 +22,8 @@ namespace DotnetSpider.DataFlow.Storage
 				$"{context.Request.Hash}.dat");
 			using var writer = OpenWrite(file);
 			await writer.WriteLineAsync("RequestUri:\t" + context.Request.RequestUri);
-			var items = context.GetData().Where(x => !ReferenceEquals(x.Key, Consts.ResponseBytes));
+			var items = context
+				.GetData();
 			await writer.WriteLineAsync("Data:\t" + JsonConvert.SerializeObject(items));
 		}
 	}

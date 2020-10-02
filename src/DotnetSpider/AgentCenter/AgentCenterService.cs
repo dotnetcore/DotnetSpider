@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.AgentCenter.Store;
 using DotnetSpider.Extensions;
+using DotnetSpider.Infrastructure;
 using DotnetSpider.Message.Agent;
 using DotnetSpider.MessageQueue;
 using Microsoft.Extensions.Hosting;
@@ -38,7 +39,7 @@ namespace DotnetSpider.AgentCenter
 
 				await _agentStore.EnsureDatabaseAndTableCreatedAsync();
 
-				_consumer = new AsyncMessageConsumer<byte[]>(TopicNames.AgentCenter);
+				_consumer = new AsyncMessageConsumer<byte[]>(Const.Topic.AgentCenter);
 				_consumer.Received += async bytes =>
 				{
 					var message = await GetMessageAsync(bytes);

@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Bert.RateLimiters;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Storage;
-using DotnetSpider.Downloader;
 using DotnetSpider.Extensions;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
@@ -32,6 +31,7 @@ namespace DotnetSpider
 		private readonly RequestedQueue _requestedQueue;
 		private MessageQueue.AsyncMessageConsumer<byte[]> _consumer;
 		private readonly DependenceServices _services;
+		private readonly string _defaultDownloader;
 
 		protected event Action<Request[]> OnTimeout;
 
@@ -72,6 +72,10 @@ namespace DotnetSpider
 			_requestedQueue = new RequestedQueue();
 			_requestSuppliers = new List<IRequestSupplier>();
 			_dataFlows = new List<IDataFlow>();
+
+			_defaultDownloader = _services.HostBuilderContext.Properties.ContainsKey(Const.DefaultDownloader)
+				? _services.HostBuilderContext.Properties[Const.DefaultDownloader]?.ToString()
+				: Const.Downloader.HttpClient;
 		}
 
 		/// <summary>
@@ -194,14 +198,10 @@ namespace DotnetSpider
 
 			foreach (var request in requests)
 			{
-				var defaultDownloader = _services.HostBuilderContext.Properties.ContainsKey("DefaultDownloader")
-					? _services.HostBuilderContext.Properties["DefaultDownloader"]?.ToString()
-					: DownloaderNames.HttpClient;
-
 				if (string.IsNullOrWhiteSpace(request.Downloader)
-				    && !string.IsNullOrWhiteSpace(defaultDownloader))
+				    && !string.IsNullOrWhiteSpace(_defaultDownloader))
 				{
-					request.Downloader = defaultDownloader;
+					request.Downloader = _defaultDownloader;
 				}
 
 				if (request.Downloader.Contains("PPPoE") &&
@@ -261,7 +261,7 @@ namespace DotnetSpider
 
 		private async Task RegisterConsumerAsync(CancellationToken stoppingToken)
 		{
-			var topic = string.Format(TopicNames.Spider, Id.ToUpper());
+			var topic = string.Format(Const.Topic.Spider, Id.ToUpper());
 
 			Logger.LogInformation($"{Id} register topic {topic}");
 			_consumer = new MessageQueue.AsyncMessageConsumer<byte[]>(topic);
@@ -341,14 +341,16 @@ namespace DotnetSpider
 			}
 		}
 
-		private async Task HandleResponseAsync(Request request, Response response, byte[] responseBytes)
+		private async Task HandleResponseAsync(Request request, Response response, byte[] messageBytes)
 		{
+			DataFlowContext context = null;
 			try
 			{
 				using var scope = _services.ServiceProvider.CreateScope();
-				var context = new DataFlowContext(scope.ServiceProvider, Options, request, response);
-				context.AddData(Consts.ResponseBytes, responseBytes);
-				context.AddData(Consts.SpiderId, Id);
+				context = new DataFlowContext(scope.ServiceProvider, Options, request, response)
+				{
+					MessageBytes = messageBytes, Id = Id, Name = Name
+				};
 
 				foreach (var dataFlow in _dataFlows)
 				{
@@ -370,6 +372,10 @@ namespace DotnetSpider
 				// retry it until trigger retryTimes limitation
 				await AddRequestsAsync(request);
 				Logger.LogError($"{Id} handle {JsonConvert.SerializeObject(request)} failed: {e}");
+			}
+			finally
+			{
+				ObjectUtilities.DisposeSafely(context);
 			}
 		}
 
@@ -543,7 +549,7 @@ namespace DotnetSpider
 					if (string.IsNullOrWhiteSpace(request.Agent))
 					{
 						topic = string.IsNullOrEmpty(request.Downloader)
-							? DownloaderNames.HttpClient
+							? Const.Downloader.HttpClient
 							: request.Downloader;
 					}
 					else
@@ -559,7 +565,7 @@ namespace DotnetSpider
 							case RequestPolicy.Random:
 							{
 								topic = string.IsNullOrEmpty(request.Downloader)
-									? DownloaderNames.HttpClient
+									? Const.Downloader.HttpClient
 									: request.Downloader;
 								break;
 							}
@@ -627,27 +633,11 @@ namespace DotnetSpider
 
 		public override void Dispose()
 		{
-			DisposeSafely(_requestedQueue);
-			foreach (var dataFlow in _dataFlows)
-			{
-				DisposeSafely(dataFlow);
-			}
-
-			DisposeSafely(_services);
+			ObjectUtilities.DisposeSafely(Logger, _requestedQueue);
+			ObjectUtilities.DisposeSafely(Logger, _dataFlows);
+			ObjectUtilities.DisposeSafely(Logger, _services);
 
 			base.Dispose();
-		}
-
-		private void DisposeSafely(IDisposable obj)
-		{
-			try
-			{
-				obj?.Dispose();
-			}
-			catch (Exception e)
-			{
-				Logger.LogWarning($"Dispose {obj} failed: {e}");
-			}
 		}
 	}
 }

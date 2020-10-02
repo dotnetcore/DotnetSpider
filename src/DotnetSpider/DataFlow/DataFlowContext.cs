@@ -11,12 +11,22 @@ namespace DotnetSpider.DataFlow
 	/// <summary>
 	/// 数据流处理器上下文
 	/// </summary>
-	public class DataFlowContext
+	public class DataFlowContext : IDisposable
 	{
 		private readonly Dictionary<string, dynamic> _properties = new Dictionary<string, dynamic>();
 		private readonly Dictionary<object, dynamic> _data = new Dictionary<object, dynamic>();
 
 		public ISelectable Selectable { get; internal set; }
+
+		/// <summary>
+		/// 爬虫标识
+		/// </summary>
+		public string Id { get; internal set; }
+
+		/// <summary>
+		/// 爬虫名称
+		/// </summary>
+		public string Name { get; internal set; }
 
 		public SpiderOptions Options { get; }
 
@@ -24,6 +34,11 @@ namespace DotnetSpider.DataFlow
 		/// 下载器返回的结果
 		/// </summary>
 		public Response Response { get; }
+
+		/// <summary>
+		/// 消息队列回传的内容
+		/// </summary>
+		public byte[] MessageBytes { get; internal set; }
 
 		/// <summary>
 		/// 下载的请求
@@ -181,6 +196,16 @@ namespace DotnetSpider.DataFlow
 		public void Clear()
 		{
 			_data.Clear();
+		}
+
+		public void Dispose()
+		{
+			_properties.Clear();
+			_data.Clear();
+			MessageBytes = null;
+
+			ObjectUtilities.DisposeSafely(Request);
+			ObjectUtilities.DisposeSafely(Response);
 		}
 	}
 }

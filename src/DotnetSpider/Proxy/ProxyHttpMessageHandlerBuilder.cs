@@ -30,13 +30,13 @@ namespace DotnetSpider.Proxy
 		{
 			if (PrimaryHandler == null)
 			{
-				if (!Name.StartsWith(Consts.ProxyPrefix))
+				if (!Name.StartsWith(Const.ProxyPrefix))
 				{
 					throw new SpiderException(
-						"You are using proxy http client builder, but looks like you didn't register any proxy downloader");
+						"You are using proxy http client builder, but looks like your http client name is incorrect");
 				}
 
-				var uri = Name.Replace(Consts.ProxyPrefix, string.Empty);
+				var uri = Name.Replace(Const.ProxyPrefix, string.Empty);
 				var handler = new ProxyHttpClientHandler
 				{
 					UseCookies = true,

@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Extensions;
+using DotnetSpider.Infrastructure;
 using DotnetSpider.Message.Statistics;
 using DotnetSpider.Statistics.Store;
 using Microsoft.Extensions.Hosting;
@@ -33,7 +34,7 @@ namespace DotnetSpider.Statistics
 			_logger.LogInformation("Statistics service starting");
 			await _statisticsStore.EnsureDatabaseAndTableCreatedAsync();
 
-			_consumer = new MessageQueue.AsyncMessageConsumer<byte[]>(TopicNames.Statistics);
+			_consumer = new MessageQueue.AsyncMessageConsumer<byte[]>(Const.Topic.Statistics);
 			_consumer.Received += async bytes =>
 			{
 				var message = await bytes.DeserializeAsync(stoppingToken);

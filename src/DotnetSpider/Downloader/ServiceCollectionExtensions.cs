@@ -17,17 +17,20 @@ namespace DotnetSpider.Downloader
 		public static Builder UseDownloader<TDownloader>(this Builder builder)
 			where TDownloader : class, IDownloader
 		{
-			builder.Properties["DefaultDownloader"] = $"DOTNET_SPIDER_{typeof(TDownloader).Name}";
-
 			builder.ConfigureServices(x =>
 			{
-				x.AddTransient<HttpMessageHandlerBuilder, DefaultHttpMessageHandlerBuilder>();
+				if (!typeof(IProxyDownloader).IsAssignableFrom(typeof(TDownloader)))
+				{
+					x.AddTransient<HttpMessageHandlerBuilder, DefaultHttpMessageHandlerBuilder>();
+				}
+
 				x.AddAgent<TDownloader>(opts =>
 				{
 					opts.AgentId = ObjectId.NewId().ToString();
 					opts.AgentName = opts.AgentId;
 				});
 			});
+
 			return builder;
 		}
 	}

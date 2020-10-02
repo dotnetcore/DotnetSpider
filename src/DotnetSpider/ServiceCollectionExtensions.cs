@@ -23,7 +23,7 @@ namespace DotnetSpider
 
 		public static Builder IgnoreServerCertificateError(this Builder builder)
 		{
-			builder.Properties[Consts.IgnoreSslError] = "true";
+			builder.Properties[Const.IgnoreSslError] = "true";
 			return builder;
 		}
 

@@ -40,7 +40,7 @@ namespace DotnetSpider.Sample.samples
 			{
 				await AddRequestsAsync(new Request("https://news.cnblogs.com/n/page/" + i)
 				{
-					Downloader = DownloaderNames.Empty
+					Downloader = Const.Downloader.Empty
 				});
 			}
 

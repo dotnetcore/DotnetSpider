@@ -234,57 +234,58 @@ namespace DotnetSpider.DataFlow.Parser
 			return ConfigureDataObject(dataObject);
 		}
 
-		private string GetEnvironment(DataFlowContext context, Dictionary<string, object> properties, ValueSelector field,
+		private string GetEnvironment(DataFlowContext context, Dictionary<string, object> properties,
+			ValueSelector field,
 			int index)
 		{
 			string value;
 			switch (field.Expression?.ToUpper())
 			{
-				case EnvironmentNames.EntityIndex:
+				case Const.EnvironmentNames.EntityIndex:
 				{
 					value = index.ToString();
 					break;
 				}
 
-				case EnvironmentNames.Guid:
+				case Const.EnvironmentNames.Guid:
 				{
 					value = Guid.NewGuid().ToString();
 					break;
 				}
 
-				case EnvironmentNames.Date:
-				case EnvironmentNames.Today:
+				case Const.EnvironmentNames.Date:
+				case Const.EnvironmentNames.Today:
 				{
 					value = DateTimeOffset.Now.Date.ToString("yyyy-MM-dd");
 					break;
 				}
 
-				case EnvironmentNames.Datetime:
-				case EnvironmentNames.Now:
+				case Const.EnvironmentNames.Datetime:
+				case Const.EnvironmentNames.Now:
 				{
 					value = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss");
 					break;
 				}
 
-				case EnvironmentNames.Month:
+				case Const.EnvironmentNames.Month:
 				{
 					value = DateTimeHelper.FirstDayOfMonth.ToString("yyyy-MM-dd");
 					break;
 				}
 
-				case EnvironmentNames.Monday:
+				case Const.EnvironmentNames.Monday:
 				{
 					value = DateTimeHelper.Monday.ToString("yyyy-MM-dd");
 					break;
 				}
 
-				case EnvironmentNames.SpiderId:
+				case Const.EnvironmentNames.SpiderId:
 				{
 					value = context.Request.Owner;
 					break;
 				}
 
-				case EnvironmentNames.RequestHash:
+				case Const.EnvironmentNames.RequestHash:
 				{
 					value = context.Request.Hash;
 					break;

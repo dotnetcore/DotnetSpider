@@ -30,7 +30,7 @@ namespace DotnetSpider.Agent
 			IMessageQueue messageQueue,
 			IOptions<AgentOptions> options,
 			IHostApplicationLifetime applicationLifetime,
-			IDownloader downloader)
+			IDownloader downloader, HostBuilderContext hostBuilderContext)
 		{
 			_options = options.Value;
 			_logger = logger;
@@ -38,6 +38,8 @@ namespace DotnetSpider.Agent
 			_applicationLifetime = applicationLifetime;
 			_downloader = downloader;
 			_consumers = new List<MessageQueue.AsyncMessageConsumer<byte[]>>();
+
+			hostBuilderContext.Properties[Const.DefaultDownloader] = downloader.Name;
 		}
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -50,7 +52,7 @@ namespace DotnetSpider.Agent
 			// 分布式才需要注册
 			if (_messageQueue.IsDistributed)
 			{
-				await _messageQueue.PublishAsBytesAsync(TopicNames.AgentCenter,
+				await _messageQueue.PublishAsBytesAsync(Const.Topic.AgentCenter,
 					new Register
 					{
 						AgentId = _options.AgentId,
@@ -67,7 +69,7 @@ namespace DotnetSpider.Agent
 
 			if (_messageQueue.IsDistributed)
 			{
-				await RegisterAgentAsync(string.Format(TopicNames.Spider, _options.AgentId), stoppingToken);
+				await RegisterAgentAsync(string.Format(Const.Topic.Spider, _options.AgentId), stoppingToken);
 			}
 
 			// 分布式才需要发送心跳
@@ -123,7 +125,7 @@ namespace DotnetSpider.Agent
 
 					response.Agent = _options.AgentId;
 
-					var topic = string.Format(TopicNames.Spider, request.Owner.ToUpper());
+					var topic = string.Format(Const.Topic.Spider, request.Owner.ToUpper());
 					await _messageQueue.PublishAsBytesAsync(topic, response);
 
 					_logger.LogInformation(
@@ -143,7 +145,7 @@ namespace DotnetSpider.Agent
 		{
 			_logger.LogInformation($"Heartbeat {_options.AgentId}, {_options.AgentName}");
 
-			await _messageQueue.PublishAsBytesAsync(TopicNames.AgentCenter,
+			await _messageQueue.PublishAsBytesAsync(Const.Topic.AgentCenter,
 				new Heartbeat
 				{
 					AgentId = _options.AgentId,

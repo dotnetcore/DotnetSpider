@@ -265,7 +265,7 @@ namespace DotnetSpider.Portal.Controllers.API
 			}
 
 			var spiderId = spiderHistory.Batch.ToUpper();
-			var topic = string.Format(TopicNames.Spider, spiderHistory.Batch.ToUpper());
+			var topic = string.Format(Const.Topic.Spider, spiderHistory.Batch.ToUpper());
 			_logger.LogInformation($"Try stop spider {topic}");
 			await _mq.PublishAsBytesAsync(topic,
 				new Exit(spiderId));

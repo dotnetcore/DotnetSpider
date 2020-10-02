@@ -9,6 +9,7 @@ using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Downloader;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
+using DotnetSpider.Proxy;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Scheduler.Component;
 using DotnetSpider.Selector;
@@ -19,34 +20,38 @@ using Serilog;
 
 namespace DotnetSpider.Sample.samples
 {
-	public class EntitySpider : Spider
+	public class ProxySpider : Spider
 	{
 		public static async Task RunAsync()
 		{
-			var builder = Builder.CreateDefaultBuilder<EntitySpider>(options =>
+			var builder = Builder.CreateDefaultBuilder<ProxySpider>(options =>
 			{
 				options.Speed = 1;
 			});
 			builder.UseDownloader<HttpClientDownloader>();
 			builder.UseSerilog();
+			builder.UseProxy<FakeProxySupplier, FakeProxyValidator>();
 			builder.IgnoreServerCertificateError();
 			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
 			await builder.Build().RunAsync();
 		}
 
-		public EntitySpider(IOptions<SpiderOptions> options, DependenceServices services,
+		public ProxySpider(IOptions<SpiderOptions> options, DependenceServices services,
 			ILogger<Spider> logger) : base(
 			options, services, logger)
 		{
 		}
 
-		protected override async Task InitializeAsync(CancellationToken stoppingToken = default)
+		protected override async Task InitializeAsync(CancellationToken stoppingToken)
 		{
 			AddDataFlow(new DataParser<CnblogsEntry>());
 			AddDataFlow(GetDefaultStorage());
-			await AddRequestsAsync(
-				new Request(
-					"https://news.cnblogs.com/n/page/1", new Dictionary<string, object> {{"网站", "博客园"}}));
+			for (var i = 1; i < 99; ++i)
+			{
+				await AddRequestsAsync(
+					new Request(
+						"https://news.cnblogs.com/n/page/" + i, new Dictionary<string, object> {{"网站", "博客园"}}));
+			}
 		}
 
 		protected override (string Id, string Name) GetIdAndName()

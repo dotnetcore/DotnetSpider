@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
 using HtmlAgilityPack;
 
@@ -48,7 +47,7 @@ namespace DotnetSpider.Selector
 			{
 				foreach (var link in links)
 				{
-					if (Uri.TryCreate(link, UriKind.Absolute, out var uri) && HttpUtilities.IsHttpUri(uri))
+					if (Uri.TryCreate(link, UriKind.Absolute, out var uri) && UriUtilities.IsHttpUri(uri))
 					{
 						results.Add(uri);
 					}
@@ -59,7 +58,7 @@ namespace DotnetSpider.Selector
 			{
 				foreach (var link in sourceLinks)
 				{
-					if (Uri.TryCreate(link, UriKind.Absolute, out var uri) && HttpUtilities.IsHttpUri(uri))
+					if (Uri.TryCreate(link, UriKind.Absolute, out var uri) && UriUtilities.IsHttpUri(uri))
 					{
 						results.Add(uri);
 					}

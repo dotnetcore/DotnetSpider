@@ -110,7 +110,7 @@ namespace DotnetSpider.Http
 			get => _requestUri;
 			set
 			{
-				if (value != null && value.IsAbsoluteUri && !HttpUtilities.IsHttpUri(value))
+				if (value != null && value.IsAbsoluteUri && !UriUtilities.IsHttpUri(value))
 				{
 					throw new ArgumentException($"http base address required: {value}");
 				}
@@ -127,16 +127,16 @@ namespace DotnetSpider.Http
 		// ReSharper disable once InconsistentNaming
 		public string PPPoERegex
 		{
-			get => _properties.ContainsKey(Consts.PPPoERegex) ? _properties[Consts.PPPoERegex]?.ToString() : null;
+			get => _properties.ContainsKey(Const.PPPoEPattern) ? _properties[Const.PPPoEPattern]?.ToString() : null;
 			set
 			{
-				if (_properties.ContainsKey(Consts.PPPoERegex))
+				if (_properties.ContainsKey(Const.PPPoEPattern))
 				{
-					_properties[Consts.PPPoERegex] = value;
+					_properties[Const.PPPoEPattern] = value;
 				}
 				else
 				{
-					_properties.Add(Consts.PPPoERegex, value);
+					_properties.Add(Const.PPPoEPattern, value);
 				}
 			}
 		}
@@ -330,7 +330,7 @@ namespace DotnetSpider.Http
 				throw new ArgumentNullException(nameof(method));
 			}
 
-			if (requestUri != null && requestUri.IsAbsoluteUri && !HttpUtilities.IsHttpUri(requestUri))
+			if (requestUri != null && requestUri.IsAbsoluteUri && !UriUtilities.IsHttpUri(requestUri))
 			{
 				throw new ArgumentException("http base address is required", nameof(requestUri));
 			}

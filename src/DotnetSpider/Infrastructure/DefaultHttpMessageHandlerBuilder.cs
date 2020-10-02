@@ -47,9 +47,9 @@ namespace DotnetSpider.Infrastructure
 			HttpClientHandler handler)
 		{
 			var hostBuilderContext = services.GetService<HostBuilderContext>();
-			var ignoreSslError = (hostBuilderContext.Properties.ContainsKey(Consts.IgnoreSslError) &&
-			                      hostBuilderContext.Properties[Consts.IgnoreSslError]?.ToString().ToLower() == "true")
-			                     || Environment.GetEnvironmentVariable(Consts.IgnoreSslError)?.ToLower() == "true";
+			var ignoreSslError = (hostBuilderContext.Properties.ContainsKey(Const.IgnoreSslError) &&
+			                      hostBuilderContext.Properties[Const.IgnoreSslError]?.ToString().ToLower() == "true")
+			                     || Environment.GetEnvironmentVariable(Const.IgnoreSslError)?.ToLower() == "true";
 			if (ignoreSslError)
 			{
 				handler.ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true;
