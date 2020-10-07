@@ -33,7 +33,7 @@ namespace DotnetSpider.AgentCenter
 				x.AddHttpClient();
 				x.AddAgentCenter<MySqlAgentStore>();
 				x.AddStatistics<MySqlStatisticsStore>();
-				x.AddRabbitMQ(configuration.GetSection("RabbitMQ"));
+				x.AddRabbitMQ(configuration);
 			});
 			builder.UseSerilog();
 			await builder.Build().RunAsync();

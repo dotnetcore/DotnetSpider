@@ -79,7 +79,7 @@ namespace DotnetSpider.Portal
 			services.AddHttpClient();
 			services.AddAgentCenter<MySqlAgentStore>();
 			services.AddStatistics<MySqlStatisticsStore>();
-			services.AddRabbitMQ(Configuration.GetSection("RabbitMQ"));
+			services.AddRabbitMQ(Configuration);
 			services.AddHostedService<QuartzService>();
 			services.AddHostedService<CleanDockerContainerService>();
 			services.AddSingleton<IActionResultTypeMapper, ActionResultTypeMapper>();
