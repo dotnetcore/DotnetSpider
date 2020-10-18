@@ -6,7 +6,6 @@
 [![NuGet](https://img.shields.io/nuget/vpre/DotnetSpider.svg)](https://www.nuget.org/packages/DotnetSpider)
 [![Member project of .NET Core Community](https://img.shields.io/badge/member%20project%20of-NCC-9e20c9.svg)](https://github.com/dotnetcore)
 [![GitHub license](https://img.shields.io/github/license/dotnetcore/DotnetSpider.svg)](https://github.com/dotnetcore/DotnetSpider/blob/master/LICENSE.txt)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fdotnetcore%2FDotnetSpider.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fdotnetcore%2FDotnetSpider?ref=badge_shield)
 
 DotnetSpider, a .NET Standard web crawling library. It is lightweight, efficient and fast high-level web crawling & scraping framework.
 
@@ -166,6 +165,33 @@ Coming soon
 
     timeout 0
     tcp-keepalive 60
+
+ ### Dependencies
+
+| Package | License |
+| --- | --- |
+| Bert.RateLimiters | Apache 2.0 |
+ | MessagePack  |  MIT   |
+ | Newtonsoft.Json  |  MIT   |
+ | Dapper  |  Apache 2.0   |
+ | HtmlAgilityPack  |  MIT   |
+ | ZCJ.HashedWheelTimer  |  MIT   |
+ | murmurhash  |  Apache 2.0   |
+ | Serilog.AspNetCore  |  Apache 2.0   |
+ | Serilog.Sinks.Console  |  Apache 2.0   |
+ | Serilog.Sinks.RollingFile  |  Apache 2.0   |
+ | Serilog.Sinks.PeriodicBatching  |  Apache 2.0   |
+ | MongoDB.Driver  |  Apache 2.0   |
+ | MySqlConnector  |  MIT   |
+ | AutoMapper.Extensions.Microsoft.DependencyInjection  | MIT   |
+ | Docker.DotNet  |  MIT   |
+ | BuildBundlerMinifier  |  Apache 2.0   |
+ | Pomelo.EntityFrameworkCore.MySql  |  MIT   |
+ | Quartz.AspNetCore  |  Apache 2.0    |
+ | Quartz.AspNetCore.MySqlConnector  | Apache 2.0  |
+ | Npgsql  |  PostgreSQL License   |
+ | RabbitMQ.Client  |  Apache 2.0   |
+ | Polly  | BSD 3-C   |
 
 ### Buy me a coffee
 
