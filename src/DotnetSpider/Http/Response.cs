@@ -88,10 +88,10 @@ namespace DotnetSpider.Http
 
 			_disposed = true;
 
-			_headers.Clear();
+			_headers?.Clear();
 			_headers = null;
 
-			_trailingHeaders.Clear();
+			_trailingHeaders?.Clear();
 			_trailingHeaders = null;
 
 			Content?.Dispose();
