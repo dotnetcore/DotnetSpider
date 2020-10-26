@@ -36,27 +36,27 @@ namespace DotnetSpider.Selector
 		/// 查找所有的链接
 		/// </summary>
 		/// <returns>查询接口</returns>
-		public override IEnumerable<Uri> Links()
+		public override IEnumerable<string> Links()
 		{
 			// todo: re-impl with regex
 			var links = SelectList(Selectors.XPath("./descendant-or-self::*/@href")).Select(x => x.Value);
 			var sourceLinks = SelectList(Selectors.XPath("./descendant-or-self::*/@src"))
 				.Select(x => x.Value);
 
-			var results = new HashSet<Uri>();
+			var results = new HashSet<string>();
 			foreach (var link in links)
 			{
-				if (Uri.TryCreate(link, UriKind.Absolute, out var uri) && UriUtilities.IsHttpUri(uri))
+				if (Uri.TryCreate(link, UriKind.RelativeOrAbsolute, out _))
 				{
-					results.Add(uri);
+					results.Add(link);
 				}
 			}
 
 			foreach (var link in sourceLinks)
 			{
-				if (Uri.TryCreate(link, UriKind.Absolute, out var uri) && UriUtilities.IsHttpUri(uri))
+				if (Uri.TryCreate(link, UriKind.RelativeOrAbsolute, out _))
 				{
-					results.Add(uri);
+					results.Add(link);
 				}
 			}
 

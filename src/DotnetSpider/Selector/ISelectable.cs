@@ -30,7 +30,7 @@ namespace DotnetSpider.Selector
         /// 查找所有的链接
         /// </summary>
         /// <returns>查询接口</returns>
-        IEnumerable<Uri> Links();
+        IEnumerable<string> Links();
 
         /// <summary>
         /// 通过JsonPath查找结果

@@ -45,9 +45,12 @@ namespace DotnetSpider.Http
 			}
 
 			_disposed = true;
+			if (_headers != null)
+			{
+				_headers.Clear();
+				_headers = null;
+			}
 
-			_headers.Clear();
-			_headers = null;
 
 			Bytes = null;
 		}

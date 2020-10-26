@@ -15,7 +15,7 @@ namespace DotnetSpider.Selector
             _token = token;
         }
 
-        public override IEnumerable<Uri> Links()
+        public override IEnumerable<string> Links()
         {
             throw new System.NotImplementedException();
         }

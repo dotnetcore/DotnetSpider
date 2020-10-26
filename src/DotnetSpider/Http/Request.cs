@@ -110,10 +110,10 @@ namespace DotnetSpider.Http
 			get => _requestUri;
 			set
 			{
-				if (value != null && value.IsAbsoluteUri && !UriUtilities.IsHttpUri(value))
+				/*if (value != null && value.IsAbsoluteUri && !UriUtilities.IsHttpUri(value))
 				{
 					throw new ArgumentException($"http base address required: {value}");
-				}
+				}*/
 
 				_requestUri = value;
 			}
@@ -255,19 +255,7 @@ namespace DotnetSpider.Http
 			return sb.ToString();
 		}
 
-		public virtual string ComputeHash(IHashAlgorithmService hashAlgorithmService)
-		{
-			// Agent 不需要添加的原因是，每当 Request 再次添加到 Scheduler 前 Requested +1 已经导致 Hash 变化
-			var bytes = new
-			{
-				Owner,
-				RequestUri = RequestUri.AbsoluteUri,
-				Method,
-				RequestedTimes,
-				Content
-			}.Serialize();
-			return hashAlgorithmService.ComputeHash(bytes).ToBase64String();
-		}
+		
 
 		public Request Clone()
 		{
@@ -330,10 +318,10 @@ namespace DotnetSpider.Http
 				throw new ArgumentNullException(nameof(method));
 			}
 
-			if (requestUri != null && requestUri.IsAbsoluteUri && !UriUtilities.IsHttpUri(requestUri))
+			/*if (requestUri != null && requestUri.IsAbsoluteUri && !UriUtilities.IsHttpUri(requestUri))
 			{
 				throw new ArgumentException("http base address is required", nameof(requestUri));
-			}
+			}*/
 
 			_properties = new Dictionary<string, object>();
 			_method = method;

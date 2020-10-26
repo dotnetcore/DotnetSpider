@@ -16,8 +16,8 @@ namespace DotnetSpider.Scheduler
 			new List<Request>();
 
 
-		public QueueDistinctBfsScheduler(IDuplicateRemover duplicateRemover, IHashAlgorithmService hashAlgorithm)
-			: base(duplicateRemover, hashAlgorithm)
+		public QueueDistinctBfsScheduler(IDuplicateRemover duplicateRemover, IRequestHasher requestHasher)
+			: base(duplicateRemover, requestHasher)
 		{
 		}
 
