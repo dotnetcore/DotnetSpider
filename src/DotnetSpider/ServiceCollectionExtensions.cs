@@ -20,13 +20,28 @@ namespace DotnetSpider
 			});
 			return builder;
 		}
-
+		public static Builder UseRequestHasher(this Builder builder)
+		{
+			builder.ConfigureServices(x =>
+			{
+				x.AddSingleton<IRequestHasher, RequestHasher>();
+			});
+			return builder;
+		}
+		public static Builder UseRequestHasher<TRequestHasher>(this Builder builder)where TRequestHasher : class, IRequestHasher
+		{
+			builder.ConfigureServices(x =>
+			{
+				x.AddSingleton<IRequestHasher, TRequestHasher>();
+			});
+			return builder;
+		}
 		public static Builder IgnoreServerCertificateError(this Builder builder)
 		{
 			builder.Properties[Const.IgnoreSslError] = "true";
 			return builder;
 		}
-
+		
 		/// <summary>
 		/// 使用 ADSL 拨号服务
 		/// </summary>

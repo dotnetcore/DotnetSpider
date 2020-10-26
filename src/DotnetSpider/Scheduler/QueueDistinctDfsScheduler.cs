@@ -15,9 +15,9 @@ namespace DotnetSpider.Scheduler
 		private readonly List<Request> _requests =
 			new List<Request>();
 
-		public QueueDistinctDfsScheduler(IDuplicateRemover duplicateRemover, IHashAlgorithmService hashAlgorithm) :
+		public QueueDistinctDfsScheduler(IDuplicateRemover duplicateRemover, IRequestHasher requestHasher) :
 			base(
-				duplicateRemover, hashAlgorithm)
+				duplicateRemover, requestHasher)
 		{
 		}
 

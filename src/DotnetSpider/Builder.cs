@@ -162,6 +162,7 @@ namespace DotnetSpider
 				services.AddAgent<HttpClientDownloader>();
 				services.TryAddSingleton<IStatisticsClient, StatisticsClient>();
 				services.TryAddSingleton<DependenceServices>();
+				services.TryAddSingleton<IRequestHasher, RequestHasher>();
 				services.TryAddSingleton<IHashAlgorithmService, MurmurHashAlgorithmService>();
 			}).UseDefaultServiceProvider((context, options) =>
 			{

@@ -35,21 +35,20 @@ namespace DotnetSpider.Selector
 			_node = document.DocumentNode;
 		}
 
-		public override IEnumerable<Uri> Links()
+		public override IEnumerable<string> Links()
 		{
 			var links = SelectList(Selectors.XPath("./descendant-or-self::*/@href"))?.Select(x => x.Value);
 			var sourceLinks = SelectList(Selectors.XPath("./descendant-or-self::*/@src"))
 				?.Select(x => x.Value);
 
-
-			var results = new HashSet<Uri>();
+			var results = new HashSet<string>();
 			if (links != null)
 			{
 				foreach (var link in links)
 				{
-					if (Uri.TryCreate(link, UriKind.Absolute, out var uri) && UriUtilities.IsHttpUri(uri))
+					if (Uri.TryCreate(link, UriKind.RelativeOrAbsolute, out _))
 					{
-						results.Add(uri);
+						results.Add(link);
 					}
 				}
 			}
@@ -58,9 +57,9 @@ namespace DotnetSpider.Selector
 			{
 				foreach (var link in sourceLinks)
 				{
-					if (Uri.TryCreate(link, UriKind.Absolute, out var uri) && UriUtilities.IsHttpUri(uri))
+					if (Uri.TryCreate(link, UriKind.RelativeOrAbsolute, out _))
 					{
-						results.Add(uri);
+						results.Add(link);
 					}
 				}
 			}

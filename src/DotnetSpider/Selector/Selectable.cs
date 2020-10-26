@@ -13,7 +13,7 @@ namespace DotnetSpider.Selector
         /// 查找所有的链接
         /// </summary>
         /// <returns>查询接口</returns>
-        public abstract IEnumerable<Uri> Links();
+        public abstract IEnumerable<string> Links();
 
         public abstract SelectableType Type { get; }
 

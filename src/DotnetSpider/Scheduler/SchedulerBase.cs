@@ -12,12 +12,12 @@ namespace DotnetSpider.Scheduler
 		private SpinLock _spinLock;
 
 		protected readonly IDuplicateRemover DuplicateRemover;
-		protected readonly IHashAlgorithmService HashAlgorithm;
 
-		protected SchedulerBase(IDuplicateRemover duplicateRemover, IHashAlgorithmService hashAlgorithm)
+		private readonly IRequestHasher RequestHasher;
+		protected SchedulerBase(IDuplicateRemover duplicateRemover, IRequestHasher requestHasher)
 		{
 			DuplicateRemover = duplicateRemover;
-			HashAlgorithm = hashAlgorithm;
+			RequestHasher = requestHasher;
 		}
 
 		/// <summary>
@@ -86,7 +86,7 @@ namespace DotnetSpider.Scheduler
 			var count = 0;
 			foreach (var request in requests)
 			{
-				request.Hash = request.ComputeHash(HashAlgorithm);
+				request.Hash = RequestHasher.ComputeHash(request);
 				if (!await DuplicateRemover.IsDuplicateAsync(request))
 				{
 					await PushWhenNoDuplicate(request);

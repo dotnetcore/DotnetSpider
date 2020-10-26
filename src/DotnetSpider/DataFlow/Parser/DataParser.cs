@@ -48,7 +48,7 @@ namespace DotnetSpider.DataFlow.Parser
 					.SelectMany(x => x.Links())
 					.Select(x =>
 					{
-						var request = context.CreateNewRequest(x);
+						var request = context.CreateNewRequest(new Uri(x));
 						request.RequestedTimes = 0;
 						return request;
 					});

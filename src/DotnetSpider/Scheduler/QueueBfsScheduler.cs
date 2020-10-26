@@ -18,7 +18,7 @@ namespace DotnetSpider.Scheduler
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		public QueueBfsScheduler(IHashAlgorithmService hashAlgorithm) : base(new FakeDuplicateRemover(), hashAlgorithm)
+		public QueueBfsScheduler(IRequestHasher requestHasher) : base(new FakeDuplicateRemover(), requestHasher)
 		{
 		}
 
