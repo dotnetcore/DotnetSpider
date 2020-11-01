@@ -195,7 +195,7 @@ Coming soon
 
 ### Buy me a coffee
 
-![](https://github.com/zlzforever/DotnetSpiderPictures/raw/master/pay.png)
+![](https://github.com/zlzforever/ClickHouseMigrator/raw/master/images/alipay.jpeg)
 
 ### AREAS FOR IMPROVEMENTS
 
