@@ -78,7 +78,7 @@ namespace DotnetSpider.Tests
 			// 只有相对路径需要做补充
 			var selectable1 = new HtmlSelectable("<div><a href=\"/a/b\">aaaaaaab</a></div>", "http://www.b.com");
 			var value1 = selectable1.Links().First();
-			Assert.Equal("http://www.b.com/a/b", value1.AbsoluteUri);
+			Assert.Equal("http://www.b.com/a/b", value1);
 
 			// 绝对路径不需要做补充
 			var selectable2 = new HtmlSelectable("<div><a href=\"http://www.aaaa.com\">aaaaaaab</a></div>",
@@ -178,8 +178,8 @@ namespace DotnetSpider.Tests
 			Assert.Equal(2, links1.Count());
 			Assert.Single(link2);
 			Assert.Single(link3);
-			Assert.Equal("http://whatever.com/aaa", link2[0].AbsoluteUri);
-			Assert.Equal("http://whatever.com/bbb", link3[0].AbsoluteUri);
+			Assert.Equal("http://whatever.com/aaa", link2[0]);
+			Assert.Equal("http://whatever.com/bbb", link3[0]);
 		}
 
 		[Fact(DisplayName = "Selectable")]

@@ -11,7 +11,7 @@ namespace DotnetSpider.Tests
 {
 	public class QueueSchedulerTests
 	{
-		private static readonly IHashAlgorithmService _hashAlgorithm = new MurmurHashAlgorithmService();
+		private static readonly RequestHasher _hashAlgorithm = new RequestHasher(new MurmurHashAlgorithmService());
 
 		[Fact(DisplayName = "ParallelEnqueueAndDequeueQueueBfs")]
 		public void ParallelEnqueueAndDequeueQueueBfs()

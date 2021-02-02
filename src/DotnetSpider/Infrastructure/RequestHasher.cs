@@ -11,11 +11,13 @@ namespace DotnetSpider.Infrastructure
 	/// </summary>
 	public class RequestHasher : IRequestHasher
 	{
-		readonly IHashAlgorithmService _hashAlgorithmService;
+		private readonly IHashAlgorithmService _hashAlgorithmService;
+
 		public RequestHasher(IHashAlgorithmService hashAlgorithmService)
 		{
 			_hashAlgorithmService = hashAlgorithmService;
 		}
+
 		public string ComputeHash(Request request)
 		{
 			var bytes = new

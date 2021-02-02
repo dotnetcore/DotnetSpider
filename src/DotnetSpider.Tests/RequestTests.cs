@@ -92,12 +92,13 @@ namespace DotnetSpider.Tests
 		public void SerializeAndDeserialize3()
 		{
 			var hashAlgorithm = new MurmurHashAlgorithmService();
+			var requestHasher = new RequestHasher(hashAlgorithm);
 			var ownerId = ObjectId.GenerateNewId().ToString();
 			var r1 = new Request("http://www.a.com") {Owner = ownerId};
-			var h1 = r1.ComputeHash(hashAlgorithm);
+			var h1 = requestHasher.ComputeHash(r1);
 
 			var r2 = new Request("http://www.a.com") {Owner = ownerId};
-			var h2 = r1.ComputeHash(hashAlgorithm);
+			var h2 = requestHasher.ComputeHash(r2);
 			Assert.Equal(h1, h2);
 		}
 

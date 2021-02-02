@@ -11,6 +11,11 @@ namespace DotnetSpider.DataFlow.Storage
 		private HashSet<string> _imageSuffixes;
 		private static readonly object _locker = new object();
 
+		protected override bool IsContextEmpty(DataFlowContext context)
+		{
+			return context.Response == null || context.Response.Content.Bytes.Length == 0;
+		}
+
 		public string[] ImageSuffixes { get; set; } = {"jpeg", "gif", "jpg", "bmp", "png", "ico"};
 
 		public override Task InitAsync()

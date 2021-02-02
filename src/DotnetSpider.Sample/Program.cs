@@ -25,7 +25,7 @@ namespace DotnetSpider.Sample
 				.CreateLogger();
 
 			// // await DistributedSpider.RunAsync();
-			await EntitySpider.RunAsync();
+			await ImageSpider.RunAsync();
 
 			Console.WriteLine("Bye!");
 			Environment.Exit(0);
