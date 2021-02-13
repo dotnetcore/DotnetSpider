@@ -120,8 +120,8 @@ namespace DotnetSpider.Portal
 			{
 				endpoints.MapHealthChecks("/health");
 				endpoints.MapControllerRoute(
-					name: "default",
-					pattern: "{controller=Home}/{action=Index}/{id?}");
+					"default",
+					"{controller=Home}/{action=Index}/{id?}");
 			});
 
 			SeedData.InitializeAsync(new PortalOptions(Configuration), app.ApplicationServices).GetAwaiter()

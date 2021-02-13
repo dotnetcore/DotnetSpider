@@ -30,8 +30,8 @@ namespace DotnetSpider.Proxy
 		private readonly IProxyValidator _proxyValidator;
 
 		private readonly HashedWheelTimer _timer = new HashedWheelTimer(TimeSpan.FromSeconds(1)
-			, ticksPerWheel: 100000
-			, maxPendingTimeouts: 0);
+			, 100000
+			, 0);
 
 		public ProxyService(IProxyValidator proxyValidator)
 		{

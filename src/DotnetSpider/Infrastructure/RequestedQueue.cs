@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Http;
 using HWT;
@@ -9,24 +9,20 @@ namespace DotnetSpider.Infrastructure
 {
 	public class RequestedQueue : IDisposable
 	{
-		private readonly Dictionary<string, Request> _dict;
-
+		private readonly ConcurrentDictionary<string, Request> _dict;
 		private readonly HashedWheelTimer _timer;
-
-		private readonly List<Request> _queue;
+		private ConcurrentBag<Request> _queue;
 
 		public RequestedQueue()
 		{
-			_dict = new Dictionary<string, Request>();
-			_queue = new List<Request>();
+			_dict = new ConcurrentDictionary<string, Request>();
+			_queue = new ConcurrentBag<Request>();
 			_timer = new HashedWheelTimer(TimeSpan.FromSeconds(1)
-				, ticksPerWheel: 100000
-				, maxPendingTimeouts: 0);
+				, 100000);
 		}
 
 		public int Count => _dict.Count;
 
-		[MethodImpl(MethodImplOptions.Synchronized)]
 		public bool Enqueue(Request request)
 		{
 			if (request.Timeout <= 2000)
@@ -34,41 +30,34 @@ namespace DotnetSpider.Infrastructure
 				throw new SpiderException("Timeout should not less than 2000 milliseconds");
 			}
 
-			if (!_dict.ContainsKey(request.Hash))
+			if (!_dict.TryAdd(request.Hash, request))
 			{
-				_dict.Add(request.Hash, request);
-				_timer.NewTimeout(new TimeoutTask(this, request.Hash),
-					TimeSpan.FromMilliseconds(request.Timeout));
-				return true;
+				return false;
 			}
 
-			return false;
+			_timer.NewTimeout(new TimeoutTask(this, request.Hash),
+				TimeSpan.FromMilliseconds(request.Timeout));
+			return true;
 		}
 
-		[MethodImpl(MethodImplOptions.Synchronized)]
+
 		public Request Dequeue(string hash)
 		{
-			var request = _dict[hash];
-			_dict.Remove(hash);
-			return request;
+			return _dict.TryRemove(hash, out var request) ? request : null;
 		}
 
-		[MethodImpl(MethodImplOptions.Synchronized)]
 		public Request[] GetAllTimeoutList()
 		{
 			var data = _queue.ToArray();
-			_queue.Clear();
+			Interlocked.Exchange(ref _queue, new ConcurrentBag<Request>());
 			return data;
 		}
 
-		[MethodImpl(MethodImplOptions.Synchronized)]
 		private void Timeout(string hash)
 		{
-			if (_dict.ContainsKey(hash))
+			if (_dict.TryRemove(hash, out var request))
 			{
-				var request = _dict[hash];
 				_queue.Add(request);
-				_dict.Remove(hash);
 			}
 		}
 
@@ -93,7 +82,7 @@ namespace DotnetSpider.Infrastructure
 		public void Dispose()
 		{
 			_dict.Clear();
-			_queue.Clear();
+			Interlocked.Exchange(ref _queue, new ConcurrentBag<Request>());
 			_timer.Dispose();
 		}
 	}

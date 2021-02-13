@@ -38,7 +38,7 @@ namespace DotnetSpider.RabbitMQ
 			_logger.LogTrace("Creating RabbitMQ publish channel");
 
 			_publishChannel = _connection.CreateModel();
-			_publishChannel.ExchangeDeclare(exchange: _options.Exchange, type: "direct", durable: true);
+			_publishChannel.ExchangeDeclare(_options.Exchange, "direct", true);
 		}
 
 		private IConnectionFactory CreateConnectionFactory()
@@ -122,12 +122,12 @@ namespace DotnetSpider.RabbitMQ
 
 			var channel = _connection.CreateModel();
 			var basicConsumer = new AsyncEventingBasicConsumer(channel);
-			channel.QueueDeclare(queue: consumer.Queue,
-				durable: true,
-				exclusive: false,
-				autoDelete: true,
-				arguments: null);
-			channel.QueueBind(queue: consumer.Queue, _options.Exchange, routingKey: consumer.Queue);
+			channel.QueueDeclare(consumer.Queue,
+				true,
+				false,
+				true,
+				null);
+			channel.QueueBind(consumer.Queue, _options.Exchange, consumer.Queue);
 			basicConsumer.Received += async (model, ea) =>
 			{
 				try
@@ -136,7 +136,7 @@ namespace DotnetSpider.RabbitMQ
 				}
 				finally
 				{
-					channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+					channel.BasicAck(ea.DeliveryTag, false);
 				}
 			};
 			consumer.OnClosing += x =>
@@ -144,7 +144,7 @@ namespace DotnetSpider.RabbitMQ
 				channel.Close();
 			};
 			//7. 启动消费者
-			channel.BasicConsume(queue: consumer.Queue, autoAck: false, consumer: basicConsumer);
+			channel.BasicConsume(consumer.Queue, false, basicConsumer);
 
 			return Task.CompletedTask;
 		}
