@@ -31,7 +31,7 @@ namespace DotnetSpider.HtmlAgilityPack.Css
         /// </summary>
         public static Token Eoi()
         {
-            return new Token(TokenKind.Eoi);
+            return new(TokenKind.Eoi);
         }
 
         private static readonly Token _star = Char('*');
@@ -106,7 +106,7 @@ namespace DotnetSpider.HtmlAgilityPack.Css
         /// </summary>
         public static Token NotEqual()
         {
-            return new Token(TokenKind.NotEqual);
+            return new(TokenKind.NotEqual);
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace DotnetSpider.HtmlAgilityPack.Css
         /// </summary>
         public static Token Plus()
         {
-            return new Token(TokenKind.Plus);
+            return new(TokenKind.Plus);
         }
 
         /// <summary>
@@ -146,7 +146,7 @@ namespace DotnetSpider.HtmlAgilityPack.Css
         /// </summary>
         public static Token Greater()
         {
-            return new Token(TokenKind.Greater);
+            return new(TokenKind.Greater);
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace DotnetSpider.HtmlAgilityPack.Css
         /// </summary>
         public static Token Includes()
         {
-            return new Token(TokenKind.Includes);
+            return new(TokenKind.Includes);
         }
 
         /// <summary>
@@ -162,7 +162,7 @@ namespace DotnetSpider.HtmlAgilityPack.Css
         /// </summary>
         public static Token RegexMatch()
         {
-            return new Token(TokenKind.RegexMatch);
+            return new(TokenKind.RegexMatch);
         }
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace DotnetSpider.HtmlAgilityPack.Css
         /// </summary>
         public static Token DashMatch()
         {
-            return new Token(TokenKind.DashMatch);
+            return new(TokenKind.DashMatch);
         }
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace DotnetSpider.HtmlAgilityPack.Css
         /// </summary>
         public static Token PrefixMatch()
         {
-            return new Token(TokenKind.PrefixMatch);
+            return new(TokenKind.PrefixMatch);
         }
 
         /// <summary>
@@ -186,7 +186,7 @@ namespace DotnetSpider.HtmlAgilityPack.Css
         /// </summary>
         public static Token SuffixMatch()
         {
-            return new Token(TokenKind.SuffixMatch);
+            return new(TokenKind.SuffixMatch);
         }
 
         /// <summary>
@@ -194,7 +194,7 @@ namespace DotnetSpider.HtmlAgilityPack.Css
         /// </summary>
         public static Token SubstringMatch()
         {
-            return new Token(TokenKind.SubstringMatch);
+            return new(TokenKind.SubstringMatch);
         }
 
         /// <summary>
@@ -202,7 +202,7 @@ namespace DotnetSpider.HtmlAgilityPack.Css
         /// </summary>
         public static Token Tilde()
         {
-            return new Token(TokenKind.Tilde);
+            return new(TokenKind.Tilde);
         }
 
         /// <summary>
@@ -210,7 +210,7 @@ namespace DotnetSpider.HtmlAgilityPack.Css
         /// </summary>
         public static Token Slash()
         {
-            return new Token(TokenKind.Slash);
+            return new(TokenKind.Slash);
         }
 
         /// <summary>
@@ -254,7 +254,7 @@ namespace DotnetSpider.HtmlAgilityPack.Css
         /// </summary>
         public static Token String(string text)
         {
-            return new Token(TokenKind.String, text ?? string.Empty);
+            return new(TokenKind.String, text ?? string.Empty);
         }
 
         /// <summary>
@@ -271,7 +271,7 @@ namespace DotnetSpider.HtmlAgilityPack.Css
         /// </summary>
         public static Token Char(char ch)
         {
-            return new Token(TokenKind.Char, ch.ToString());
+            return new(TokenKind.Char, ch.ToString());
         }
 
         /// <summary>

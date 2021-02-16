@@ -56,8 +56,7 @@ namespace DotnetSpider.Selector
 				return null;
 			}
 
-			var token = JsonConvert.DeserializeObject(text) as JToken;
-			if (token == null)
+			if (!(JsonConvert.DeserializeObject(text) is JToken token))
 			{
 				return Enumerable.Empty<ISelectable>();
 			}

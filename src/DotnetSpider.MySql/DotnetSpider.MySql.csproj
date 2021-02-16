@@ -3,6 +3,7 @@
   <Import Project="../../package.props" />
   <PropertyGroup>
     <PackageId>DotnetSpider.MySql</PackageId>
+    <TargetFrameworks>netstandard2.1;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,6 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MySqlConnector" Version="0.69.9" />
+    <PackageReference Include="MySqlConnector" Version="0.69.10" />
   </ItemGroup>
 </Project>

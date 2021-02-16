@@ -1,6 +1,8 @@
 using System;
 using DotnetSpider.Downloader;
+using DotnetSpider.Proxy;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace DotnetSpider.Agent
 {
@@ -17,6 +19,7 @@ namespace DotnetSpider.Agent
 				services.Configure(configure);
 			}
 
+			services.TryAddSingleton<IProxyService, EmptyProxyService>();
 			services.AddSingleton<IDownloader, TDownloader>();
 			services.AddHostedService<AgentService>();
 			return services;

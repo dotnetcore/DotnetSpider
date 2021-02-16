@@ -1,4 +1,3 @@
-using System;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -10,22 +9,6 @@ using MySql.Data.MySqlClient;
 
 namespace DotnetSpider.MySql
 {
-	public class MySqlOptions
-	{
-		private readonly IConfiguration _configuration;
-
-		public MySqlOptions(IConfiguration configuration)
-		{
-			_configuration = configuration;
-		}
-
-		public StorageMode Mode => string.IsNullOrWhiteSpace(_configuration["MySql:Mode"])
-			? StorageMode.Insert
-			: (StorageMode)Enum.Parse(typeof(StorageMode), _configuration["MySql:Mode"]);
-
-		public string ConnectionString => _configuration["MySql:ConnectionString"];
-	}
-
 	/// <summary>
 	/// MySql 保存解析(实体)结果
 	/// </summary>
@@ -36,7 +19,12 @@ namespace DotnetSpider.MySql
 		public static IDataFlow CreateFromOptions(IConfiguration configuration)
 		{
 			var options = new MySqlOptions(configuration);
-			return new MySqlEntityStorage(options.Mode, options.ConnectionString);
+			return new MySqlEntityStorage(options.Mode, options.ConnectionString)
+			{
+				UseTransaction = options.UseTransaction,
+				IgnoreCase = options.IgnoreCase,
+				RetryTimes = options.RetryTimes
+			};
 		}
 
 		/// <summary>

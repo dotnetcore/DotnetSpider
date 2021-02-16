@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using AutoMapper;
 using DotnetSpider.AgentCenter;
 using DotnetSpider.MySql.AgentCenter;
 using DotnetSpider.Portal.BackgroundService;

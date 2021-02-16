@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Security;
@@ -6,9 +7,6 @@ using System.Threading;
 
 namespace DotnetSpider.Infrastructure
 {
-	/// <summary>
-	/// Copied from https://github.com/mongodb/mongo-csharp-driver/blob/master/src/MongoDB.Bson/ObjectModel/ObjectId.cs
-	/// </summary>
 #if NET452
     [Serializable]
 #endif
@@ -18,12 +16,20 @@ namespace DotnetSpider.Infrastructure
 		private static readonly ObjectId EmptyInstance = default;
 		private static readonly long Random = CalculateRandomValue();
 		private static int _staticIncrement = new Random().Next();
-		private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+		private static readonly DateTime UnixEpoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
 		// private fields
 		private readonly int _a;
 		private readonly int _b;
 		private readonly int _c;
+
+		/// <summary>
+		/// System.Text.Json.JsonSerializer 需要注册类型
+		/// </summary>
+		internal static void AddTypeDescriptor()
+		{
+			TypeDescriptor.AddAttributes(typeof(ObjectId), new TypeConverterAttribute(typeof(StringConverter)));
+		}
 
 		// constructors
 		/// <summary>
@@ -31,6 +37,21 @@ namespace DotnetSpider.Infrastructure
 		/// </summary>
 		/// <param name="bytes">The bytes.</param>
 		public ObjectId(byte[] bytes)
+		{
+			if (bytes == null)
+			{
+				throw new ArgumentNullException(nameof(bytes));
+			}
+
+			if (bytes.Length != 12)
+			{
+				throw new ArgumentException("Byte array must be 12 bytes long", nameof(bytes));
+			}
+
+			FromByteArray(bytes, 0, out _a, out _b, out _c);
+		}
+
+		public ObjectId(ReadOnlySpan<byte> bytes)
 		{
 			if (bytes == null)
 			{
@@ -171,9 +192,9 @@ namespace DotnetSpider.Infrastructure
 		/// Generates a new ObjectId with a unique value.
 		/// </summary>
 		/// <returns>An ObjectId.</returns>
-		public static ObjectId NewId()
+		public static ObjectId CreateId()
 		{
-			return NewId(GetTimestampFromDateTime(DateTime.UtcNow));
+			return CreateId(GetTimestampFromDateTime(DateTime.UtcNow));
 		}
 
 		/// <summary>
@@ -181,9 +202,9 @@ namespace DotnetSpider.Infrastructure
 		/// </summary>
 		/// <param name="timestamp">The timestamp component (expressed as a DateTime).</param>
 		/// <returns>An ObjectId.</returns>
-		public static ObjectId NewId(DateTime timestamp)
+		public static ObjectId CreateId(DateTime timestamp)
 		{
-			return NewId(GetTimestampFromDateTime(timestamp));
+			return CreateId(GetTimestampFromDateTime(timestamp));
 		}
 
 		/// <summary>
@@ -191,7 +212,7 @@ namespace DotnetSpider.Infrastructure
 		/// </summary>
 		/// <param name="timestamp">The timestamp component.</param>
 		/// <returns>An ObjectId.</returns>
-		public static ObjectId NewId(int timestamp)
+		public static ObjectId CreateId(int timestamp)
 		{
 			int increment = Interlocked.Increment(ref _staticIncrement) & 0x00ffffff; // only use low order 3 bytes
 			return Create(timestamp, Random, increment);
@@ -231,8 +252,7 @@ namespace DotnetSpider.Infrastructure
 			// don't throw ArgumentNullException if s is null
 			if (s != null && s.Length == 24)
 			{
-				byte[] bytes;
-				if (TryParseHexString(s, out bytes))
+				if (TryParseHexString(s, out var bytes))
 				{
 					objectId = new ObjectId(bytes);
 					return true;
@@ -376,6 +396,13 @@ namespace DotnetSpider.Infrastructure
 			c = (bytes[offset + 8] << 24) | (bytes[offset + 9] << 16) | (bytes[offset + 10] << 8) | bytes[offset + 11];
 		}
 
+		private static void FromByteArray(ReadOnlySpan<byte> bytes, int offset, out int a, out int b, out int c)
+		{
+			a = (bytes[offset] << 24) | (bytes[offset + 1] << 16) | (bytes[offset + 2] << 8) | bytes[offset + 3];
+			b = (bytes[offset + 4] << 24) | (bytes[offset + 5] << 16) | (bytes[offset + 6] << 8) | bytes[offset + 7];
+			c = (bytes[offset + 8] << 24) | (bytes[offset + 9] << 16) | (bytes[offset + 10] << 8) | bytes[offset + 11];
+		}
+
 		// public methods
 		/// <summary>
 		/// Compares this ObjectId to another ObjectId.
@@ -460,8 +487,7 @@ namespace DotnetSpider.Infrastructure
 				throw new ArgumentNullException(nameof(s));
 			}
 
-			byte[] bytes;
-			if (!TryParseHexString(s, out bytes))
+			if (!TryParseHexString(s, out var bytes))
 			{
 				throw new FormatException("String should contain only hexadecimal digits.");
 			}
@@ -489,11 +515,10 @@ namespace DotnetSpider.Infrastructure
 			var i = 0;
 			var j = 0;
 
-			if ((s.Length % 2) == 1)
+			if (s.Length % 2 == 1)
 			{
 				// if s has an odd length assume an implied leading "0"
-				int y;
-				if (!TryParseHexChar(s[i++], out y))
+				if (!TryParseHexChar(s[i++], out var y))
 				{
 					return false;
 				}
@@ -503,13 +528,12 @@ namespace DotnetSpider.Infrastructure
 
 			while (i < s.Length)
 			{
-				int x, y;
-				if (!TryParseHexChar(s[i++], out x))
+				if (!TryParseHexChar(s[i++], out var x))
 				{
 					return false;
 				}
 
-				if (!TryParseHexChar(s[i++], out y))
+				if (!TryParseHexChar(s[i++], out var y))
 				{
 					return false;
 				}
@@ -555,26 +579,26 @@ namespace DotnetSpider.Infrastructure
 		{
 			if (destination == null)
 			{
-				throw new ArgumentNullException("destination");
+				throw new ArgumentNullException(nameof(destination));
 			}
 
 			if (offset + 12 > destination.Length)
 			{
-				throw new ArgumentException("Not enough room in destination buffer.", "offset");
+				throw new ArgumentException("Not enough room in destination buffer.", nameof(offset));
 			}
 
 			destination[offset + 0] = (byte)(_a >> 24);
 			destination[offset + 1] = (byte)(_a >> 16);
 			destination[offset + 2] = (byte)(_a >> 8);
-			destination[offset + 3] = (byte)(_a);
+			destination[offset + 3] = (byte)_a;
 			destination[offset + 4] = (byte)(_b >> 24);
 			destination[offset + 5] = (byte)(_b >> 16);
 			destination[offset + 6] = (byte)(_b >> 8);
-			destination[offset + 7] = (byte)(_b);
+			destination[offset + 7] = (byte)_b;
 			destination[offset + 8] = (byte)(_c >> 24);
 			destination[offset + 9] = (byte)(_c >> 16);
 			destination[offset + 10] = (byte)(_c >> 8);
-			destination[offset + 11] = (byte)(_c);
+			destination[offset + 11] = (byte)_c;
 		}
 
 		/// <summary>

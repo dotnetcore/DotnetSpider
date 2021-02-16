@@ -603,7 +603,7 @@ namespace DotnetSpider.HtmlAgilityPack.Css
             return TokenSpec.B(token);
         }
 
-        internal static Dictionary<string, DelegateInfo> CustomSelectors = new Dictionary<string, DelegateInfo>();
+        internal static Dictionary<string, DelegateInfo> CustomSelectors = new();
 
         public static void RegisterCustomSelector<TNode>(string name, Func<Selector<TNode>> selector)
         {

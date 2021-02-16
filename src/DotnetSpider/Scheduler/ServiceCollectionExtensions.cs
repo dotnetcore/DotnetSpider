@@ -21,12 +21,12 @@ namespace DotnetSpider.Scheduler
 			return builder;
 		}
 
-		public static Builder UseQueueDistinctBfsScheduler<T>(this Builder builder)
-			where T : class, IDuplicateRemover
+		public static Builder UseQueueDistinctBfsScheduler<TDuplicateRemover>(this Builder builder)
+			where TDuplicateRemover : class, IDuplicateRemover
 		{
 			builder.ConfigureServices(x =>
 			{
-				x.TryAddSingleton<IDuplicateRemover, T>();
+				x.TryAddSingleton<IDuplicateRemover, TDuplicateRemover>();
 				x.TryAddSingleton<IScheduler, QueueDistinctBfsScheduler>();
 			});
 			return builder;

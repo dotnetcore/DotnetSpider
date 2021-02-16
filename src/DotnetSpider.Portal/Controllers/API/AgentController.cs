@@ -6,7 +6,6 @@ using DotnetSpider.AgentCenter;
 using DotnetSpider.AgentCenter.Store;
 using DotnetSpider.Extensions;
 using DotnetSpider.Infrastructure;
-using DotnetSpider.Message.Agent;
 using DotnetSpider.MessageQueue;
 using DotnetSpider.Portal.Common;
 using DotnetSpider.Portal.Data;
@@ -66,7 +65,7 @@ namespace DotnetSpider.Portal.Controllers.API
 			limit = limit <= 5 ? 5 : limit;
 
 			var @out = await _dbContext.Set<AgentHeartbeat>().PagedQueryAsync(page, limit, x => x.AgentId == id,
-				new OrderCondition<AgentHeartbeat, int>(x => x.Id));
+				new OrderCondition<AgentHeartbeat, long>(x => x.Id));
 			return _mapper.ToPagedQueryResult<AgentHeartbeat, AgentHeartbeatViewObject>(@out);
 		}
 
@@ -78,9 +77,9 @@ namespace DotnetSpider.Portal.Controllers.API
 				return new FailedResult("Agent is not exists");
 			}
 
-			await _mq.PublishAsBytesAsync(string.Format(Const.Topic.Spider, id.ToUpper()), new Exit {AgentId = id});
+			await _mq.PublishAsBytesAsync(string.Format(Topics.Spider, id), new Messages.Agent.Exit {AgentId = id});
 
-			using (var conn = _dbContext.Database.GetDbConnection())
+			await using (var conn = _dbContext.Database.GetDbConnection())
 			{
 				await conn.ExecuteAsync(
 					$"DELETE FROM {_options.Database}.agent_heartbeat WHERE agent_id = @Id; DELETE FROM {_options.Database}.agent WHERE id = @Id;",
@@ -98,7 +97,7 @@ namespace DotnetSpider.Portal.Controllers.API
 				return new FailedResult("Agent is not exists");
 			}
 
-			await _mq.PublishAsBytesAsync(string.Format(Const.Topic.Spider, id.ToUpper()), new Exit {AgentId = id});
+			await _mq.PublishAsBytesAsync(string.Format(Topics.Spider, id), new Messages.Agent.Exit {AgentId = id});
 			return new ApiResult("OK");
 		}
 	}

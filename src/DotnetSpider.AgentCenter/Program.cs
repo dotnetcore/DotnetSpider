@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using DotnetSpider.Extensions;
 using DotnetSpider.MySql.AgentCenter;
 using DotnetSpider.RabbitMQ;
 using DotnetSpider.Statistics;
@@ -26,14 +25,13 @@ namespace DotnetSpider.AgentCenter
 				.CreateLogger();
 
 			var builder = Host.CreateDefaultBuilder(args);
-			builder.ConfigureServices(x =>
+			builder.ConfigureServices((context, x) =>
 			{
-				var configuration = builder.GetConfiguration();
-				x.Configure<AgentCenterOptions>(configuration);
+				x.Configure<AgentCenterOptions>(context.Configuration);
 				x.AddHttpClient();
 				x.AddAgentCenter<MySqlAgentStore>();
 				x.AddStatistics<MySqlStatisticsStore>();
-				x.AddRabbitMQ(configuration);
+				x.AddRabbitMQ(context.Configuration);
 			});
 			builder.UseSerilog();
 			await builder.Build().RunAsync();

@@ -4,8 +4,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
-using DotnetSpider.DataFlow.Storage;
-using DotnetSpider.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -30,13 +28,14 @@ namespace DotnetSpider.HBase
 	/// $ hbase shell
 	/// $ create_namespace 'dotnet_spider'
 	/// </summary>
-	public class HBaseStorage : StorageBase
+	public class HBaseStorage : DataFlowBase
 	{
 		private readonly string _rest;
-		private readonly string _columnName = "data:".ToBase64String();
+
+		private readonly string _columnName = Convert.ToBase64String(Encoding.UTF8.GetBytes("data:"));
 
 		private readonly ConcurrentDictionary<string, bool>
-			_tableCreatedDict = new ConcurrentDictionary<string, bool>();
+			_tableCreatedDict = new();
 
 		/// <summary>
 		/// 根据配置返回存储器
@@ -56,7 +55,7 @@ namespace DotnetSpider.HBase
 			_rest = uri.ToString();
 		}
 
-		protected override async Task StoreAsync(DataFlowContext context)
+		public override async Task HandleAsync(DataFlowContext context)
 		{
 			var id = context.Request.Owner;
 			var table = $"dotnet_spider:response_{id}";
@@ -78,7 +77,7 @@ namespace DotnetSpider.HBase
 				{
 					var httpRequestMessage = new HttpRequestMessage(HttpMethod.Put, $"{_rest}{table}/row");
 					httpRequestMessage.Headers.TryAddWithoutValidation("Accept", "application/json");
-					var rowKey = hash.ToBase64String();
+					var rowKey = Convert.ToBase64String(Encoding.UTF8.GetBytes(hash));
 
 					var body =
 						"{\"Row\":[{\"key\":\"" + rowKey +

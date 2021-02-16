@@ -49,9 +49,9 @@ namespace DotnetSpider.Sample.samples
 			AddDataFlow(new MyDataFlow());
 		}
 
-		protected override (string Id, string Name) GetIdAndName()
+		protected override SpiderId CreateSpiderId()
 		{
-			return (ObjectId.NewId().ToString(), "speed");
+			return new(ObjectId.CreateId().ToString(), "speed");
 		}
 
 		protected class MyDataFlow : DataFlowBase

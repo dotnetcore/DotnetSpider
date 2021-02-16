@@ -69,6 +69,7 @@ namespace DotnetSpider.Statistics.Store
 			id.NotNullOrWhiteSpace(nameof(id));
 
 			Id = id;
+			CreationTime = DateTimeOffset.Now;
 		}
 
 		public void SetName(string name)
@@ -90,16 +91,19 @@ namespace DotnetSpider.Statistics.Store
 		public void IncrementSuccess()
 		{
 			Success += 1;
+			LastModificationTime = DateTimeOffset.Now;
 		}
 
 		public void IncrementFailure()
 		{
 			Failure += 1;
+			LastModificationTime = DateTimeOffset.Now;
 		}
 
 		public void IncrementTotal(long count)
 		{
 			Total += count;
+			LastModificationTime = DateTimeOffset.Now;
 		}
 	}
 }

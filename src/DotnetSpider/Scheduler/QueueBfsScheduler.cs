@@ -13,7 +13,7 @@ namespace DotnetSpider.Scheduler
 	public class QueueBfsScheduler : SchedulerBase
 	{
 		private readonly List<Request> _requests =
-			new List<Request>();
+			new();
 
 		/// <summary>
 		/// 构造方法

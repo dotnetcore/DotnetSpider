@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using DotnetSpider.Extensions;
 using DotnetSpider.Http;
 
@@ -18,7 +16,7 @@ namespace DotnetSpider.Infrastructure
 			_hashAlgorithmService = hashAlgorithmService;
 		}
 
-		public string ComputeHash(Request request)
+		public void ComputeHash(Request request)
 		{
 			var bytes = new
 			{
@@ -28,7 +26,8 @@ namespace DotnetSpider.Infrastructure
 				request.RequestedTimes,
 				request.Content
 			}.Serialize();
-			return _hashAlgorithmService.ComputeHash(bytes).ToBase64String();
+			request.Hash = Convert.ToBase64String(_hashAlgorithmService.ComputeHash(bytes));
+			// return request.Hash;
 		}
 	}
 }

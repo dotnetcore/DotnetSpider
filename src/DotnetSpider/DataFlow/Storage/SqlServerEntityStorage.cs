@@ -3,10 +3,12 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using DotnetSpider.DataFlow.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace DotnetSpider.DataFlow.Storage
+// ReSharper disable once CheckNamespace
+namespace DotnetSpider.DataFlow
 {
 	/// <summary>
 	/// 数据库版本
@@ -37,7 +39,29 @@ namespace DotnetSpider.DataFlow.Storage
 			? SqlServerVersion.V2008
 			: (SqlServerVersion)Enum.Parse(typeof(SqlServerVersion), _configuration["SqlServer:Version"]);
 
+		/// <summary>
+		/// 连接字符串
+		/// </summary>
 		public string ConnectionString => _configuration["SqlServer:ConnectionString"];
+
+		/// <summary>
+		/// 数据库操作重试次数
+		/// </summary>
+		public int RetryTimes => string.IsNullOrWhiteSpace(_configuration["SqlServer:RetryTimes"])
+			? 600
+			: int.Parse(_configuration["SqlServer:RetryTimes"]);
+
+		/// <summary>
+		/// 是否使用事务操作。默认不使用。
+		/// </summary>
+		public bool UseTransaction => !string.IsNullOrWhiteSpace(_configuration["SqlServer:UseTransaction"]) &&
+		                              bool.Parse(_configuration["SqlServer:UseTransaction"]);
+
+		/// <summary>
+		/// 数据库忽略大小写
+		/// </summary>
+		public bool IgnoreCase => !string.IsNullOrWhiteSpace(_configuration["SqlServer:IgnoreCase"]) &&
+		                          bool.Parse(_configuration["SqlServer:IgnoreCase"]);
 	}
 
 	/// <summary>
@@ -50,7 +74,12 @@ namespace DotnetSpider.DataFlow.Storage
 		public static IDataFlow CreateFromOptions(IConfiguration configuration)
 		{
 			var options = new SqlServerOptions(configuration);
-			return new SqlServerEntityStorage(options.Mode, options.ConnectionString, options.ServerVersion);
+			return new SqlServerEntityStorage(options.Mode, options.ConnectionString, options.ServerVersion)
+			{
+				RetryTimes = options.RetryTimes,
+				UseTransaction = options.UseTransaction,
+				IgnoreCase = options.IgnoreCase
+			};
 		}
 
 		/// <summary>

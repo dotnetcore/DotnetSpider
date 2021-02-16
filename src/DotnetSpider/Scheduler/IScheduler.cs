@@ -11,6 +11,12 @@ namespace DotnetSpider.Scheduler
 	public interface IScheduler : IDisposable
 	{
 		/// <summary>
+		/// 初始化
+		/// </summary>
+		/// <param name="spiderId"></param>
+		Task InitializeAsync(string spiderId);
+
+		/// <summary>
 		/// 从队列中取出指定爬虫的指定个数请求
 		/// </summary>
 		/// <param name="count">出队数</param>
@@ -27,6 +33,26 @@ namespace DotnetSpider.Scheduler
 		/// <summary>
 		/// 队列中的总请求个数
 		/// </summary>
-		long Total { get; }
+		Task<long> GetTotalAsync();
+
+		/// <summary>
+		/// 重置
+		/// </summary>
+		/// <returns></returns>
+		Task ResetDuplicateCheckAsync();
+
+		/// <summary>
+		/// 标记请求成功
+		/// </summary>
+		/// <param name="request"></param>
+		/// <returns></returns>
+		Task SuccessAsync(Request request);
+
+		/// <summary>
+		/// 标记请求失败
+		/// </summary>
+		/// <param name="request"></param>
+		/// <returns></returns>
+		Task FailAsync(Request request);
 	}
 }

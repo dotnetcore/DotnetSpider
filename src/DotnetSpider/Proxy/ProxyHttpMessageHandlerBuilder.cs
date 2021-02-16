@@ -28,27 +28,29 @@ namespace DotnetSpider.Proxy
 
 		public override HttpMessageHandler Build()
 		{
-			if (PrimaryHandler == null)
+			if (PrimaryHandler != null)
 			{
-				if (!Name.StartsWith(Const.ProxyPrefix))
-				{
-					throw new SpiderException(
-						"You are using proxy http client builder, but looks like your http client name is incorrect");
-				}
-
-				var uri = Name.Replace(Const.ProxyPrefix, string.Empty);
-				var handler = new ProxyHttpClientHandler
-				{
-					UseCookies = true,
-					UseProxy = true,
-					ProxyService = _proxyService,
-					AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
-					Proxy = new WebProxy(uri)
-				};
-
-				DefaultHttpMessageHandlerBuilder.SetServerCertificateCustomValidationCallback(Services, handler);
-				PrimaryHandler = handler;
+				return CreateHandlerPipeline(PrimaryHandler, AdditionalHandlers);
 			}
+
+			if (!Name.StartsWith(Const.ProxyPrefix))
+			{
+				throw new SpiderException(
+					"You are using proxy http client builder, but looks like your http client name is incorrect");
+			}
+
+			var uri = Name.Replace(Const.ProxyPrefix, string.Empty);
+			var handler = new ProxyHttpClientHandler
+			{
+				UseCookies = true,
+				UseProxy = true,
+				ProxyService = _proxyService,
+				AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+				Proxy = new WebProxy(uri)
+			};
+
+			DefaultHttpMessageHandlerBuilder.SetServerCertificateCustomValidationCallback(Services, handler);
+			PrimaryHandler = handler;
 
 			return CreateHandlerPipeline(PrimaryHandler, AdditionalHandlers);
 		}

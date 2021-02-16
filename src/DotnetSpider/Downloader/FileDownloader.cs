@@ -3,7 +3,6 @@ using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using DotnetSpider.Http;
-using DotnetSpider.Infrastructure;
 
 namespace DotnetSpider.Downloader
 {
@@ -29,6 +28,6 @@ namespace DotnetSpider.Downloader
 			return Task.FromResult(response);
 		}
 
-		public string Name => Const.Downloader.File;
+		public string Name => Downloaders.File;
 	}
 }

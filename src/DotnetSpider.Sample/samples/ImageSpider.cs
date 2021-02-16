@@ -1,8 +1,9 @@
 using System.Threading;
 using System.Threading.Tasks;
-using DotnetSpider.DataFlow.Storage;
+using DotnetSpider.DataFlow;
 using DotnetSpider.Downloader;
 using DotnetSpider.Http;
+using DotnetSpider.Infrastructure;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Scheduler.Component;
 using Microsoft.Extensions.Hosting;
@@ -29,7 +30,12 @@ namespace DotnetSpider.Sample.samples
 		{
 		}
 
-		protected override async Task InitializeAsync(CancellationToken stoppingToken)
+		protected override SpiderId CreateSpiderId()
+		{
+			return new(ObjectId.CreateId().ToString(), "博客园");
+		}
+
+		protected override async Task InitializeAsync(CancellationToken stoppingToken = default)
 		{
 			await AddRequestsAsync(
 				new Request("https://www.cnblogs.com/images/logo_small.gif"));

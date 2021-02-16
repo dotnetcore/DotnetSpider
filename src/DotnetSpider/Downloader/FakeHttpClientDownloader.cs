@@ -1,9 +1,8 @@
-using System;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using DotnetSpider.Infrastructure;
+using DotnetSpider.Proxy;
 using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Downloader
@@ -11,8 +10,8 @@ namespace DotnetSpider.Downloader
 	public class FakeHttpClientDownloader : HttpClientDownloader
 	{
 		public FakeHttpClientDownloader(IHttpClientFactory httpClientFactory,
-			IServiceProvider serviceProvider,
-			ILogger<HttpClientDownloader> logger) : base(httpClientFactory, serviceProvider, logger)
+			IProxyService proxyService,
+			ILogger<HttpClientDownloader> logger) : base(httpClientFactory, proxyService, logger)
 		{
 		}
 
@@ -28,6 +27,6 @@ namespace DotnetSpider.Downloader
 			});
 		}
 
-		public override string Name => UseProxy ? Const.Downloader.FakeProxyHttpClient : Const.Downloader.FakeHttpClient;
+		public override string Name => UseProxy ? Downloaders.FakeProxyHttpClient : Downloaders.FakeHttpClient;
 	}
 }

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Concurrent;
+#if NETSTANDARD2_0
 using System.Threading;
+#endif
 using System.Threading.Tasks;
 using DotnetSpider.Http;
 using HWT;
@@ -25,7 +27,7 @@ namespace DotnetSpider.Infrastructure
 
 		public bool Enqueue(Request request)
 		{
-			if (request.Timeout <= 2000)
+			if (request.Timeout < 2000)
 			{
 				throw new SpiderException("Timeout should not less than 2000 milliseconds");
 			}
@@ -49,7 +51,11 @@ namespace DotnetSpider.Infrastructure
 		public Request[] GetAllTimeoutList()
 		{
 			var data = _queue.ToArray();
+#if NETSTANDARD2_0
 			Interlocked.Exchange(ref _queue, new ConcurrentBag<Request>());
+#else
+			_queue.Clear();
+#endif
 			return data;
 		}
 
@@ -82,7 +88,11 @@ namespace DotnetSpider.Infrastructure
 		public void Dispose()
 		{
 			_dict.Clear();
+#if NETSTANDARD2_0
 			Interlocked.Exchange(ref _queue, new ConcurrentBag<Request>());
+#else
+			_queue.Clear();
+#endif
 			_timer.Dispose();
 		}
 	}

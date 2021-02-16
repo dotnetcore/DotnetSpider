@@ -38,12 +38,12 @@ namespace DotnetSpider.MySql
 	public class MySqlFileEntityStorage : EntityFileStorageBase
 	{
 		private readonly ConcurrentDictionary<string, StreamWriter> _streamWriters =
-			new ConcurrentDictionary<string, StreamWriter>();
+			new();
 
 		/// <summary>
 		/// 数据库忽略大小写
 		/// </summary>
-		public bool IgnoreCase { get; set; } = true;
+		public bool IgnoreCase { get; set; }
 
 		public MySqlFileType MySqlFileType { get; set; }
 
@@ -69,21 +69,21 @@ namespace DotnetSpider.MySql
 			IgnoreCase = ignoreCase;
 		}
 
-		protected override async Task StorageAsync(DataFlowContext context, TableMetadata tableMetadata, IList data)
+		protected override async Task HandleAsync(DataFlowContext context, TableMetadata tableMetadata, IEnumerable entities)
 		{
 			var writer = _streamWriters.GetOrAdd(tableMetadata.TypeName,
-				s => OpenWrite(context, tableMetadata, "sql"));
+				_ => OpenWrite(context, tableMetadata, "sql"));
 
 			switch (MySqlFileType)
 			{
 				case MySqlFileType.LoadFile:
 				{
-					await WriteLoadFileAsync(writer, tableMetadata, data);
+					await WriteLoadFileAsync(writer, tableMetadata, entities);
 					break;
 				}
 				case MySqlFileType.InsertSql:
 				{
-					await WriteInsertFile(writer, tableMetadata, data);
+					await WriteInsertFile(writer, tableMetadata, entities);
 					break;
 				}
 			}
@@ -99,7 +99,7 @@ namespace DotnetSpider.MySql
 			base.Dispose();
 		}
 
-		private async Task WriteLoadFileAsync(StreamWriter writer, TableMetadata tableMetadata, IList items)
+		private async Task WriteLoadFileAsync(StreamWriter writer, TableMetadata tableMetadata, IEnumerable items)
 		{
 			var builder = new StringBuilder();
 			var columns = tableMetadata.Columns;
@@ -122,7 +122,7 @@ namespace DotnetSpider.MySql
 			await writer.WriteLineAsync(builder.ToString());
 		}
 
-		private async Task WriteInsertFile(StreamWriter writer, TableMetadata tableMetadata, IList items)
+		private async Task WriteInsertFile(StreamWriter writer, TableMetadata tableMetadata, IEnumerable items)
 		{
 			var builder = new StringBuilder();
 			var columns = tableMetadata.Columns;

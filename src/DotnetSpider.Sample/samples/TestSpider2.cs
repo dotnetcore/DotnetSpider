@@ -49,9 +49,9 @@ namespace DotnetSpider.Sample.samples
 			// AddDataFlow(new HBaseStorage("http://localhost:8080"));
 		}
 
-		protected override (string, string) GetIdAndName()
+		protected override SpiderId CreateSpiderId()
 		{
-			return (ObjectId.NewId().ToString(), "测试爬虫 1");
+			return new(ObjectId.CreateId().ToString(), "测试爬虫 1");
 		}
 
 		[Schema("cnblogs", "news")]

@@ -1,22 +1,28 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="../../package.props" />
   <PropertyGroup>
     <PackageId>DotnetSpider</PackageId>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TargetFrameworks>netstandard2.1;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
+
+  <Import Project="../../package.props" />
+
   <ItemGroup>
     <PackageReference Include="Bert.RateLimiters" Version="1.0.15" />
-    <PackageReference Include="MessagePack" Version="2.2.60" />
+    <PackageReference Include="MessagePack" Version="2.2.85" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.8" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.8" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Dapper" Version="2.0.35" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.24" />
-    <PackageReference Include="System.Collections.Immutable" Version="1.7.1" />
+    <PackageReference Include="Dapper" Version="2.0.78" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.30" />
+    <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
-    <PackageReference Include="System.Text.Json" Version="4.7.2" />
-    <PackageReference Include="System.Threading.Channels" Version="4.7.1" />
+    <PackageReference Include="System.Text.Json" Version="5.0.1" />
+    <PackageReference Include="System.Threading.Channels" Version="5.0.0" />
+    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="5.0.0" />
     <PackageReference Include="ZCJ.HashedWheelTimer" Version="0.10.2" />
     <PackageReference Include="murmurhash" Version="1.0.3" />
   </ItemGroup>

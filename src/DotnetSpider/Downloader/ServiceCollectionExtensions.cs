@@ -19,14 +19,10 @@ namespace DotnetSpider.Downloader
 		{
 			builder.ConfigureServices(x =>
 			{
-				if (!typeof(IProxyDownloader).IsAssignableFrom(typeof(TDownloader)))
-				{
-					x.AddTransient<HttpMessageHandlerBuilder, DefaultHttpMessageHandlerBuilder>();
-				}
-
+				x.AddTransient<HttpMessageHandlerBuilder, DefaultHttpMessageHandlerBuilder>();
 				x.AddAgent<TDownloader>(opts =>
 				{
-					opts.AgentId = ObjectId.NewId().ToString();
+					opts.AgentId = ObjectId.CreateId().ToString();
 					opts.AgentName = opts.AgentId;
 				});
 			});

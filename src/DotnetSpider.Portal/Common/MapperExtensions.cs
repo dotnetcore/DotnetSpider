@@ -8,7 +8,7 @@ namespace DotnetSpider.Portal.Common
 	{
 		public static PagedResult<T2> ToPagedQueryResult<T1, T2>(this IMapper mapper, PagedResult<T1> source)
 		{
-			return new PagedResult<T2>(source.Page, source.Limit, source.Count, mapper.Map<List<T2>>(source.Data));
+			return new(source.Page, source.Limit, source.Count, mapper.Map<List<T2>>(source.Data));
 		}
 	}
 }

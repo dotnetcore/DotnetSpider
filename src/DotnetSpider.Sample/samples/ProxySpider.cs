@@ -30,7 +30,10 @@ namespace DotnetSpider.Sample.samples
 			});
 			builder.UseDownloader<HttpClientDownloader>();
 			builder.UseSerilog();
-			builder.UseProxy<FakeProxySupplier, FakeProxyValidator>();
+			builder.UseProxy<FiddlerProxySupplier, DefaultProxyValidator>(x =>
+			{
+				x.ProxyTestUrl = "http://192.168.31.200:8866";
+			});
 			builder.IgnoreServerCertificateError();
 			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
 			await builder.Build().RunAsync();
@@ -42,21 +45,18 @@ namespace DotnetSpider.Sample.samples
 		{
 		}
 
-		protected override async Task InitializeAsync(CancellationToken stoppingToken)
+		protected override async Task InitializeAsync(CancellationToken stoppingToken = default)
 		{
 			AddDataFlow(new DataParser<CnblogsEntry>());
 			AddDataFlow(GetDefaultStorage());
-			for (var i = 1; i < 99; ++i)
-			{
-				await AddRequestsAsync(
-					new Request(
-						"https://news.cnblogs.com/n/page/" + i, new Dictionary<string, object> {{"网站", "博客园"}}));
-			}
+			await AddRequestsAsync(
+				new Request(
+					"https://news.cnblogs.com/n/page/1", new Dictionary<string, object> {{"网站", "博客园"}}));
 		}
 
-		protected override (string Id, string Name) GetIdAndName()
+		protected override SpiderId CreateSpiderId()
 		{
-			return (ObjectId.NewId().ToString(), "博客园");
+			return new(ObjectId.CreateId().ToString(), "博客园");
 		}
 
 		[Schema("cnblogs", "news")]

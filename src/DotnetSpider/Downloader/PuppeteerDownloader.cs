@@ -2,7 +2,6 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using DotnetSpider.Http;
-using DotnetSpider.Infrastructure;
 using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Downloader
@@ -28,6 +27,6 @@ namespace DotnetSpider.Downloader
 			return Task.FromResult(response);
 		}
 
-		public string Name => Const.Downloader.Puppeteer;
+		public string Name => Downloaders.Puppeteer;
 	}
 }

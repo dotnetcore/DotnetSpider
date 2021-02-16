@@ -12,17 +12,17 @@ namespace DotnetSpider.HtmlAgilityPack.Css
         /// in a target document, depending on whether a default namespace is
         /// in effect or not.
         /// </summary>
-        public static readonly NamespacePrefix None = new NamespacePrefix(null);
+        public static readonly NamespacePrefix None = new(null);
 
         /// <summary>
         /// Represents an empty namespace.
         /// </summary>
-        public static readonly NamespacePrefix Empty = new NamespacePrefix(string.Empty);
+        public static readonly NamespacePrefix Empty = new(string.Empty);
 
         /// <summary>
         /// Represents any namespace.
         /// </summary>
-        public static readonly NamespacePrefix Any = new NamespacePrefix("*");
+        public static readonly NamespacePrefix Any = new("*");
 
         /// <summary>
         /// Initializes an instance with a namespace prefix specification.

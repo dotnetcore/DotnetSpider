@@ -4,13 +4,13 @@ namespace DotnetSpider.Infrastructure
 {
 	public class PagedResult<TEntity>
 	{
-		public IEnumerable<TEntity> Data { get; private set; }
+		public IEnumerable<TEntity> Data { get; }
 
-		public int Count { get; private set; }
+		public int Count { get; }
 
-		public int Page { get; private set; }
+		public int Page { get; }
 
-		public int Limit { get; private set; }
+		public int Limit { get; }
 
 		public PagedResult(int page, int limit, int count, IEnumerable<TEntity> data)
 		{

@@ -1,6 +1,6 @@
-namespace DotnetSpider.Downloader
-{
-	public interface IProxyDownloader
-	{
-	}
-}
+// namespace DotnetSpider.Downloader
+// {
+// 	public interface IProxyDownloader
+// 	{
+// 	}
+// }

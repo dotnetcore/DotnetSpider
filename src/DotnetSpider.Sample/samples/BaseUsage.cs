@@ -2,7 +2,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
-using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Downloader;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
@@ -59,9 +58,9 @@ namespace DotnetSpider.Sample.samples
 			AddDataFlow(new ConsoleStorage());
 		}
 
-		protected override (string Id, string Name) GetIdAndName()
+		protected override SpiderId CreateSpiderId()
 		{
-			return (ObjectId.NewId().ToString(), "Cnblogs");
+			return new(ObjectId.CreateId().ToString(), "博客园");
 		}
 	}
 }

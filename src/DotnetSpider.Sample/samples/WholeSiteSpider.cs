@@ -2,7 +2,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
-using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Downloader;
 using DotnetSpider.Infrastructure;
 using DotnetSpider.Scheduler;
@@ -43,9 +42,9 @@ namespace DotnetSpider.Sample.samples
 			await AddRequestsAsync("http://www.cnblogs.com/"); // 设置起始链接
 		}
 
-		protected override (string Id, string Name) GetIdAndName()
+		protected override SpiderId CreateSpiderId()
 		{
-			return (ObjectId.NewId().ToString(), "博客园全站采集");
+			return new(ObjectId.CreateId().ToString(), "博客园全站采集");
 		}
 
 		class MyDataParser : DataParser

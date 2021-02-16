@@ -1,12 +1,9 @@
 using System;
-using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.AgentCenter.Store;
 using DotnetSpider.Extensions;
-using DotnetSpider.Infrastructure;
-using DotnetSpider.Message.Agent;
 using DotnetSpider.MessageQueue;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -39,40 +36,56 @@ namespace DotnetSpider.AgentCenter
 
 				await _agentStore.EnsureDatabaseAndTableCreatedAsync();
 
-				_consumer = new AsyncMessageConsumer<byte[]>(Const.Topic.AgentCenter);
+				_consumer = new AsyncMessageConsumer<byte[]>(Topics.AgentCenter);
 				_consumer.Received += async bytes =>
 				{
-					var message = await GetMessageAsync(bytes);
-					if (message == null)
+					object message;
+					try
 					{
+						message = await bytes.DeserializeAsync(stoppingToken);
+						if (message == null)
+						{
+							return;
+						}
+					}
+					catch (Exception e)
+					{
+						_logger.LogError($"Deserialize message failed: {e}");
 						return;
 					}
 
-					if (message is Register register)
+					switch (message)
 					{
-						if (_distributed)
+						case Messages.Agent.Register register:
 						{
-							_logger.LogInformation($"Register agent: {register.AgentId}, {register.AgentName}");
-						}
+							if (_distributed)
+							{
+								_logger.LogInformation($"Register agent: {register.AgentId}, {register.AgentName}");
+							}
 
-						await _agentStore.RegisterAsync(new AgentInfo(register.AgentId, register.AgentName,
-							register.ProcessorCount,
-							register.TotalMemory));
-					}
-					else if (message is Heartbeat heartbeat)
-					{
-						if (_distributed)
+							await _agentStore.RegisterAsync(new AgentInfo(register.AgentId, register.AgentName,
+								register.ProcessorCount,
+								register.TotalMemory));
+							break;
+						}
+						case Messages.Agent.Heartbeat heartbeat:
 						{
-							_logger.LogInformation($"Receive heartbeat: {heartbeat.AgentId}, {heartbeat.AgentName}");
-						}
+							if (_distributed)
+							{
+								_logger.LogInformation(
+									$"Receive heartbeat: {heartbeat.AgentId}, {heartbeat.AgentName}");
+							}
 
-						await _agentStore.HeartbeatAsync(new AgentHeartbeat(heartbeat.AgentId, heartbeat.AgentName,
-							heartbeat.FreeMemory, heartbeat.CpuLoad));
-					}
-					else
-					{
-						var msg = Encoding.UTF8.GetString(JsonSerializer.SerializeToUtf8Bytes(message));
-						_logger.LogWarning($"Not supported message: {msg}");
+							await _agentStore.HeartbeatAsync(new AgentHeartbeat(heartbeat.AgentId, heartbeat.AgentName,
+								heartbeat.FreeMemory, heartbeat.CpuLoad));
+							break;
+						}
+						default:
+						{
+							var msg = JsonSerializer.Serialize(message);
+							_logger.LogWarning($"Message not supported: {msg}");
+							break;
+						}
 					}
 				};
 				await _messageQueue.ConsumeAsync(_consumer, stoppingToken);
@@ -91,19 +104,6 @@ namespace DotnetSpider.AgentCenter
 
 			await base.StopAsync(cancellationToken);
 			_logger.LogInformation("Agent center service stopped");
-		}
-
-		private async Task<object> GetMessageAsync(byte[] bytes)
-		{
-			try
-			{
-				return await bytes.DeserializeAsync();
-			}
-			catch (Exception e)
-			{
-				_logger.LogError($"Deserialize message failed: {e}");
-				return null;
-			}
 		}
 	}
 }

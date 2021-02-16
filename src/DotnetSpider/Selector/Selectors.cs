@@ -9,7 +9,7 @@ namespace DotnetSpider.Selector
     public class Selectors
     {
         private static readonly ConcurrentDictionary<string, ISelector> Cache =
-            new ConcurrentDictionary<string, ISelector>();
+            new();
 
         /// <summary>
         /// 创建正则查询器

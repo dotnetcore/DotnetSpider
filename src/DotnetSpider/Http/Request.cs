@@ -16,7 +16,7 @@ namespace DotnetSpider.Http
 	[Serializable]
 	public class Request : IDisposable
 	{
-		private static HashSet<string> _hashBodyMethods = new HashSet<string> {"DELETE", "POST", "PATCH", "PUT"};
+		private static HashSet<string> _hashBodyMethods = new() {"DELETE", "POST", "PATCH", "PUT"};
 
 		private string _method;
 		private Uri _requestUri;
@@ -58,11 +58,6 @@ namespace DotnetSpider.Http
 		public int Depth { get; set; }
 
 		/// <summary>
-		/// 已经重试的次数
-		/// </summary>
-		public int RequestedTimes { get; set; }
-
-		/// <summary>
 		/// 创建时间
 		/// </summary>
 		public long Timestamp { get; set; }
@@ -71,6 +66,11 @@ namespace DotnetSpider.Http
 		/// 下载策略
 		/// </summary>
 		public RequestPolicy Policy { get; set; }
+
+		/// <summary>
+		/// 已经重试的次数
+		/// </summary>
+		internal int RequestedTimes { get; set; }
 
 		public Version Version
 		{
@@ -245,7 +245,7 @@ namespace DotnetSpider.Http
 			sb.Append("Method: ");
 			sb.Append(_method);
 			sb.Append(", RequestUri: '");
-			sb.Append(_requestUri == (Uri)null ? "<null>" : _requestUri.ToString());
+			sb.Append(_requestUri == null ? "<null>" : _requestUri.ToString());
 			sb.Append("', Version: ");
 			sb.Append(_version);
 			sb.Append(", Content: ");
@@ -255,7 +255,6 @@ namespace DotnetSpider.Http
 			return sb.ToString();
 		}
 
-		
 
 		public Request Clone()
 		{

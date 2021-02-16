@@ -7,9 +7,9 @@ namespace DotnetSpider.HtmlAgilityPack.Css
 	{
 
 		private readonly Dictionary<TInput, TResult> _data;
-		private readonly IndexedLinkedList<TInput> _lruList = new IndexedLinkedList<TInput>();
+		private readonly IndexedLinkedList<TInput> _lruList = new();
 		private readonly Func<TInput, TResult> _evalutor;
-		private readonly object _rwl = new object();
+		private readonly object _rwl = new();
 		private int _capacity;
 
 		public LruCache(Func<TInput, TResult> evalutor, int capacity)
@@ -91,8 +91,8 @@ namespace DotnetSpider.HtmlAgilityPack.Css
 		private class IndexedLinkedList<T>
 		{
 
-			private LinkedList<T> _data = new LinkedList<T>();
-			private Dictionary<T, LinkedListNode<T>> _index = new Dictionary<T, LinkedListNode<T>>();
+			private LinkedList<T> _data = new();
+			private Dictionary<T, LinkedListNode<T>> _index = new();
 
 			public void Add(T value)
 			{

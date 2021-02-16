@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using DotnetSpider.Extensions;
 using HWT;
+using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Proxy
 {
@@ -28,22 +29,29 @@ namespace DotnetSpider.Proxy
 		private readonly ConcurrentQueue<ProxyEntry> _queue;
 		private readonly ConcurrentDictionary<Uri, ProxyEntry> _dict;
 		private readonly IProxyValidator _proxyValidator;
+		private readonly ILogger<ProxyService> _logger;
 
-		private readonly HashedWheelTimer _timer = new HashedWheelTimer(TimeSpan.FromSeconds(1)
-			, 100000
-			, 0);
+		private readonly HashedWheelTimer _timer = new(TimeSpan.FromSeconds(1)
+			, 100000);
 
-		public ProxyService(IProxyValidator proxyValidator)
+		private readonly int _ignoreCount;
+		private readonly int _reDetectCount;
+
+		public ProxyService(IProxyValidator proxyValidator, ILogger<ProxyService> logger)
 		{
 			_proxyValidator = proxyValidator;
+			_logger = logger;
 			_queue = new ConcurrentQueue<ProxyEntry>();
 			_dict = new ConcurrentDictionary<Uri, ProxyEntry>();
+			_ignoreCount = 6;
+			_reDetectCount = _ignoreCount / 2;
 		}
 
 		public async Task ReturnAsync(Uri proxy, HttpStatusCode statusCode)
 		{
 			if (_dict.TryGetValue(proxy, out var p))
 			{
+				// 若是返回成功，则直接把失败次数至为 0
 				if (statusCode.IsSuccessStatusCode())
 				{
 					p.FailedNum = 0;
@@ -53,31 +61,39 @@ namespace DotnetSpider.Proxy
 					p.FailedNum += 1;
 				}
 
-				if (p.FailedNum > 6)
+				// 若是失败次数大于 ignoreCount，则把此代理从缓存中删除，不再使用
+				if (p.FailedNum > _ignoreCount)
 				{
 					_dict.TryRemove(p.Uri, out _);
 					return;
 				}
 
-				if (_proxyValidator != null && p.FailedNum % 3 == 0 && await _proxyValidator.IsAvailable(p.Uri))
+				// 若是失败次数为 reDetectCount 的倍数则尝试重新测试此代理是否正常，若是测试不成功，则把此代理从缓存中删除，不再使用
+				if (p.FailedNum % _reDetectCount == 0 &&
+				    !await _proxyValidator.IsAvailable(p.Uri))
 				{
 					_dict.TryRemove(p.Uri, out _);
 					return;
 				}
 
-				_queue.TryDequeue(out p);
+				_queue.Enqueue(p);
 			}
 		}
 
-		public async Task AddAsync(IEnumerable<Uri> proxies)
+		public async Task<int> AddAsync(IEnumerable<Uri> proxies)
 		{
+			var cnt = 0;
 			foreach (var proxy in proxies)
 			{
 				if (await _proxyValidator.IsAvailable(proxy) && _dict.TryAdd(proxy, new ProxyEntry(proxy)))
 				{
+					_logger.LogInformation($"Proxy {proxy} is available");
 					_queue.Enqueue(_dict[proxy]);
+					cnt++;
 				}
 			}
+
+			return cnt;
 		}
 
 		public async Task<Uri> GetAsync(int seconds)

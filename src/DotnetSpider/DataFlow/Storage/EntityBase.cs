@@ -18,7 +18,7 @@ namespace DotnetSpider.DataFlow.Storage
     /// <typeparam name="T"></typeparam>
     public abstract class EntityBase<T> : IEntity where T : class, new()
     {
-        private readonly Lazy<TableMetadata> _tableMetadata = new Lazy<TableMetadata>();
+        private readonly Lazy<TableMetadata> _tableMetadata = new();
 
         /// <summary>
         /// 获取实体的表元数据

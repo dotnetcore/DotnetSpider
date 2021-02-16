@@ -10,6 +10,6 @@ namespace DotnetSpider.Proxy
 		Task<Uri> GetAsync(int seconds);
 		Uri Get();
 		Task ReturnAsync(Uri proxy, HttpStatusCode statusCode);
-		Task AddAsync(IEnumerable<Uri> proxies);
+		Task<int> AddAsync(IEnumerable<Uri> proxies);
 	}
 }

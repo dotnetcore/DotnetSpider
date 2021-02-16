@@ -11,7 +11,7 @@ namespace DotnetSpider.Selector
     public class XPathSelector : ISelector
     {
         private static readonly Regex AttributeXPathRegex =
-            new Regex(@"@[\w\s-]+", RegexOptions.RightToLeft | RegexOptions.IgnoreCase);
+            new(@"@[\w\s-]+", RegexOptions.RightToLeft | RegexOptions.IgnoreCase);
 
         private readonly string _xpath;
         private readonly string _attrName;

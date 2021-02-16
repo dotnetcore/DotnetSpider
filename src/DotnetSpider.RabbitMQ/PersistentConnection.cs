@@ -16,7 +16,7 @@ namespace DotnetSpider.RabbitMQ
 		private readonly int _retryCount;
 		private	IConnection _connection;
 		private	bool _disposed;
-		private readonly object _syncLocker = new object();
+		private readonly object _syncLocker = new();
 
 		public PersistentConnection(IConnectionFactory connectionFactory,
 			ILogger<PersistentConnection> logger, int retryCount = 5)

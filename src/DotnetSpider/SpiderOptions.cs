@@ -23,23 +23,28 @@ namespace DotnetSpider
 		public int EmptySleepTime { get; set; } = 60;
 
 		/// <summary>
-		/// 爬虫采集速度，1 表示 1 秒钟一个请求，0.5 表示 1 秒钟 0.5 个请求，5 表示 1 秒钟发送 5 个请求
+		/// 爬虫采集速度，1 表示 1 秒钟一个请求，0.5 表示 1 秒钟 0.5 个请求，5 表示 1 秒钟 5 个请求
 		/// </summary>
 		public double Speed { get; set; } = 1;
 
 		/// <summary>
-		/// 一次重请求队列获取多少个请求
+		/// 一次请求队列获取多少个请求
 		/// </summary>
 		public uint Batch { get; set; } = 4;
 
 		/// <summary>
-		/// 去除外链
+		/// 是否去除外链
 		/// </summary>
 		public bool RemoveOutboundLinks { get; set; } = false;
 
 		/// <summary>
 		/// 存储器类型: FullTypeName, AssemblyName
 		/// </summary>
-		public string Storage { get; set; } = "DotnetSpider.MySql.MySqlEntityStorage,DotnetSpider.MySql";
+		public string StorageType { get; set; } = "DotnetSpider.MySql.MySqlEntityStorage, DotnetSpider.MySql";
+
+		/// <summary>
+		/// 获取新代码的时间间隔
+		/// </summary>
+		public int RefreshProxy { get; set; } = 30;
 	}
 }

@@ -1,10 +1,9 @@
-using System;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using DotnetSpider.Http;
-using DotnetSpider.Infrastructure;
+using DotnetSpider.Proxy;
 using Microsoft.Extensions.Logging;
 using ByteArrayContent = DotnetSpider.Http.ByteArrayContent;
 
@@ -16,8 +15,8 @@ namespace DotnetSpider.Downloader
 
 		public PPPoEHttpClientDownloader(IHttpClientFactory httpClientFactory,
 			ILogger<PPPoEHttpClientDownloader> logger,
-			IServiceProvider serviceProvider,
-			PPPoEService pppoeService) : base(httpClientFactory, serviceProvider, logger)
+			IProxyService proxyService,
+			PPPoEService pppoeService) : base(httpClientFactory, proxyService, logger)
 		{
 			_pppoeService = pppoeService;
 			if (!_pppoeService.IsActive)
@@ -26,7 +25,7 @@ namespace DotnetSpider.Downloader
 			}
 		}
 
-		public override string Name => Const.Downloader.PPPoEHttpClient;
+		public override string Name => Downloaders.PPPoEHttpClient;
 
 		protected override async Task<Response> HandleAsync(Request request, HttpResponseMessage responseMessage)
 		{

@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
-using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Downloader;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
@@ -45,15 +44,21 @@ namespace DotnetSpider.Sample.samples
 			await AddRequestsAsync(new Request("https://news.cnblogs.com/n/page/1/"));
 		}
 
-		protected override (string Id, string Name) GetIdAndName()
+		protected override SpiderId CreateSpiderId()
 		{
-			return (ObjectId.NewId().ToString(), "cnblogs");
+			return new(ObjectId.CreateId().ToString(), "博客园");
 		}
 
-		protected class MyConsoleStorage : StorageBase
+		protected class MyConsoleStorage : DataFlowBase
 		{
-			protected override Task StoreAsync(DataFlowContext context)
+			public override Task HandleAsync(DataFlowContext context)
 			{
+				if (IsNullOrEmpty(context))
+				{
+					Logger.LogWarning("数据流上下文不包含解析结果");
+					return Task.CompletedTask;
+				}
+
 				var typeName = typeof(News).FullName;
 				var data = context.GetData(typeName);
 				if (data is News news)

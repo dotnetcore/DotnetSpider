@@ -41,6 +41,12 @@ namespace DotnetSpider.Statistics
 		/// <returns></returns>
 		Task ExitAsync(string id);
 
+		/// <summary>
+		/// 注册节点
+		/// </summary>
+		/// <param name="agentId"></param>
+		/// <param name="agentName"></param>
+		/// <returns></returns>
 		Task RegisterAgentAsync(string agentId, string agentName);
 
 		/// <summary>
@@ -59,6 +65,11 @@ namespace DotnetSpider.Statistics
 		/// <returns></returns>
 		Task IncreaseAgentFailureAsync(string agentId, int elapsedMilliseconds);
 
+		/// <summary>
+		/// 打印信息
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		Task PrintAsync(string id);
 	}
 }

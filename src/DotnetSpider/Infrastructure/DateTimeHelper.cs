@@ -4,8 +4,6 @@ namespace DotnetSpider.Infrastructure
 {
 	public static class DateTimeHelper
 	{
-		public static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-
 		/// <summary>
 		/// 当前月份的第一天
 		/// </summary>
@@ -82,23 +80,5 @@ namespace DotnetSpider.Infrastructure
 		/// 星期天
 		/// </summary>
 		public static DateTime Sunday => Monday.AddDays(6);
-
-		/// <summary>
-		/// 获取当前Unix时间(毫秒)
-		/// </summary>
-		/// <returns>Unix时间</returns>
-		public static long Timestamp =>
-			(long)DateTime.Now.ToUniversalTime().Subtract(Epoch)
-				.TotalMilliseconds;
-
-		public static DateTimeOffset ToDateTimeOffset(long timestamp)
-		{
-			return Epoch.AddMilliseconds(timestamp);
-		}
-
-		public static long ToTimestamp(DateTimeOffset dateTime)
-		{
-			return (long)(dateTime - Epoch).TotalMilliseconds;
-		}
 	}
 }

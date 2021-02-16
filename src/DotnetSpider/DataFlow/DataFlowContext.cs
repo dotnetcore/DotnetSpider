@@ -13,20 +13,10 @@ namespace DotnetSpider.DataFlow
 	/// </summary>
 	public class DataFlowContext : IDisposable
 	{
-		private readonly Dictionary<string, dynamic> _properties = new Dictionary<string, dynamic>();
-		private readonly Dictionary<object, dynamic> _data = new Dictionary<object, dynamic>();
+		private readonly Dictionary<string, dynamic> _properties = new();
+		private readonly Dictionary<object, dynamic> _data = new();
 
 		public ISelectable Selectable { get; internal set; }
-
-		/// <summary>
-		/// 爬虫标识
-		/// </summary>
-		public string Id { get; internal set; }
-
-		/// <summary>
-		/// 爬虫名称
-		/// </summary>
-		public string Name { get; internal set; }
 
 		public SpiderOptions Options { get; }
 
@@ -102,7 +92,7 @@ namespace DotnetSpider.DataFlow
 			request.RequestedTimes = 0;
 			request.Depth += 1;
 			request.Hash = null;
-			request.Timestamp = DateTimeHelper.Timestamp;
+			request.Timestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 			request.RequestUri = uri;
 			return request;
 		}

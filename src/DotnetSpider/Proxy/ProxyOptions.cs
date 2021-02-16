@@ -5,7 +5,7 @@ namespace DotnetSpider.Proxy
 		/// <summary>
 		/// 测试代理是否正常的链接
 		/// </summary>
-		public string ProxyTestUrl { get; set; } = "http://www.baidu.com";
+		public string ProxyTestUrl { get; set; } = "http://www.bing.com";
 
 		/// <summary>
 		/// 代理供应 API

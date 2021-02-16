@@ -17,13 +17,13 @@ namespace DotnetSpider.DataFlow.Storage
 	public abstract class RelationalDatabaseEntityStorageBase : EntityStorageBase
 	{
 		private readonly ConcurrentDictionary<string, SqlStatements> _sqlStatementDict =
-			new ConcurrentDictionary<string, SqlStatements>();
+			new();
 
 		private readonly ConcurrentDictionary<string, object> _executedCache =
-			new ConcurrentDictionary<string, object>();
+			new();
 
 		private readonly ConcurrentDictionary<Type, TableMetadata> _tableMetadataDict =
-			new ConcurrentDictionary<Type, TableMetadata>();
+			new();
 
 		protected const string BoolType = "Boolean";
 		protected const string DateTimeType = "DateTime";
@@ -103,20 +103,21 @@ namespace DotnetSpider.DataFlow.Storage
 		/// </summary>
 		public bool IgnoreCase { get; set; } = true;
 
-		protected override async Task StoreAsync(DataFlowContext context, Dictionary<Type, List<dynamic>> dict)
+		protected override async Task HandleAsync(DataFlowContext context,
+			IDictionary<Type, ICollection<dynamic>> entities)
 		{
 			using var conn = TryCreateDbConnection();
 
-			foreach (var kv in dict)
+			foreach (var kv in entities)
 			{
 				var list = (IList)kv.Value;
 				var tableMetadata = _tableMetadataDict.GetOrAdd(kv.Key,
-					type => ((IEntity)list[0]).GetTableMetadata());
+					_ => ((IEntity)list[0]).GetTableMetadata());
 
 				var sqlStatements = GetSqlStatements(tableMetadata);
 
 				// 因为同一个存储器会收到不同的数据对象，因此不能使用 initAsync 来初始化数据库
-				_executedCache.GetOrAdd(sqlStatements.CreateTableSql, str =>
+				_executedCache.GetOrAdd(sqlStatements.CreateTableSql, _ =>
 				{
 					var conn1 = TryCreateDbConnection();
 					EnsureDatabaseAndTableCreated(conn1, sqlStatements);
@@ -160,6 +161,8 @@ namespace DotnetSpider.DataFlow.Storage
 								await conn.ExecuteAsync(sqlStatements.InsertAndUpdateSql, list, transaction);
 								break;
 							}
+							default:
+								throw new ArgumentOutOfRangeException();
 						}
 
 						transaction?.Commit();
@@ -170,8 +173,7 @@ namespace DotnetSpider.DataFlow.Storage
 						Logger.LogError($"尝试插入数据失败: {ex}");
 
 						// 网络异常需要重试，并且不需要 Rollback
-						var endOfStreamException = ex.InnerException as EndOfStreamException;
-						if (endOfStreamException == null)
+						if (!(ex.InnerException is EndOfStreamException))
 						{
 							try
 							{
@@ -239,7 +241,7 @@ namespace DotnetSpider.DataFlow.Storage
 				key = $"{key}-{DateTimeOffset.Now:yyyyMMdd}";
 			}
 
-			return _sqlStatementDict.GetOrAdd(key, str => GenerateSqlStatements(tableMetadata));
+			return _sqlStatementDict.GetOrAdd(key, _ => GenerateSqlStatements(tableMetadata));
 		}
 
 		private IDbConnection TryCreateDbConnection()

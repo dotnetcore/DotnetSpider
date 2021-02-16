@@ -1,26 +1,34 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 
-namespace DotnetSpider.DataFlow.Storage
+// ReSharper disable once CheckNamespace
+namespace DotnetSpider.DataFlow
 {
 	/// <summary>
 	/// 控制台打印解析结果(所有解析结果)
 	/// </summary>
-	public class ConsoleStorage : StorageBase
+	public class ConsoleStorage : DataFlowBase
 	{
 		public static IDataFlow CreateFromOptions(IConfiguration configuration)
 		{
 			return new ConsoleStorage();
 		}
 
-		protected override Task StoreAsync(DataFlowContext context)
+		public override Task HandleAsync(DataFlowContext context)
 		{
-			var items = context.GetData();
+			if (IsNullOrEmpty(context))
+			{
+				Logger.LogWarning("数据流上下文不包含解析结果");
+				return Task.CompletedTask;
+			}
+
+			var data = context.GetData();
 
 			Console.ForegroundColor = ConsoleColor.Cyan;
-			Console.WriteLine($"{Environment.NewLine}DATA: {JsonConvert.SerializeObject(items)}{Environment.NewLine}");
+			Console.WriteLine(
+				$"{Environment.NewLine}DATA: {System.Text.Json.JsonSerializer.Serialize(data)}");
 
 			return Task.CompletedTask;
 		}

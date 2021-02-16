@@ -48,6 +48,12 @@ namespace DotnetSpider.Statistics.Store
 		/// <returns></returns>
 		Task ExitAsync(string id);
 
+		/// <summary>
+		/// 注册结点
+		/// </summary>
+		/// <param name="agentId"></param>
+		/// <param name="agentName"></param>
+		/// <returns></returns>
 		Task RegisterAgentAsync(string agentId, string agentName);
 
 		/// <summary>

@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using DotnetSpider.Agent;
 using DotnetSpider.Downloader;
-using DotnetSpider.Extensions;
 using DotnetSpider.Infrastructure;
 using DotnetSpider.MessageQueue;
 using DotnetSpider.Statistics;
@@ -27,6 +26,8 @@ namespace DotnetSpider
 		private Builder()
 		{
 		}
+
+		public IConfiguration Configuration { get; private set; }
 
 		/// <summary>
 		/// Create a spider builder only contains spider background service
@@ -70,8 +71,9 @@ namespace DotnetSpider
 		{
 			var builder = new Builder();
 			ConfigureBuilder(builder, args, configureDelegate);
-			builder.ConfigureServices(services =>
+			builder.ConfigureServices((x, services) =>
 			{
+				builder.Configuration = x.Configuration;
 				services.AddSingleton(typeof(IHostedService), type);
 			});
 			return builder;
@@ -81,8 +83,9 @@ namespace DotnetSpider
 			Action<SpiderOptions> configure = null)
 		{
 			var builder = CreateBuilder(type, args, configure);
-			builder.ConfigureServices(services =>
+			builder.ConfigureServices((x, services) =>
 			{
+				builder.Configuration = x.Configuration;
 				services.AddMessageQueue();
 				services.AddStatistics<DefaultStatisticsStore>();
 				// services.AddAgentCenter<DefaultAgentStore>();
@@ -144,9 +147,9 @@ namespace DotnetSpider
 				}
 
 				logging.AddEventLog();
-			}).ConfigureServices(services =>
+			}).ConfigureServices((context, services) =>
 			{
-				var configuration = builder.GetConfiguration();
+				var configuration = context.Configuration;
 				if (configuration != null)
 				{
 					services.Configure<SpiderOptions>(configuration);

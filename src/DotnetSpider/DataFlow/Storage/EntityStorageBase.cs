@@ -13,53 +13,61 @@ namespace DotnetSpider.DataFlow.Storage
 	{
 		private readonly Type _baseType = typeof(IEntity);
 
-		protected abstract Task StoreAsync(DataFlowContext context, Dictionary<Type, List<dynamic>> dict);
+		/// <summary>
+		///
+		/// </summary>
+		/// <param name="context">数据流上下文</param>
+		/// <param name="entities">数据解析结果 (数据类型, List(数据对象))</param>
+		/// <returns></returns>
+		protected abstract Task HandleAsync(DataFlowContext context, IDictionary<Type, ICollection<dynamic>> entities);
 
 		public override async Task HandleAsync(DataFlowContext context)
 		{
-			if (context.IsEmpty)
+			if (IsNullOrEmpty(context))
 			{
 				Logger.LogWarning("数据流上下文不包含实体解析结果");
 				return;
 			}
 
 			var data = context.GetData();
-			var dict = new Dictionary<Type, List<dynamic>>();
-			foreach (var d in data)
+			var result = new Dictionary<Type, ICollection<dynamic>>();
+			foreach (var kv in data)
 			{
-				var type = d.Key as Type;
+				var type = kv.Key as Type;
 				if (type == null || !_baseType.IsAssignableFrom(type))
 				{
 					continue;
 				}
 
-				if (d.Value is IEnumerable list)
+				if (kv.Value is IEnumerable list)
 				{
 					foreach (var obj in list)
 					{
-						InsertData(dict, type, obj);
+						AddResult(result, type, obj);
 					}
 				}
 				else
 				{
-					InsertData(dict, type, d.Value);
+					AddResult(result, type, kv.Value);
 				}
 			}
 
-			await StoreAsync(context, dict);
+			await HandleAsync(context, result);
 		}
 
-		private void InsertData(Dictionary<Type, List<object>> dict, Type type, dynamic obj)
+		private void AddResult(IDictionary<Type, ICollection<dynamic>> dict, Type type, dynamic obj)
 		{
-			if (_baseType.IsInstanceOfType(obj))
+			if (!_baseType.IsInstanceOfType(obj))
 			{
-				if (!dict.ContainsKey(type))
-				{
-					dict.Add(type, new List<dynamic>());
-				}
-
-				dict[type].Add(obj);
+				return;
 			}
+
+			if (!dict.ContainsKey(type))
+			{
+				dict.Add(type, new List<dynamic>());
+			}
+
+			dict[type].Add(obj);
 		}
 	}
 }

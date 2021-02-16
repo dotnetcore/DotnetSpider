@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using DotnetSpider.Extensions;
 using DotnetSpider.Infrastructure;
-using DotnetSpider.Message.Spider;
 using DotnetSpider.MessageQueue;
 using DotnetSpider.Portal.BackgroundService;
 using DotnetSpider.Portal.Common;
@@ -264,11 +263,11 @@ namespace DotnetSpider.Portal.Controllers.API
 				throw new ApplicationException("Spider history is not exits");
 			}
 
-			var spiderId = spiderHistory.Batch.ToUpper();
-			var topic = string.Format(Const.Topic.Spider, spiderHistory.Batch.ToUpper());
+			var spiderId = spiderHistory.Batch;
+			var topic = string.Format(Topics.Spider, spiderHistory.Batch);
 			_logger.LogInformation($"Try stop spider {topic}");
 			await _mq.PublishAsBytesAsync(topic,
-				new Exit(spiderId));
+				new Messages.Spider.Exit {SpiderId = spiderId});
 			return true;
 		}
 

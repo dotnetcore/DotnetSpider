@@ -13,8 +13,7 @@ namespace DotnetSpider.Scheduler
 	public class QueueDistinctBfsScheduler : SchedulerBase
 	{
 		private readonly List<Request> _requests =
-			new List<Request>();
-
+			new();
 
 		public QueueDistinctBfsScheduler(IDuplicateRemover duplicateRemover, IRequestHasher requestHasher)
 			: base(duplicateRemover, requestHasher)

@@ -40,16 +40,16 @@ namespace DotnetSpider.Sample.samples
 			{
 				await AddRequestsAsync(new Request("https://news.cnblogs.com/n/page/" + i)
 				{
-					Downloader = Const.Downloader.Empty
+					Downloader = Downloaders.Empty
 				});
 			}
 
 			AddDataFlow(new MyDataFlow());
 		}
 
-		protected override (string Id, string Name) GetIdAndName()
+		protected override SpiderId CreateSpiderId()
 		{
-			return (ObjectId.NewId().ToString(), "speed");
+			return new(ObjectId.CreateId().ToString(), "speed");
 		}
 
 		protected class MyDataFlow : DataFlowBase

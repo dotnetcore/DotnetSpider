@@ -53,16 +53,19 @@ namespace DotnetSpider.Statistics.Store
 		public AgentStatistics(string id)
 		{
 			Id = id;
+			CreationTime = DateTimeOffset.Now;
 		}
 
 		public void IncreaseSuccess()
 		{
 			Success += 1;
+			LastModificationTime = DateTimeOffset.Now;
 		}
 
 		public void IncreaseFailure()
 		{
 			Failure += 1;
+			LastModificationTime = DateTimeOffset.Now;
 		}
 
 		public void IncreaseElapsedMilliseconds(int elapsedMilliseconds)

@@ -22,7 +22,7 @@ namespace DotnetSpider.Tests
 
 		public class MyOptions : IOptions<RabbitMQOptions>
 		{
-			public RabbitMQOptions Value => new RabbitMQOptions
+			public RabbitMQOptions Value => new()
 			{
 				Exchange = "Test", HostName = "localhost", UserName = "user", Password = "password"
 			};

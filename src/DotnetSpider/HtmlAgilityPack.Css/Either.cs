@@ -72,9 +72,8 @@ namespace DotnetSpider.HtmlAgilityPack.Css
 
             public override bool Equals(Either<TA, TB> obj)
             {
-                var a = obj as AImpl;
-                return a != null
-                    && EqualityComparer<TA>.Default.Equals(_value, a._value);
+	            return obj is AImpl a
+	                   && EqualityComparer<TA>.Default.Equals(_value, a._value);
             }
 
             public override TResult Fold<TResult>(Func<TA, TResult> a, Func<TB, TResult> b)
@@ -111,9 +110,8 @@ namespace DotnetSpider.HtmlAgilityPack.Css
 
             public override bool Equals(Either<TA, TB> obj)
             {
-                var b = obj as BImpl;
-                return b != null
-                    && EqualityComparer<TB>.Default.Equals(_value, b._value);
+	            return obj is BImpl b
+	                   && EqualityComparer<TB>.Default.Equals(_value, b._value);
             }
 
             public override TResult Fold<TResult>(Func<TA, TResult> a, Func<TB, TResult> b)

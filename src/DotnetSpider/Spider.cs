@@ -1,23 +1,22 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Bert.RateLimiters;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Storage;
+using DotnetSpider.Downloader;
 using DotnetSpider.Extensions;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
-using DotnetSpider.Message.Spider;
+using DotnetSpider.MessageQueue;
 using DotnetSpider.RequestSupplier;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 
 [assembly: InternalsVisibleTo("DotnetSpider.Tests")]
 
@@ -26,33 +25,43 @@ namespace DotnetSpider
 	public abstract class Spider :
 		BackgroundService
 	{
-		private readonly List<IDataFlow> _dataFlows;
-		private readonly List<IRequestSupplier> _requestSuppliers;
+		private readonly IList<IDataFlow> _dataFlows;
+		private readonly IList<IRequestSupplier> _requestSuppliers;
 		private readonly RequestedQueue _requestedQueue;
-		private MessageQueue.AsyncMessageConsumer<byte[]> _consumer;
+		private AsyncMessageConsumer<byte[]> _consumer;
 		private readonly DependenceServices _services;
 		private readonly string _defaultDownloader;
 
-		protected event Action<Request[]> OnTimeout;
+		/// <summary>
+		/// 请求 Timeout 事件
+		/// </summary>
+		protected event Action<Request[]> OnRequestTimeout;
 
-		protected event Action<Request, Response> OnError;
+		/// <summary>
+		/// 请求错误事件
+		/// </summary>
+		protected event Action<Request, Response> OnRequestError;
 
+		/// <summary>
+		/// 调度器中无新的请求事件
+		/// </summary>
 		protected event Action OnSchedulerEmpty;
 
-		protected SpiderOptions Options { get; private set; }
+		protected SpiderOptions Options { get; }
 
 		/// <summary>
 		/// 爬虫标识
 		/// </summary>
-		protected string Id { get; private set; }
+		protected SpiderId SpiderId { get; private set; }
 
 		/// <summary>
-		/// 爬虫名称
+		/// 日志接口
 		/// </summary>
-		protected string Name { get; private set; }
+		protected ILogger Logger { get; }
 
-		protected ILogger Logger { get; private set; }
-
+		/// <summary>
+		/// 是否分布式爬虫
+		/// </summary>
 		protected bool IsDistributed => _services.MessageQueue.IsDistributed;
 
 		protected Spider(IOptions<SpiderOptions> options,
@@ -75,7 +84,7 @@ namespace DotnetSpider
 
 			_defaultDownloader = _services.HostBuilderContext.Properties.ContainsKey(Const.DefaultDownloader)
 				? _services.HostBuilderContext.Properties[Const.DefaultDownloader]?.ToString()
-				: Const.Downloader.HttpClient;
+				: Downloaders.HttpClient;
 		}
 
 		/// <summary>
@@ -89,60 +98,31 @@ namespace DotnetSpider
 		/// 获取爬虫标识和名称
 		/// </summary>
 		/// <returns></returns>
-		protected virtual (string Id, string Name) GetIdAndName()
+		protected virtual SpiderId CreateSpiderId()
 		{
 			var id = Environment.GetEnvironmentVariable("DOTNET_SPIDER_ID");
-			id = string.IsNullOrWhiteSpace(id) ? ObjectId.NewId().ToString() : id;
+			id = string.IsNullOrWhiteSpace(id) ? ObjectId.CreateId().ToString() : id;
 			var name = Environment.GetEnvironmentVariable("DOTNET_SPIDER_NAME");
-			return (id, name);
+			return new SpiderId(id, name);
 		}
 
 		protected IDataFlow GetDefaultStorage()
 		{
-			if (string.IsNullOrWhiteSpace(Options.Storage))
-			{
-				throw new ArgumentNullException($"Storage is not configured");
-			}
-
-			var type = Type.GetType(Options.Storage);
-			if (type == null)
-			{
-				throw new SpiderException($"Type of storage {Options.Storage} not found");
-			}
-
-			if (!typeof(StorageBase).IsAssignableFrom(type) && !typeof(EntityStorageBase).IsAssignableFrom(type))
-			{
-				throw new SpiderException($"{type} is not a storage dataFlow");
-			}
-
-			var method = type.GetMethod("CreateFromOptions");
-
-			if (method == null)
-			{
-				throw new SpiderException($"Storage {type} didn't implement method CreateFromOptions");
-			}
-
-			var storage = method.Invoke(null, new object[] {_services.Configuration});
-			if (storage == null)
-			{
-				throw new SpiderException("Create default storage failed");
-			}
-
-			return (IDataFlow)storage;
+			return StorageUtilities.CreateStorage(Options.StorageType, _services.Configuration);
 		}
 
 		public override async Task StopAsync(CancellationToken cancellationToken)
 		{
-			Logger.LogInformation($"{Id} stopping");
+			Logger.LogInformation($"{SpiderId} stopping");
 
 			_consumer?.Close();
-			_services.MessageQueue.CloseQueue(Id);
+			_services.MessageQueue.CloseQueue(SpiderId.Id);
 
 			await base.StopAsync(cancellationToken);
 
 			Dispose();
 
-			Logger.LogInformation($"{Id} stopped");
+			Logger.LogInformation($"{SpiderId} stopped");
 		}
 
 		/// <summary>
@@ -214,21 +194,21 @@ namespace DotnetSpider
 				request.RequestedTimes += 1;
 
 				// 1. 请求次数超过限制则跳过，并添加失败记录
-				// 2. 默认构造的请求次数为 0， 并且不可用户更改，因此可以保证数据安全性
+				// 2. 默认构造的请求次数为 0， 并且不允许用户更改，因此可以保证数据安全性
 				if (request.RequestedTimes > Options.RetriedTimes)
 				{
-					await _services.StatisticsClient.IncreaseFailureAsync(Id);
+					await _services.StatisticsClient.IncreaseFailureAsync(SpiderId.Id);
 					continue;
 				}
 
-				// 1. 默认构造的深度为 0， 并且用户不可更改，可以保证数据安全
+				// 1. 默认构造的深度为 0， 并且不允许用户更改，因此可以保证数据安全性
 				// 2. 当深度超过限制则跳过
 				if (Options.Depth > 0 && request.Depth > Options.Depth)
 				{
 					continue;
 				}
 
-				request.Owner = Id;
+				request.Owner = SpiderId.Id;
 
 				list.Add(request);
 			}
@@ -239,106 +219,102 @@ namespace DotnetSpider
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			var tuple = GetIdAndName();
-			tuple.Id.NotNullOrWhiteSpace("Id");
-			if (tuple.Id.Length > 36)
-			{
-				throw new ArgumentException("Id 长度不能超过 36 个字符");
-			}
-
-			Id = tuple.Id;
-			Name = tuple.Name;
-			Logger.LogInformation($"Initialize {Id}");
-			await _services.StatisticsClient.StartAsync(Id, Name);
+			SpiderId = CreateSpiderId();
+			Logger.LogInformation($"Initialize spider {SpiderId}, {SpiderId.Name}");
+			await _services.StatisticsClient.StartAsync(SpiderId.Id, SpiderId.Name);
+			await _services.Scheduler.InitializeAsync(SpiderId.Id);
 			await InitializeAsync(stoppingToken);
 			await InitializeDataFlowsAsync();
 			await LoadRequestFromSuppliers(stoppingToken);
-			await _services.StatisticsClient.IncreaseTotalAsync(Id, _services.Scheduler.Total);
+			await _services.StatisticsClient.IncreaseTotalAsync(SpiderId.Id, await _services.Scheduler.GetTotalAsync());
 			await RegisterConsumerAsync(stoppingToken);
 			await RunAsync(stoppingToken);
-			Logger.LogInformation($"{Id} started");
+			Logger.LogInformation($"{SpiderId} started");
 		}
 
 		private async Task RegisterConsumerAsync(CancellationToken stoppingToken)
 		{
-			var topic = string.Format(Const.Topic.Spider, Id.ToUpper());
+			var topic = string.Format(Topics.Spider, SpiderId.Id);
 
-			Logger.LogInformation($"{Id} register topic {topic}");
-			_consumer = new MessageQueue.AsyncMessageConsumer<byte[]>(topic);
+			Logger.LogInformation($"{SpiderId} register topic {topic}");
+			_consumer = new AsyncMessageConsumer<byte[]>(topic);
 			_consumer.Received += async bytes =>
 			{
-				var message = await GetMessageAsync(bytes);
-				if (message == null)
+				object message;
+				try
 				{
+					message = await bytes.DeserializeAsync(stoppingToken);
+					if (message == null)
+					{
+						return;
+					}
+				}
+				catch (Exception e)
+				{
+					Logger.LogError($"Deserialize message failed: {e}");
 					return;
 				}
 
-				if (message is Exit exit)
+				switch (message)
 				{
-					Logger.LogInformation($"{Id} receive exit message {JsonConvert.SerializeObject(exit)}");
-					if (exit.SpiderId == Id.ToUpper())
+					case Messages.Spider.Exit exit:
 					{
-						await ExitAsync();
-					}
-				}
-				else if (message is Response response)
-				{
-					// 1. 从请求队列中去除请求
-					var request = _requestedQueue.Dequeue(response.RequestHash);
-
-					if (request == null)
-					{
-						Logger.LogWarning($"{Id} dequeue {response.RequestHash} failed");
-					}
-					else
-					{
-						if (response.StatusCode == HttpStatusCode.OK)
+						Logger.LogInformation(
+							$"{SpiderId} receive exit message {System.Text.Json.JsonSerializer.Serialize(exit)}");
+						if (exit.SpiderId == SpiderId.Id)
 						{
-							request.Agent = response.Agent;
+							await ExitAsync();
+						}
 
-							if (IsDistributed)
+						break;
+					}
+					case Response response:
+					{
+						// 1. 从请求队列中去除请求
+						// 2. 若是 timeout 的请求，无法通过 Dequeue 获取，会通过 _requestedQueue.GetAllTimeoutList() 获取得到
+						var request = _requestedQueue.Dequeue(response.RequestHash);
+
+						if (request != null)
+						{
+							if (response.StatusCode.IsSuccessStatusCode())
 							{
-								Logger.LogInformation(
-									$"{Id} download {request.RequestUri}, {request.Hash} via {request.Agent} success");
+								request.Agent = response.Agent;
+
+								if (IsDistributed)
+								{
+									Logger.LogInformation(
+										$"{SpiderId} download {request.RequestUri}, {request.Hash} via {request.Agent} success");
+								}
+
+								// 是否下载成功由爬虫来决定，则非 Agent 自身
+								await _services.StatisticsClient.IncreaseAgentSuccessAsync(response.Agent,
+									response.ElapsedMilliseconds);
+								await HandleResponseAsync(request, response, bytes);
 							}
+							else
+							{
+								await _services.StatisticsClient.IncreaseAgentFailureAsync(response.Agent,
+									response.ElapsedMilliseconds);
+								Logger.LogError(
+									$"{SpiderId} download {request.RequestUri}, {request.Hash} status code: {response.StatusCode} failed: {response.ReasonPhrase}");
 
-							await _services.StatisticsClient.IncreaseAgentSuccessAsync(response.Agent,
-								response.ElapsedMilliseconds);
-							await HandleResponseAsync(request, response, bytes);
-						}
-						else
-						{
-							await _services.StatisticsClient.IncreaseAgentFailureAsync(response.Agent,
-								response.ElapsedMilliseconds);
-							Logger.LogError(
-								$"{Id} download {request.RequestUri}, {request.Hash} status code: {response.StatusCode} failed: {response.ReasonPhrase}");
-							// 每次调用添加会导致 Requested + 1, 因此失败多次的请求最终会被过滤不再加到调度队列
-							await AddRequestsAsync(request);
+								// 每次调用添加会导致 Requested + 1, 因此失败多次的请求最终会被过滤不再加到调度队列
+								await AddRequestsAsync(request);
 
-							OnError?.Invoke(request, response);
+								OnRequestError?.Invoke(request, response);
+							}
 						}
+
+						break;
 					}
-				}
-				else
-				{
-					Logger.LogError($"{Id} receive error message {JsonConvert.SerializeObject(message)}");
+					default:
+						Logger.LogError(
+							$"{SpiderId} receive error message {System.Text.Json.JsonSerializer.Serialize(message)}");
+						break;
 				}
 			};
 
 			await _services.MessageQueue.ConsumeAsync(_consumer, stoppingToken);
-		}
-
-		private async Task<object> GetMessageAsync(byte[] bytes)
-		{
-			try
-			{
-				return await bytes.DeserializeAsync();
-			}
-			catch (Exception e)
-			{
-				Logger.LogError($"Deserialize message failed: {e}");
-				return null;
-			}
 		}
 
 		private async Task HandleResponseAsync(Request request, Response response, byte[] messageBytes)
@@ -349,7 +325,7 @@ namespace DotnetSpider
 				using var scope = _services.ServiceProvider.CreateScope();
 				context = new DataFlowContext(scope.ServiceProvider, Options, request, response)
 				{
-					MessageBytes = messageBytes, Id = Id, Name = Name
+					MessageBytes = messageBytes
 				};
 
 				foreach (var dataFlow in _dataFlows)
@@ -358,20 +334,25 @@ namespace DotnetSpider
 				}
 
 				var count = await AddRequestsAsync(context.FollowRequests);
-				await _services.StatisticsClient.IncreaseTotalAsync(Id, count);
-				await _services.StatisticsClient.IncreaseSuccessAsync(Id);
+				await _services.StatisticsClient.IncreaseTotalAsync(SpiderId.Id, count);
+
+				// 增加一次成功的请求
+				await _services.StatisticsClient.IncreaseSuccessAsync(SpiderId.Id);
+				await _services.Scheduler.SuccessAsync(request);
 			}
+			// DataFlow 可以参过抛出 ExitException 来中止爬虫程序
 			catch (ExitException ee)
 			{
-				Logger.LogError($"Exit by: {ee.Message}");
+				Logger.LogError($"Exit: {ee}");
 				await ExitAsync();
 			}
 			catch (Exception e)
 			{
+				await _services.Scheduler.FailAsync(request);
 				// if download correct content, parser or storage failed by network or something else
 				// retry it until trigger retryTimes limitation
 				await AddRequestsAsync(request);
-				Logger.LogError($"{Id} handle {JsonConvert.SerializeObject(request)} failed: {e}");
+				Logger.LogError($"{SpiderId} handle {System.Text.Json.JsonSerializer.Serialize(request)} failed: {e}");
 			}
 			finally
 			{
@@ -400,7 +381,7 @@ namespace DotnetSpider
 						sleepTime += 10;
 
 						if (await WaitForContinueAsync(sleepTime, sleepTimeLimit, (end - start).TotalSeconds,
-							$"{Id} too much requests enqueued"))
+							$"{SpiderId} too much requests enqueued"))
 						{
 							continue;
 						}
@@ -454,7 +435,7 @@ namespace DotnetSpider
 			}
 			catch (Exception e)
 			{
-				Logger.LogError($"{Id} exited by exception: {e}");
+				Logger.LogError($"{SpiderId} exited by exception: {e}");
 			}
 			finally
 			{
@@ -465,22 +446,22 @@ namespace DotnetSpider
 		private async Task<bool> HandleTimeoutRequestAsync()
 		{
 			var timeoutRequests = _requestedQueue.GetAllTimeoutList();
-			if (timeoutRequests.Length > 0)
+			if (timeoutRequests.Length <= 0)
 			{
-				foreach (var request in timeoutRequests)
-				{
-					Logger.LogWarning(
-						$"{Id} request {request.RequestUri}, {request.Hash} timeout");
-				}
-
-				await AddRequestsAsync(timeoutRequests);
-
-				OnTimeout?.Invoke(timeoutRequests);
-
-				return true;
+				return false;
 			}
 
-			return false;
+			foreach (var request in timeoutRequests)
+			{
+				Logger.LogWarning(
+					$"{SpiderId} request {request.RequestUri}, {request.Hash} timeout");
+			}
+
+			await AddRequestsAsync(timeoutRequests);
+
+			OnRequestTimeout?.Invoke(timeoutRequests);
+
+			return true;
 		}
 
 		private async Task<bool> WaitForContinueAsync(int sleepTime, int sleepTimeLimit, double totalSeconds,
@@ -512,7 +493,7 @@ namespace DotnetSpider
 					while (!stoppingToken.IsCancellationRequested)
 					{
 						await Task.Delay(5000, stoppingToken);
-						await _services.StatisticsClient.PrintAsync(Id);
+						await _services.StatisticsClient.PrintAsync(SpiderId.Id);
 					}
 				}, stoppingToken).ConfigureAwait(false).GetAwaiter();
 			}
@@ -520,7 +501,7 @@ namespace DotnetSpider
 
 		private async Task ExitAsync()
 		{
-			await _services.StatisticsClient.ExitAsync(Id);
+			await _services.StatisticsClient.ExitAsync(SpiderId.Id);
 			_services.ApplicationLifetime.StopApplication();
 		}
 
@@ -545,11 +526,11 @@ namespace DotnetSpider
 				foreach (var request in requests)
 				{
 					string topic;
-					request.Timestamp = DateTimeHelper.ToTimestamp(DateTimeOffset.Now);
+					request.Timestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 					if (string.IsNullOrWhiteSpace(request.Agent))
 					{
 						topic = string.IsNullOrEmpty(request.Downloader)
-							? Const.Downloader.HttpClient
+							? Downloaders.HttpClient
 							: request.Downloader;
 					}
 					else
@@ -559,13 +540,13 @@ namespace DotnetSpider
 							// 非初始请求如果是链式模式则使用旧的下载器
 							case RequestPolicy.Chained:
 							{
-								topic = $"{request.Agent}".ToUpper();
+								topic = $"{request.Agent}";
 								break;
 							}
 							case RequestPolicy.Random:
 							{
 								topic = string.IsNullOrEmpty(request.Downloader)
-									? Const.Downloader.HttpClient
+									? Downloaders.HttpClient
 									: request.Downloader;
 								break;
 							}
@@ -582,7 +563,8 @@ namespace DotnetSpider
 					}
 					else
 					{
-						Logger.LogWarning($"{Id} enqueue request: {request.RequestUri}, {request.Hash} failed");
+						Logger.LogWarning(
+							$"{SpiderId} enqueue request: {request.RequestUri}, {request.Hash} failed");
 					}
 				}
 			}
@@ -601,7 +583,7 @@ namespace DotnetSpider
 				}
 
 				Logger.LogInformation(
-					$"{Id} load request from {requestSupplier.GetType().Name} {_requestSuppliers.IndexOf(requestSupplier)}/{_requestSuppliers.Count}");
+					$"{SpiderId} load request from {requestSupplier.GetType().Name} {_requestSuppliers.IndexOf(requestSupplier)}/{_requestSuppliers.Count}");
 			}
 		}
 
@@ -609,12 +591,12 @@ namespace DotnetSpider
 		{
 			if (_dataFlows.Count == 0)
 			{
-				Logger.LogWarning("{Id} there is no any dataFlow");
+				Logger.LogWarning($"{SpiderId} there is no any dataFlow");
 			}
 			else
 			{
 				var dataFlowInfo = string.Join(" -> ", _dataFlows.Select(x => x.GetType().Name));
-				Logger.LogInformation($"{Id} DataFlows: {dataFlowInfo}");
+				Logger.LogInformation($"{SpiderId} DataFlows: {dataFlowInfo}");
 				foreach (var dataFlow in _dataFlows)
 				{
 					dataFlow.SetLogger(Logger);
@@ -624,7 +606,8 @@ namespace DotnetSpider
 					}
 					catch (Exception e)
 					{
-						Logger.LogError($"{Id} initialize dataFlow {dataFlow.GetType().Name} failed: {e}");
+						Logger.LogError(
+							$"{SpiderId} initialize dataFlow {dataFlow.GetType().Name} failed: {e}");
 						_services.ApplicationLifetime.StopApplication();
 					}
 				}

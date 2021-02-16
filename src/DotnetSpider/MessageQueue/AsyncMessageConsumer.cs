@@ -14,7 +14,7 @@ namespace DotnetSpider.MessageQueue
 	{
 		public bool Registered { get; private set; }
 
-		public string Queue { get; private set; }
+		public string Queue { get; }
 
 		public event AsyncMessageHandler<TMessage> Received;
 

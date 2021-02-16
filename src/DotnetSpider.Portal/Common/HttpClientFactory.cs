@@ -7,7 +7,7 @@ namespace DotnetSpider.Portal.Common
 {
 	public static class HttpClientFactory
 	{
-		private static readonly Dictionary<string, HttpClient> _httpClients = new Dictionary<string, HttpClient>();
+		private static readonly Dictionary<string, HttpClient> _httpClients = new();
 
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public static HttpClient GetHttpClient(string name, string user, string password)

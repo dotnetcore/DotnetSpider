@@ -12,7 +12,7 @@ namespace DotnetSpider.AgentCenter.Store
 		/// 节点标识
 		/// </summary>
 		// ReSharper disable once UnusedAutoPropertyAccessor.Local
-		public int Id { get; private set; }
+		public long Id { get; private set; }
 
 		/// <summary>
 		/// 标识
@@ -34,6 +34,9 @@ namespace DotnetSpider.AgentCenter.Store
 		[Column("free_memory")]
 		public int FreeMemory { get; private set; }
 
+		/// <summary>
+		/// CPU 负载
+		/// </summary>
 		[Column("cpu_load")]
 		public int CpuLoad { get; private set; }
 
@@ -52,6 +55,11 @@ namespace DotnetSpider.AgentCenter.Store
 			FreeMemory = freeMemory;
 			CpuLoad = cpuLoad;
 			CreationTime = DateTimeOffset.Now;
+		}
+
+		public override string ToString()
+		{
+			return $"Id {Id}, CreationTime {CreationTime}";
 		}
 	}
 }

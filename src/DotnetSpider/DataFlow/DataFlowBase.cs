@@ -11,8 +11,6 @@ namespace DotnetSpider.DataFlow
 	{
 		protected ILogger Logger { get; private set; }
 
-		public virtual string Name => GetType().Name;
-
 		/// <summary>
 		/// 初始化
 		/// </summary>
@@ -34,6 +32,16 @@ namespace DotnetSpider.DataFlow
 		/// <param name="context">处理上下文</param>
 		/// <returns></returns>
 		public abstract Task HandleAsync(DataFlowContext context);
+
+		/// <summary>
+		/// 是否为空
+		/// </summary>
+		/// <param name="context"></param>
+		/// <returns></returns>
+		protected virtual bool IsNullOrEmpty(DataFlowContext context)
+		{
+			return context.IsEmpty;
+		}
 
 		/// <summary>
 		/// 释放

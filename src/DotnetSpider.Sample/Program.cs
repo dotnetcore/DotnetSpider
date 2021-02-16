@@ -25,10 +25,11 @@ namespace DotnetSpider.Sample
 				.CreateLogger();
 
 			// // await DistributedSpider.RunAsync();
-			await ImageSpider.RunAsync();
+			// await ProxySpider.RunAsync();
+			// await EntitySpider.RunMySqlQueueAsync();
+			await EntitySpider.RunAsync();
 
 			Console.WriteLine("Bye!");
-			Environment.Exit(0);
 		}
 	}
 }

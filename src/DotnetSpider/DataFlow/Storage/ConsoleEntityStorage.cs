@@ -1,29 +1,30 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using DotnetSpider.DataFlow.Storage;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 
-namespace DotnetSpider.DataFlow.Storage
+// ReSharper disable once CheckNamespace
+namespace DotnetSpider.DataFlow
 {
-    /// <summary>
-    /// 控制台打印(实体)解析结果
-    /// </summary>
-    public class ConsoleEntityStorage : EntityStorageBase
-    {
-        public static IDataFlow CreateFromOptions(IConfiguration configuration)
-        {
-            return new ConsoleEntityStorage();
-        }
+	/// <summary>
+	/// 控制台打印(实体)解析结果
+	/// </summary>
+	public class ConsoleEntityStorage : EntityStorageBase
+	{
+		public static IDataFlow CreateFromOptions(IConfiguration configuration)
+		{
+			return new ConsoleEntityStorage();
+		}
 
-        protected override Task StoreAsync(DataFlowContext context, Dictionary<Type, List<dynamic>> dict)
-        {
-            foreach (var kv in dict)
-            {
-                Console.WriteLine(JsonConvert.SerializeObject(kv.Value));
-            }
+		protected override Task HandleAsync(DataFlowContext context, IDictionary<Type, ICollection<dynamic>> entities)
+		{
+			foreach (var kv in entities)
+			{
+				Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(kv.Value));
+			}
 
-            return Task.CompletedTask;
-        }
-    }
+			return Task.CompletedTask;
+		}
+	}
 }

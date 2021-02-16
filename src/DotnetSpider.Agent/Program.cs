@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using DotnetSpider.Downloader;
-using DotnetSpider.Extensions;
 using DotnetSpider.RabbitMQ;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -33,15 +32,14 @@ namespace DotnetSpider.Agent
 						var builder = Host.CreateDefaultBuilder(args);
 						var id = i2;
 						builder.UseSerilog();
-						builder.ConfigureServices(x =>
+						builder.ConfigureServices((context, services) =>
 						{
-							x.AddAgent<HttpClientDownloader>(o =>
+							services.AddAgent<HttpClientDownloader>(o =>
 							{
 								o.AgentId = "agent" + id;
 								o.AgentName = o.AgentId;
 							});
-							var configuration = builder.GetConfiguration();
-							x.AddRabbitMQ(configuration);
+							services.AddRabbitMQ(context.Configuration);
 						});
 						await builder.Build().RunAsync();
 					}

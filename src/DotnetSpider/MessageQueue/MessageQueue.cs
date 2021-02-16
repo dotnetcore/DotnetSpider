@@ -9,16 +9,12 @@ namespace DotnetSpider.MessageQueue
 	public class MessageQueue : IMessageQueue
 	{
 		private readonly ConcurrentDictionary<string, Channel<byte[]>> _channelDict =
-			new ConcurrentDictionary<string, Channel<byte[]>>();
+			new();
 
 		public async Task PublishAsync(string queue, byte[] message)
 		{
-			if (!DeclareQueue(queue))
-			{
-				throw new ApplicationException("Declare queue failed");
-			}
-
-			await _channelDict[queue].Writer.WriteAsync(message);
+			var channel = _channelDict.GetOrAdd(queue, _ => Channel.CreateUnbounded<byte[]>());
+			await channel.Writer.WriteAsync(message);
 		}
 
 		public async Task ConsumeAsync(AsyncMessageConsumer<byte[]> consumer,
@@ -29,12 +25,7 @@ namespace DotnetSpider.MessageQueue
 				throw new ApplicationException("This consumer is already registered");
 			}
 
-			if (!DeclareQueue(consumer.Queue))
-			{
-				throw new ApplicationException("Declare queue failed");
-			}
-
-			var channel = _channelDict[consumer.Queue];
+			var channel = _channelDict.GetOrAdd(consumer.Queue, _ => Channel.CreateUnbounded<byte[]>());
 			consumer.Register();
 			consumer.OnClosing += x => { CloseQueue(x.Queue); };
 
@@ -49,7 +40,7 @@ namespace DotnetSpider.MessageQueue
 						}, cancellationToken)
 						.ConfigureAwait(false).GetAwaiter();
 				}
-			}, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+			}, cancellationToken);
 		}
 
 		public void CloseQueue(string queue)
@@ -69,19 +60,14 @@ namespace DotnetSpider.MessageQueue
 
 		public bool IsDistributed => false;
 
-		private bool DeclareQueue(string queue)
-		{
-			if (!_channelDict.ContainsKey(queue))
-			{
-				var channel = Channel.CreateUnbounded<byte[]>();
-				return _channelDict.TryAdd(queue, channel);
-			}
-
-			return true;
-		}
-
 		public void Dispose()
 		{
+			foreach (var kv in _channelDict)
+			{
+				kv.Value.Writer.Complete();
+			}
+
+			_channelDict.Clear();
 		}
 	}
 }

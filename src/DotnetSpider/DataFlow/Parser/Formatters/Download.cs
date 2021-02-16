@@ -9,7 +9,7 @@ namespace DotnetSpider.DataFlow.Parser.Formatters
 	/// </summary>
 	public class Download : Formatter
 	{
-		private readonly WebClient _client = new WebClient();
+		private readonly WebClient _client = new();
 		/// <summary>
 		/// 执行下载操作
 		/// </summary>

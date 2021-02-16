@@ -14,7 +14,7 @@ namespace DotnetSpider.DataFlow.Parser.Formatters
 		private const string UnitStringForQian = "千";
 		private const string UnitStringForWan = "万";
 		private const string UnitStringForYi = "亿";
-		private readonly Regex _decimalRegex = new Regex(@"\d+(\.\d+)?");
+		private readonly Regex _decimalRegex = new(@"\d+(\.\d+)?");
 
 		/// <summary>
 		/// 数字格式化模版

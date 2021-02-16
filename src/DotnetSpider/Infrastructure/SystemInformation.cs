@@ -7,7 +7,7 @@ namespace DotnetSpider.Infrastructure
 {
 	public static class SystemInformation
 	{
-		private static readonly Stopwatch _getMemoryStatusWatch = new Stopwatch();
+		private static readonly Stopwatch _getMemoryStatusWatch = new();
 		private static MemoryInfo _memoryInfo;
 
 		public static readonly int TotalMemory;

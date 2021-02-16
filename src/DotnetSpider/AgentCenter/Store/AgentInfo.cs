@@ -51,6 +51,22 @@ namespace DotnetSpider.AgentCenter.Store
 		[Column("creation_time")]
 		public DateTimeOffset CreationTime { get; private set; }
 
+		public AgentInfo(string id, string name, int processorCount, int totalMemory)
+		{
+			id.NotNullOrWhiteSpace(nameof(id));
+			name.NotNullOrWhiteSpace(nameof(name));
+
+			Id = id;
+			Name = name;
+			Deleted = false;
+			ProcessorCount = processorCount;
+			TotalMemory = totalMemory;
+			CreationTime = DateTimeOffset.Now;
+			LastModificationTime = CreationTime;
+		}
+
+		public bool Online => (DateTimeOffset.Now - LastModificationTime).TotalSeconds <= 30;
+
 		/// <summary>
 		/// 刷新上一次更新时间
 		/// </summary>
@@ -59,19 +75,9 @@ namespace DotnetSpider.AgentCenter.Store
 			LastModificationTime = DateTimeOffset.Now;
 		}
 
-		public AgentInfo(string id, string name, int processorCount, int totalMemory)
+		public override string ToString()
 		{
-			id.NotNullOrWhiteSpace(nameof(id));
-			name.NotNullOrWhiteSpace(nameof(name));
-
-			Id = id;
-			Name = name;
-			ProcessorCount = processorCount;
-			TotalMemory = totalMemory;
-			CreationTime = DateTimeOffset.Now;
-			LastModificationTime = CreationTime;
+			return $"Id {Id}, CreationTime {CreationTime}, Deleted {Deleted}";
 		}
-
-		public bool Online => (DateTimeOffset.Now - LastModificationTime).TotalSeconds <= 30;
 	}
 }

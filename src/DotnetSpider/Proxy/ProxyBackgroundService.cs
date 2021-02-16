@@ -33,15 +33,20 @@ namespace DotnetSpider.Proxy
 
 			await Task.Factory.StartNew(async () =>
 			{
+				var interval = _options.RefreshProxy * 1000;
 				while (!stoppingToken.IsCancellationRequested)
 				{
 					var failedNum = 0;
 					try
 					{
 						var proxies = await _proxySupplier.GetProxiesAsync();
-						await _pool.AddAsync(proxies);
+						var cnt = await _pool.AddAsync(proxies);
+						if (cnt > 0)
+						{
+							_logger.LogInformation($"Find new {cnt} proxies");
+						}
 
-						await Task.Delay(30000, default);
+						await Task.Delay(interval, default);
 					}
 					catch (Exception e)
 					{

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
 using DotnetSpider.Proxy;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Downloader
@@ -14,18 +13,18 @@ namespace DotnetSpider.Downloader
 	public class HttpClientDownloader : IDownloader
 	{
 		private readonly IProxyService _proxyService;
-
 		protected IHttpClientFactory HttpClientFactory { get; }
 		protected ILogger Logger { get; }
-		protected bool UseProxy => _proxyService != null;
+		protected bool UseProxy { get; }
 
 		public HttpClientDownloader(IHttpClientFactory httpClientFactory,
-			IServiceProvider serviceProvider,
+			IProxyService proxyService,
 			ILogger<HttpClientDownloader> logger)
 		{
 			HttpClientFactory = httpClientFactory;
 			Logger = logger;
-			_proxyService = serviceProvider.GetService<IProxyService>();
+			_proxyService = proxyService;
+			UseProxy = !(_proxyService is EmptyProxyService);
 		}
 
 		public async Task<Response> DownloadAsync(Request request)
@@ -110,6 +109,6 @@ namespace DotnetSpider.Downloader
 			return Task.FromResult((Response)null);
 		}
 
-		public virtual string Name => UseProxy ? Const.Downloader.ProxyHttpClient : Const.Downloader.HttpClient;
+		public virtual string Name => UseProxy ? Downloaders.ProxyHttpClient : Downloaders.HttpClient;
 	}
 }

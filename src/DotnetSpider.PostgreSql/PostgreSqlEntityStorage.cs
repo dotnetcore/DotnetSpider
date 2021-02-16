@@ -11,22 +11,6 @@ using Npgsql;
 
 namespace DotnetSpider.PostgreSql
 {
-	public class PostgreOptions
-	{
-		private readonly IConfiguration _configuration;
-
-		public PostgreOptions(IConfiguration configuration)
-		{
-			_configuration = configuration;
-		}
-
-		public StorageMode Mode => string.IsNullOrWhiteSpace(_configuration["Postgre:Mode"])
-			? StorageMode.Insert
-			: (StorageMode)Enum.Parse(typeof(StorageMode), _configuration["Postgre:Mode"]);
-
-		public string ConnectionString => _configuration["ConnectionString"];
-	}
-
 	/// <summary>
 	/// PostgreSql 保存解析(实体)结果
 	/// </summary>
@@ -40,7 +24,12 @@ namespace DotnetSpider.PostgreSql
 		public static IDataFlow CreateFromOptions(IConfiguration configuration)
 		{
 			var options = new PostgreOptions(configuration);
-			return new PostgreSqlEntityStorage(options.Mode, options.ConnectionString);
+			return new PostgreSqlEntityStorage(options.Mode, options.ConnectionString)
+			{
+				UseTransaction = options.UseTransaction,
+				IgnoreCase = options.IgnoreCase,
+				RetryTimes = options.RetryTimes
+			};
 		}
 
 		/// <summary>

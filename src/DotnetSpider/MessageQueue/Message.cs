@@ -9,7 +9,7 @@ namespace DotnetSpider.MessageQueue
 
 		protected Message()
 		{
-			MessageId = ObjectId.NewId().ToString();
+			MessageId = ObjectId.CreateId().ToString();
 		}
 	}
 }

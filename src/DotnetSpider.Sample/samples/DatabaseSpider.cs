@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Dapper;
 using DotnetSpider.DataFlow;
-using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Downloader;
 using DotnetSpider.Http;
 using DotnetSpider.Scheduler;
@@ -26,7 +25,8 @@ namespace DotnetSpider.Sample.samples
 			await builder.Build().RunAsync();
 		}
 
-		public DatabaseSpider(IOptions<SpiderOptions> options, DependenceServices services, ILogger<Spider> logger) : base(
+		public DatabaseSpider(IOptions<SpiderOptions> options, DependenceServices services,
+			ILogger<Spider> logger) : base(
 			options, services, logger)
 		{
 		}
@@ -39,11 +39,13 @@ namespace DotnetSpider.Sample.samples
 			await AddRequestsAsync(new Request("https://news.cnblogs.com/n/page/1/"));
 		}
 
-		class MyStorage : StorageBase
+		class MyStorage : DataFlowBase
 		{
 			public override async Task InitAsync()
 			{
-				await using var conn = new MySqlConnection("Database='mysql';Data Source=localhost;password=1qazZAQ!;User ID=root;Port=3306;");
+				await using var conn =
+					new MySqlConnection(
+						"Database='mysql';Data Source=localhost;password=1qazZAQ!;User ID=root;Port=3306;");
 				await conn.ExecuteAsync("create database if not exists cnblogs2;");
 				await conn.ExecuteAsync($@"
 create table if not exists cnblogs2.news2
@@ -59,8 +61,14 @@ create table if not exists cnblogs2.news2
 ");
 			}
 
-			protected override async Task StoreAsync(DataFlowContext context)
+			public override async Task HandleAsync(DataFlowContext context)
 			{
+				if (IsNullOrEmpty(context))
+				{
+					Logger.LogWarning("数据流上下文不包含解析结果");
+					return;
+				}
+
 				var typeName = typeof(News).FullName;
 				var data = (News)context.GetData(typeName);
 				if (data != null)

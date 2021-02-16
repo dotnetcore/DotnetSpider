@@ -17,7 +17,6 @@ ProjectSection(SolutionItems) = preProject
 	.editorconfig = .editorconfig
 	.gitignore = .gitignore
 	azure-pipelines.yml = azure-pipelines.yml
-	Directory.Build.props = Directory.Build.props
 	LICENSE.txt = LICENSE.txt
 	package.props = package.props
 	README.md = README.md
@@ -29,6 +28,7 @@ ProjectSection(SolutionItems) = preProject
 	build_spiders.sh = build_spiders.sh
 	build_agent.sh = build_agent.sh
 	build_portal.sh = build_portal.sh
+	publish_nuget.sh = publish_nuget.sh
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Agent", "src\DotnetSpider.Agent\DotnetSpider.Agent.csproj", "{FCCA37B0-FF8F-4C32-9286-26A39EFA94E5}"

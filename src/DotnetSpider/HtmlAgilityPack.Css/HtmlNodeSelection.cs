@@ -13,7 +13,7 @@ namespace DotnetSpider.HtmlAgilityPack.Css
     /// </remarks>
     public static class HtmlNodeSelection
     {
-        private static readonly HtmlNodeOps Ops = new HtmlNodeOps();
+        private static readonly HtmlNodeOps Ops = new();
 
         /// <summary>
         /// Similar to <see cref="QuerySelectorAll(HtmlNode,string)" /> 
@@ -81,7 +81,7 @@ namespace DotnetSpider.HtmlAgilityPack.Css
 
         private const int DefaultCacheSize = 60;
 
-        private static LruCache<string, Func<HtmlNode, IEnumerable<HtmlNode>>> _compilerCache = new LruCache<string, Func<HtmlNode, IEnumerable<HtmlNode>>>(Compile, DefaultCacheSize);
+        private static LruCache<string, Func<HtmlNode, IEnumerable<HtmlNode>>> _compilerCache = new(Compile, DefaultCacheSize);
         private static Func<string, Func<HtmlNode, IEnumerable<HtmlNode>>> _defaultCachingCompiler = _compilerCache.GetValue;
             
         /// <summary>

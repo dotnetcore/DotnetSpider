@@ -10,22 +10,32 @@ namespace DotnetSpider.Scheduler
 	public abstract class SchedulerBase : IScheduler
 	{
 		private SpinLock _spinLock;
+		private readonly IRequestHasher _requestHasher;
 
 		protected readonly IDuplicateRemover DuplicateRemover;
 
-		private readonly IRequestHasher RequestHasher;
 		protected SchedulerBase(IDuplicateRemover duplicateRemover, IRequestHasher requestHasher)
 		{
 			DuplicateRemover = duplicateRemover;
-			RequestHasher = requestHasher;
+			_requestHasher = requestHasher;
 		}
 
 		/// <summary>
 		/// 重置去重器
 		/// </summary>
-		public virtual void ResetDuplicateCheck()
+		public virtual async Task ResetDuplicateCheckAsync()
 		{
-			DuplicateRemover.ResetDuplicateCheck();
+			await DuplicateRemover.ResetDuplicateCheckAsync();
+		}
+
+		public virtual Task SuccessAsync(Request request)
+		{
+			return Task.CompletedTask;
+		}
+
+		public virtual Task FailAsync(Request request)
+		{
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -45,7 +55,10 @@ namespace DotnetSpider.Scheduler
 		/// <summary>
 		/// 队列中的总请求个数
 		/// </summary>
-		public long Total => DuplicateRemover.Total;
+		public async Task<long> GetTotalAsync()
+		{
+			return await DuplicateRemover.GetTotalAsync();
+		}
 
 		/// <summary>
 		/// 从队列中取出指定爬虫的指定个数请求
@@ -53,6 +66,11 @@ namespace DotnetSpider.Scheduler
 		/// <param name="count">出队数</param>
 		/// <returns>请求</returns>
 		protected abstract Task<IEnumerable<Request>> ImplDequeueAsync(int count = 1);
+
+		public virtual async Task InitializeAsync(string spiderId)
+		{
+			await DuplicateRemover.InitializeAsync(spiderId);
+		}
 
 		public async Task<IEnumerable<Request>> DequeueAsync(int count = 1)
 		{
@@ -86,12 +104,14 @@ namespace DotnetSpider.Scheduler
 			var count = 0;
 			foreach (var request in requests)
 			{
-				request.Hash = RequestHasher.ComputeHash(request);
-				if (!await DuplicateRemover.IsDuplicateAsync(request))
+				_requestHasher.ComputeHash(request);
+				if (await DuplicateRemover.IsDuplicateAsync(request))
 				{
-					await PushWhenNoDuplicate(request);
-					count++;
+					continue;
 				}
+
+				await PushWhenNoDuplicate(request);
+				count++;
 			}
 
 			return count;

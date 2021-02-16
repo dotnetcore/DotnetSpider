@@ -13,17 +13,17 @@ namespace DotnetSpider.DataFlow.Parser
 	/// <summary>
 	/// 实体解析器
 	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	public class DataParser<T> : DataParser where T : EntityBase<T>, new()
+	/// <typeparam name="TEntity"></typeparam>
+	public class DataParser<TEntity> : DataParser where TEntity : EntityBase<TEntity>, new()
 	{
-		protected readonly Model<T> Model;
+		protected readonly Model<TEntity> Model;
 
 		/// <summary>
 		/// 构造方法
 		/// </summary>
 		public DataParser()
 		{
-			Model = new Model<T>();
+			Model = new Model<TEntity>();
 
 			var patterns = new HashSet<string>();
 			if (Model.FollowRequestSelectors != null)
@@ -88,9 +88,7 @@ namespace DotnetSpider.DataFlow.Parser
 			}
 		}
 
-		public override string Name => $"DataParser<{typeof(T).Name}>";
-
-		protected virtual T ConfigureDataObject(T t)
+		protected virtual TEntity ConfigureDataObject(TEntity t)
 		{
 			return t;
 		}
@@ -99,7 +97,7 @@ namespace DotnetSpider.DataFlow.Parser
 		{
 			var selectable = context.Selectable;
 
-			var results = new List<T>();
+			var results = new List<TEntity>();
 
 			// don't change request properties
 			var properties = new Dictionary<string, object>();
@@ -182,10 +180,10 @@ namespace DotnetSpider.DataFlow.Parser
 			return Task.CompletedTask;
 		}
 
-		private T ParseObject(DataFlowContext context, Dictionary<string, object> properties, ISelectable selectable,
+		private TEntity ParseObject(DataFlowContext context, Dictionary<string, object> properties, ISelectable selectable,
 			int index)
 		{
-			var dataObject = new T();
+			var dataObject = new TEntity();
 			foreach (var field in Model.ValueSelectors)
 			{
 				string value;

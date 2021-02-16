@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using DotnetSpider.Http;
+﻿using DotnetSpider.Http;
 
 namespace DotnetSpider.Infrastructure
 {
 	/// <summary>
-	/// 请求哈希器接口
+	/// 请求的哈希器计算接口
 	/// </summary>
 	public interface IRequestHasher
 	{
@@ -14,6 +11,6 @@ namespace DotnetSpider.Infrastructure
 		/// 编译Hash
 		/// </summary>
 		/// <returns></returns>
-		string ComputeHash(Request request);
+		void ComputeHash(Request request);
 	}
 }

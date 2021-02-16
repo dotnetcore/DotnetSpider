@@ -15,7 +15,6 @@ namespace DotnetSpider
 		public IStatisticsClient StatisticsClient { get; }
 		public IHostApplicationLifetime ApplicationLifetime { get; }
 		public HostBuilderContext HostBuilderContext { get; }
-
 		public IConfiguration Configuration { get; }
 
 		public DependenceServices(IServiceProvider serviceProvider,
