@@ -49,10 +49,11 @@ namespace DotnetSpider.Sample.samples
 
 		class MyDataParser : DataParser
 		{
-			public MyDataParser()
+			public override Task InitializeAsync()
 			{
 				AddRequiredValidator("cnblogs\\.com");
 				AddFollowRequestQuerier(Selectors.XPath("."));
+				return Task.CompletedTask;
 			}
 
 			protected override Task ParseAsync(DataFlowContext context)

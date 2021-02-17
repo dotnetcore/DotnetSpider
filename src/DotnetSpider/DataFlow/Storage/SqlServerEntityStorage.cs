@@ -3,6 +3,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using DotnetSpider.DataFlow.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -80,6 +81,11 @@ namespace DotnetSpider.DataFlow
 				UseTransaction = options.UseTransaction,
 				IgnoreCase = options.IgnoreCase
 			};
+		}
+
+		public override Task InitializeAsync()
+		{
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

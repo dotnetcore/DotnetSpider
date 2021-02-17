@@ -16,12 +16,9 @@ namespace DotnetSpider.DataFlow.Parser
 	/// <typeparam name="TEntity"></typeparam>
 	public class DataParser<TEntity> : DataParser where TEntity : EntityBase<TEntity>, new()
 	{
-		protected readonly Model<TEntity> Model;
+		protected Model<TEntity> Model { get; private set; }
 
-		/// <summary>
-		/// 构造方法
-		/// </summary>
-		public DataParser()
+		public override Task InitializeAsync()
 		{
 			Model = new Model<TEntity>();
 
@@ -86,6 +83,8 @@ namespace DotnetSpider.DataFlow.Parser
 			{
 				AddRequiredValidator(request => Regex.IsMatch(request.RequestUri.ToString(), pattern));
 			}
+
+			return Task.CompletedTask;
 		}
 
 		protected virtual TEntity ConfigureDataObject(TEntity t)
@@ -180,7 +179,8 @@ namespace DotnetSpider.DataFlow.Parser
 			return Task.CompletedTask;
 		}
 
-		private TEntity ParseObject(DataFlowContext context, Dictionary<string, object> properties, ISelectable selectable,
+		private TEntity ParseObject(DataFlowContext context, Dictionary<string, object> properties,
+			ISelectable selectable,
 			int index)
 		{
 			var dataObject = new TEntity();

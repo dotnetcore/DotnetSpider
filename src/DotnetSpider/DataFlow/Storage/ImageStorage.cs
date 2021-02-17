@@ -20,7 +20,7 @@ namespace DotnetSpider.DataFlow
 
 		public string[] ImageExtensions { get; set; } = {"jpeg", "gif", "jpg", "bmp", "png", "ico"};
 
-		public override Task InitAsync()
+		public override Task InitializeAsync()
 		{
 			_imageExtensions = new HashSet<string>(ImageExtensions);
 			return Task.CompletedTask;

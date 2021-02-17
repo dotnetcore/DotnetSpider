@@ -60,10 +60,10 @@ namespace DotnetSpider.Sample.samples
 
 			private DateTime _start;
 
-			public override Task InitAsync()
+			public override Task InitializeAsync()
 			{
 				_start = DateTime.Now;
-				return base.InitAsync();
+				return Task.CompletedTask;
 			}
 
 			public override Task HandleAsync(DataFlowContext context)

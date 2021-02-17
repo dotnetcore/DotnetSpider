@@ -31,7 +31,7 @@ namespace DotnetSpider.Sample.samples
 		{
 		}
 
-		protected override async Task InitializeAsync(CancellationToken stoppingToken)
+		protected override async Task InitializeAsync(CancellationToken stoppingToken = default)
 		{
 			AddDataFlow(new ListNewsParser());
 			AddDataFlow(new NewsParser());
@@ -41,7 +41,7 @@ namespace DotnetSpider.Sample.samples
 
 		class MyStorage : DataFlowBase
 		{
-			public override async Task InitAsync()
+			public override async Task InitializeAsync()
 			{
 				await using var conn =
 					new MySqlConnection(

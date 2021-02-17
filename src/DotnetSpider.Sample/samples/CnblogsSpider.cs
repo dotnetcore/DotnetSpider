@@ -51,6 +51,11 @@ namespace DotnetSpider.Sample.samples
 
 		protected class MyConsoleStorage : DataFlowBase
 		{
+			public override Task InitializeAsync()
+			{
+				return Task.CompletedTask;
+			}
+
 			public override Task HandleAsync(DataFlowContext context)
 			{
 				if (IsNullOrEmpty(context))
@@ -72,7 +77,7 @@ namespace DotnetSpider.Sample.samples
 
 		protected class ListNewsParser : DataParser
 		{
-			public ListNewsParser()
+			public override Task InitializeAsync()
 			{
 				// AddRequiredValidator("news\\.cnblogs\\.com/n/page");
 				AddRequiredValidator((request =>
@@ -83,6 +88,7 @@ namespace DotnetSpider.Sample.samples
 				}));
 				// if you want to collect every pages
 				// AddFollowRequestQuerier(Selectors.XPath(".//div[@class='pager']"));
+				return Task.CompletedTask;
 			}
 
 			protected override Task ParseAsync(DataFlowContext context)
@@ -113,9 +119,10 @@ namespace DotnetSpider.Sample.samples
 
 		protected class NewsParser : DataParser
 		{
-			public NewsParser()
+			public override Task InitializeAsync()
 			{
 				AddRequiredValidator("news\\.cnblogs\\.com/n/\\d+");
+				return Task.CompletedTask;
 			}
 
 			protected override Task ParseAsync(DataFlowContext context)

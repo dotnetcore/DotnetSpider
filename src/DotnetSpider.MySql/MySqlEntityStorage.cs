@@ -1,6 +1,7 @@
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Storage;
 using Microsoft.Extensions.Configuration;
@@ -36,6 +37,11 @@ namespace DotnetSpider.MySql
 			string connectionString) : base(mode,
 			connectionString)
 		{
+		}
+
+		public override Task InitializeAsync()
+		{
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

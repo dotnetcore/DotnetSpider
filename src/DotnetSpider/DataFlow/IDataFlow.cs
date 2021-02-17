@@ -13,7 +13,7 @@ namespace DotnetSpider.DataFlow
         /// 初始化
         /// </summary>
         /// <returns></returns>
-        Task InitAsync();
+        Task InitializeAsync();
 
         /// <summary>
         /// 设置日志

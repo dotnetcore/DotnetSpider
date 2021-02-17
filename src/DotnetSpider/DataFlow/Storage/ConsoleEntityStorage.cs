@@ -17,6 +17,11 @@ namespace DotnetSpider.DataFlow
 			return new ConsoleEntityStorage();
 		}
 
+		public override Task InitializeAsync()
+		{
+			return Task.CompletedTask;
+		}
+
 		protected override Task HandleAsync(DataFlowContext context, IDictionary<Type, ICollection<dynamic>> entities)
 		{
 			foreach (var kv in entities)

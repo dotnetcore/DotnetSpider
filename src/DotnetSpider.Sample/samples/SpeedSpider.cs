@@ -56,6 +56,11 @@ namespace DotnetSpider.Sample.samples
 		{
 			private int _downloadCount;
 
+			public override Task InitializeAsync()
+			{
+				return Task.CompletedTask;
+			}
+
 			public override Task HandleAsync(DataFlowContext context)
 			{
 				Interlocked.Increment(ref _downloadCount);

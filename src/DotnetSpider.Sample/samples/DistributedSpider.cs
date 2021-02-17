@@ -20,7 +20,5 @@ namespace DotnetSpider.Sample.samples
 			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
 			await builder.Build().RunAsync();
 		}
-
-
 	}
 }

@@ -135,7 +135,7 @@ namespace DotnetSpider.Tests
 			await conn.ExecuteAsync($"drop table if exists {Escape}test{Escape}.{Escape}createtable{Escape};");
 			{
 				var storage = CreateStorage(StorageMode.Insert);
-				await storage.InitAsync();
+				await storage.InitializeAsync();
 
 				var context = new DataFlowContext(null, new SpiderOptions(),
 					new Request(), new Response());

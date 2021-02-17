@@ -30,9 +30,10 @@ namespace DotnetSpider.Sample.samples
 			});
 			builder.UseDownloader<HttpClientDownloader>();
 			builder.UseSerilog();
+			// Open fiddler and make sure the listen port is 8866
 			builder.UseProxy<FiddlerProxySupplier, DefaultProxyValidator>(x =>
 			{
-				x.ProxyTestUrl = "http://192.168.31.200:8866";
+				x.ProxyTestUrl = "http://localhost:8866";
 			});
 			builder.IgnoreServerCertificateError();
 			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();

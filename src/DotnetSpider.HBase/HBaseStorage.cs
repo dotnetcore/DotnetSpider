@@ -49,6 +49,11 @@ namespace DotnetSpider.HBase
 			return storage;
 		}
 
+		public override Task InitializeAsync()
+		{
+			return Task.CompletedTask;
+		}
+
 		public HBaseStorage(string restServer)
 		{
 			var uri = new Uri(restServer);

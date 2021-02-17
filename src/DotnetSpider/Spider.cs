@@ -617,7 +617,7 @@ namespace DotnetSpider
 					dataFlow.SetLogger(Logger);
 					try
 					{
-						await dataFlow.InitAsync();
+						await dataFlow.InitializeAsync();
 						if (dataFlow is DataParser dataParser)
 						{
 							_dataParsers.Add(dataParser);

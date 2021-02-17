@@ -2,6 +2,7 @@
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Dapper;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Storage;
@@ -30,6 +31,11 @@ namespace DotnetSpider.PostgreSql
 				IgnoreCase = options.IgnoreCase,
 				RetryTimes = options.RetryTimes
 			};
+		}
+
+		public override Task InitializeAsync()
+		{
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

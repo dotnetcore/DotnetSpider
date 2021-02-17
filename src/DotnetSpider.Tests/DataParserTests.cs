@@ -75,6 +75,11 @@ namespace DotnetSpider.Tests
 			{
 				return Task.CompletedTask;
 			}
+
+			public override Task InitializeAsync()
+			{
+				return Task.CompletedTask;
+			}
 		}
 	}
 }

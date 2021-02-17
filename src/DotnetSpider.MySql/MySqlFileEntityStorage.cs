@@ -47,6 +47,11 @@ namespace DotnetSpider.MySql
 
 		public MySqlFileType MySqlFileType { get; set; }
 
+		public override Task InitializeAsync()
+		{
+			return Task.CompletedTask;
+		}
+
 		/// <summary>
 		/// 根据配置返回存储器
 		/// </summary>

@@ -16,6 +16,11 @@ namespace DotnetSpider.DataFlow
 			return new ConsoleStorage();
 		}
 
+		public override Task InitializeAsync()
+		{
+			return Task.CompletedTask;
+		}
+
 		public override Task HandleAsync(DataFlowContext context)
 		{
 			if (IsNullOrEmpty(context))

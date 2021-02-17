@@ -15,10 +15,7 @@ namespace DotnetSpider.DataFlow
 		/// 初始化
 		/// </summary>
 		/// <returns></returns>
-		public virtual Task InitAsync()
-		{
-			return Task.CompletedTask;
-		}
+		public abstract Task InitializeAsync();
 
 		public void SetLogger(ILogger logger)
 		{

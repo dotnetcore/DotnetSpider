@@ -50,6 +50,11 @@ namespace DotnetSpider.Mongo
 			_client = mongoClient;
 		}
 
+		public override Task InitializeAsync()
+		{
+			return Task.CompletedTask;
+		}
+
 		protected override async Task HandleAsync(DataFlowContext context,
 			IDictionary<Type, ICollection<dynamic>> entities)
 		{

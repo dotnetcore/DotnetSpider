@@ -27,6 +27,11 @@ namespace DotnetSpider.DataFlow
 			return new();
 		}
 
+		public override Task InitializeAsync()
+		{
+			return Task.CompletedTask;
+		}
+
 		protected override async Task HandleAsync(DataFlowContext context, TableMetadata tableMetadata,
 			IEnumerable entities)
 		{

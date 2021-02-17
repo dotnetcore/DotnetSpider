@@ -41,6 +41,7 @@ namespace DotnetSpider.Tests
 				new Response {Content = new ByteArrayContent(File.ReadAllBytes("Jd.html"))});
 
 			var parser = new DataParser<Product>();
+			await parser.InitializeAsync();
 			parser.UseHtmlSelectableBuilder();
 			await parser.HandleAsync(dataContext);
 
@@ -85,7 +86,7 @@ namespace DotnetSpider.Tests
 
 			var parser = new DataParser<N>();
 			parser.UseHtmlSelectableBuilder();
-
+			await parser.InitializeAsync();
 			await parser.HandleAsync(dataContext);
 
 			var results = (List<N>)dataContext.GetData(typeof(N));
@@ -105,7 +106,7 @@ namespace DotnetSpider.Tests
 					new Response {Content = new ByteArrayContent(Encoding.UTF8.GetBytes(Html))});
 
 			var parser = new DataParser<E>();
-
+			await parser.InitializeAsync();
 			await parser.HandleAsync(dataContext);
 
 			var results = (List<E>)dataContext.GetData(typeof(E));

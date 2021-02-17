@@ -69,20 +69,22 @@ namespace DotnetSpider.DataFlow.Parser
 		protected virtual void AddParsedResult<T>(DataFlowContext context, IEnumerable<T> results)
 			where T : EntityBase<T>, new()
 		{
-			if (results != null)
+			if (results == null)
 			{
-				var type = typeof(T);
-				var items = context.GetData(type);
-				if (items == null)
-				{
-					var list = new List<T>();
-					list.AddRange(results);
-					context.AddData(type, list);
-				}
-				else
-				{
-					items.AddRange(results);
-				}
+				return;
+			}
+
+			var type = typeof(T);
+			var items = context.GetData(type);
+			if (items == null)
+			{
+				var list = new List<T>();
+				list.AddRange(results);
+				context.AddData(type, list);
+			}
+			else
+			{
+				items.AddRange(results);
 			}
 		}
 
@@ -121,7 +123,6 @@ namespace DotnetSpider.DataFlow.Parser
 				return;
 			}
 
-			var request = context.Request;
 			if (context.Selectable == null)
 			{
 				if (SelectableBuilder != null)
@@ -166,14 +167,14 @@ namespace DotnetSpider.DataFlow.Parser
 				}
 			}
 
-			foreach (var followRequest in requests)
+			foreach (var request in requests)
 			{
-				if (IsValidRequest(followRequest))
+				if (IsValidRequest(request))
 				{
 					// 在此强制设制 Owner, 防止用户忘记导致出错
-					followRequest.Owner = request.Owner;
-					followRequest.Agent = context.Response.Agent;
-					context.AddFollowRequests(followRequest);
+					request.Owner = context.Request.Owner;
+					request.Agent = context.Response.Agent;
+					context.AddFollowRequests(request);
 				}
 			}
 		}

@@ -17,7 +17,7 @@ namespace DotnetSpider.DataFlow.Storage
 		/// </summary>
 		protected string Folder { get; private set; }
 
-		public override Task InitAsync()
+		public override Task InitializeAsync()
 		{
 			Folder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "files");
 			if (!Directory.Exists(Folder))
@@ -25,7 +25,7 @@ namespace DotnetSpider.DataFlow.Storage
 				Directory.CreateDirectory(Folder);
 			}
 
-			return base.InitAsync();
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
