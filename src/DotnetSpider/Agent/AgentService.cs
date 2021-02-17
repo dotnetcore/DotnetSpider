@@ -61,7 +61,7 @@ namespace DotnetSpider.Agent
 					{
 						AgentId = _options.AgentId,
 						AgentName = _options.AgentName,
-						TotalMemory = SystemInformation.TotalMemory,
+						TotalMemory = SystemInformation.MemoryStatus.TotalMemory,
 						ProcessorCount = Environment.ProcessorCount
 					});
 			}
@@ -167,7 +167,7 @@ namespace DotnetSpider.Agent
 				{
 					AgentId = _options.AgentId,
 					AgentName = _options.AgentName,
-					FreeMemory = SystemInformation.FreeMemory,
+					FreeMemory =  SystemInformation.MemoryStatus.FreeMemory,
 					CpuLoad = 0
 				});
 		}
