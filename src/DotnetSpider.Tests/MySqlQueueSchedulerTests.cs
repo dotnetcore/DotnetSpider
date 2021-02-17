@@ -21,8 +21,13 @@ namespace DotnetSpider.Tests
 			{
 				Value = new MySqlSchedulerOptions
 				{
+#if DEBUG
 					ConnectionString =
 						"Database='test';Data Source=localhost;password=1qazZAQ!;User ID=root;Port=3306;SslMode=None;Allow User Variables=True;AllowPublicKeyRetrieval=True"
+#else
+					ConnectionString =
+						"Database='mysql';Data Source=localhost;password=1qazZAQ!;User ID=root;Port=3306;SslMode=None;Allow User Variables=True;AllowPublicKeyRetrieval=True"
+#endif
 				};
 			}
 		}
