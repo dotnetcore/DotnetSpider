@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Bert.RateLimiters;
 using DotnetSpider.DataFlow;
+using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Downloader;
 using DotnetSpider.Extensions;
@@ -31,6 +32,7 @@ namespace DotnetSpider
 		private AsyncMessageConsumer<byte[]> _consumer;
 		private readonly DependenceServices _services;
 		private readonly string _defaultDownloader;
+		private readonly IList<DataParser> _dataParsers;
 
 		/// <summary>
 		/// 请求 Timeout 事件
@@ -81,6 +83,7 @@ namespace DotnetSpider
 			_requestedQueue = new RequestedQueue();
 			_requestSuppliers = new List<IRequestSupplier>();
 			_dataFlows = new List<IDataFlow>();
+			_dataParsers = new List<DataParser>();
 
 			_defaultDownloader = _services.HostBuilderContext.Properties.ContainsKey(Const.DefaultDownloader)
 				? _services.HostBuilderContext.Properties[Const.DefaultDownloader]?.ToString()
@@ -360,6 +363,11 @@ namespace DotnetSpider
 			}
 		}
 
+		private bool IsValidRequest(Request request)
+		{
+			return _dataParsers.Count > 0 && _dataParsers.Any(x => x.IsValidRequest(request));
+		}
+
 		private async Task RunAsync(CancellationToken stoppingToken)
 		{
 			try
@@ -405,6 +413,13 @@ namespace DotnetSpider
 						foreach (var request in requests)
 						{
 							ConfigureRequest(request);
+
+							// 若是没有一个 Parser 可以处理此请求，则不需要下载
+							// https://github.com/dotnetcore/DotnetSpider/issues/182
+							if (!IsValidRequest(request))
+							{
+								continue;
+							}
 
 							while (bucket.ShouldThrottle(1, out var waitTimeMillis))
 							{
@@ -603,6 +618,10 @@ namespace DotnetSpider
 					try
 					{
 						await dataFlow.InitAsync();
+						if (dataFlow is DataParser dataParser)
+						{
+							_dataParsers.Add(dataParser);
+						}
 					}
 					catch (Exception e)
 					{
@@ -621,6 +640,8 @@ namespace DotnetSpider
 			ObjectUtilities.DisposeSafely(Logger, _services);
 
 			base.Dispose();
+
+			GC.Collect();
 		}
 	}
 }

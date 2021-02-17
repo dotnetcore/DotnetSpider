@@ -93,6 +93,7 @@ namespace DotnetSpider.Infrastructure
 #else
 			_queue.Clear();
 #endif
+			_timer.Stop();
 			_timer.Dispose();
 		}
 	}

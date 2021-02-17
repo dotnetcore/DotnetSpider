@@ -3,7 +3,7 @@ export NUGET_SERVER=https://api.nuget.org/v3/index.json
 echo $NUGET_SERVER
 rm -rf src/DotnetSpider/bin/Release
 rm -rf src/DotnetSpider.HBase/bin/Release
-rm -rf src/DotnetSpider.Mongo.AccessControl/bin/Release
+rm -rf src/DotnetSpider.Mongo/bin/Release
 rm -rf src/DotnetSpider.MySql/bin/Release
 rm -rf src/DotnetSpider.PostgreSql/bin/Release
 rm -rf src/DotnetSpider.RabbitMQ/bin/Release

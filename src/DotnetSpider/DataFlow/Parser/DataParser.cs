@@ -39,7 +39,7 @@ namespace DotnetSpider.DataFlow.Parser
 			_requiredValidator = new List<Func<Request, bool>>();
 		}
 
-		public void AddFollowRequestQuerier(ISelector selector)
+		public virtual void AddFollowRequestQuerier(ISelector selector)
 		{
 			_followRequestQueriers.Add(context =>
 			{
@@ -56,12 +56,12 @@ namespace DotnetSpider.DataFlow.Parser
 			});
 		}
 
-		public void AddRequiredValidator(Func<Request, bool> requiredValidator)
+		public virtual void AddRequiredValidator(Func<Request, bool> requiredValidator)
 		{
 			_requiredValidator.Add(requiredValidator);
 		}
 
-		public void AddRequiredValidator(string pattern)
+		public virtual void AddRequiredValidator(string pattern)
 		{
 			_requiredValidator.Add(request => Regex.IsMatch(request.RequestUri.ToString(), pattern));
 		}
@@ -178,7 +178,7 @@ namespace DotnetSpider.DataFlow.Parser
 			}
 		}
 
-		private bool IsValidRequest(Request request)
+		public bool IsValidRequest(Request request)
 		{
 			return _requiredValidator.Count <= 0 ||
 			       _requiredValidator.Any(validator => validator(request));
