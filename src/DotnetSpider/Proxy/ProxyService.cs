@@ -69,7 +69,7 @@ namespace DotnetSpider.Proxy
 				}
 
 				// 若是失败次数为 reDetectCount 的倍数则尝试重新测试此代理是否正常，若是测试不成功，则把此代理从缓存中删除，不再使用
-				if (p.FailedNum % _reDetectCount == 0 &&
+				if ((p.FailedNum != 0 && p.FailedNum % _reDetectCount == 0) &&
 				    !await _proxyValidator.IsAvailable(p.Uri))
 				{
 					_dict.TryRemove(p.Uri, out _);
@@ -87,7 +87,7 @@ namespace DotnetSpider.Proxy
 			{
 				if (await _proxyValidator.IsAvailable(proxy) && _dict.TryAdd(proxy, new ProxyEntry(proxy)))
 				{
-					_logger.LogInformation($"Proxy {proxy} is available");
+					_logger.LogInformation($"proxy {proxy} is available");
 					_queue.Enqueue(_dict[proxy]);
 					cnt++;
 				}
