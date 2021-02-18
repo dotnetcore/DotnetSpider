@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Sample.samples;
+using DotnetSpider.Scheduler;
+using DotnetSpider.Scheduler.Component;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
 
@@ -12,14 +15,10 @@ namespace DotnetSpider.Sample
 {
 	class Program
 	{
-
-
-
 		static async Task Main(string[] args)
 		{
 			ThreadPool.SetMaxThreads(255, 255);
 			ThreadPool.SetMinThreads(255, 255);
-
 
 			Log.Logger = new LoggerConfiguration()
 				.MinimumLevel.Information()
@@ -31,10 +30,11 @@ namespace DotnetSpider.Sample
 				.WriteTo.Console().WriteTo.RollingFile("logs/spider.log")
 				.CreateLogger();
 
+
 			// // await DistributedSpider.RunAsync();
-			// await ProxySpider.RunAsync();
+			await ProxySpider.RunAsync();
 			// await EntitySpider.RunMySqlQueueAsync();
-			await EntitySpider.RunAsync();
+			// await EntitySpider.RunAsync();
 
 			Console.WriteLine("Bye!");
 		}

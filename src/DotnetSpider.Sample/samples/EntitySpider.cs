@@ -66,7 +66,7 @@ namespace DotnetSpider.Sample.samples
 					"https://news.cnblogs.com/n/page/1", new Dictionary<string, object> {{"网站", "博客园"}}));
 		}
 
-		protected override SpiderId CreateSpiderId()
+		protected override SpiderId GenerateSpiderId()
 		{
 			return new(ObjectId.CreateId().ToString(), "博客园");
 		}

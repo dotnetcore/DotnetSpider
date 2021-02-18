@@ -101,7 +101,7 @@ namespace DotnetSpider
 		/// 获取爬虫标识和名称
 		/// </summary>
 		/// <returns></returns>
-		protected virtual SpiderId CreateSpiderId()
+		protected virtual SpiderId GenerateSpiderId()
 		{
 			var id = Environment.GetEnvironmentVariable("DOTNET_SPIDER_ID");
 			id = string.IsNullOrWhiteSpace(id) ? ObjectId.CreateId().ToString() : id;
@@ -116,8 +116,6 @@ namespace DotnetSpider
 
 		public override async Task StopAsync(CancellationToken cancellationToken)
 		{
-			Logger.LogInformation($"{SpiderId} stopping");
-
 			_consumer?.Close();
 			_services.MessageQueue.CloseQueue(SpiderId.Id);
 
@@ -222,7 +220,7 @@ namespace DotnetSpider
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			SpiderId = CreateSpiderId();
+			SpiderId = GenerateSpiderId();
 			Logger.LogInformation($"Initialize spider {SpiderId}, {SpiderId.Name}");
 			await _services.StatisticsClient.StartAsync(SpiderId.Id, SpiderId.Name);
 			await _services.Scheduler.InitializeAsync(SpiderId.Id);
@@ -232,7 +230,6 @@ namespace DotnetSpider
 			await _services.StatisticsClient.IncreaseTotalAsync(SpiderId.Id, await _services.Scheduler.GetTotalAsync());
 			await RegisterConsumerAsync(stoppingToken);
 			await RunAsync(stoppingToken);
-			Logger.LogInformation($"{SpiderId} started");
 		}
 
 		private async Task RegisterConsumerAsync(CancellationToken stoppingToken)

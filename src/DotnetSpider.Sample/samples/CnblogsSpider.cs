@@ -44,7 +44,7 @@ namespace DotnetSpider.Sample.samples
 			await AddRequestsAsync(new Request("https://news.cnblogs.com/n/page/1/"));
 		}
 
-		protected override SpiderId CreateSpiderId()
+		protected override SpiderId GenerateSpiderId()
 		{
 			return new(ObjectId.CreateId().ToString(), "博客园");
 		}

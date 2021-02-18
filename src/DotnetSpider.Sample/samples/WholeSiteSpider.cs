@@ -42,7 +42,7 @@ namespace DotnetSpider.Sample.samples
 			await AddRequestsAsync("http://www.cnblogs.com/"); // 设置起始链接
 		}
 
-		protected override SpiderId CreateSpiderId()
+		protected override SpiderId GenerateSpiderId()
 		{
 			return new(ObjectId.CreateId().ToString(), "博客园全站采集");
 		}

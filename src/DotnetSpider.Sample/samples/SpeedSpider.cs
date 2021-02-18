@@ -47,7 +47,7 @@ namespace DotnetSpider.Sample.samples
 			AddDataFlow(new MyDataFlow());
 		}
 
-		protected override SpiderId CreateSpiderId()
+		protected override SpiderId GenerateSpiderId()
 		{
 			return new(ObjectId.CreateId().ToString(), "speed");
 		}

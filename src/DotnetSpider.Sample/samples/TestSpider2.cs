@@ -49,7 +49,7 @@ namespace DotnetSpider.Sample.samples
 			// AddDataFlow(new HBaseStorage("http://localhost:8080"));
 		}
 
-		protected override SpiderId CreateSpiderId()
+		protected override SpiderId GenerateSpiderId()
 		{
 			return new(ObjectId.CreateId().ToString(), "测试爬虫 1");
 		}

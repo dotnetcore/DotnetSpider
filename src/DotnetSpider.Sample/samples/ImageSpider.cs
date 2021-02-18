@@ -30,7 +30,7 @@ namespace DotnetSpider.Sample.samples
 		{
 		}
 
-		protected override SpiderId CreateSpiderId()
+		protected override SpiderId GenerateSpiderId()
 		{
 			return new(ObjectId.CreateId().ToString(), "博客园");
 		}
