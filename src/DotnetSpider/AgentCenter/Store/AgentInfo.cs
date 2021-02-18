@@ -30,7 +30,7 @@ namespace DotnetSpider.AgentCenter.Store
 		/// 总内存
 		/// </summary>
 		[Column("total_memory")]
-		public int TotalMemory { get; private set; }
+		public long TotalMemory { get; private set; }
 
 		/// <summary>
 		/// 上一次更新时间
@@ -51,7 +51,7 @@ namespace DotnetSpider.AgentCenter.Store
 		[Column("creation_time")]
 		public DateTimeOffset CreationTime { get; private set; }
 
-		public AgentInfo(string id, string name, int processorCount, int totalMemory)
+		public AgentInfo(string id, string name, int processorCount, long totalMemory)
 		{
 			id.NotNullOrWhiteSpace(nameof(id));
 			name.NotNullOrWhiteSpace(nameof(name));

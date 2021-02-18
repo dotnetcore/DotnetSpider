@@ -24,7 +24,7 @@ namespace DotnetSpider.MessageQueue
 				/// <summary>
 				/// 空闲内存
 				/// </summary>
-				public int FreeMemory { get; set; }
+				public long FreeMemory { get; set; }
 
 				/// <summary>
 				/// CPU 负载
@@ -52,7 +52,7 @@ namespace DotnetSpider.MessageQueue
 				/// <summary>
 				/// 总内存
 				/// </summary>
-				public int TotalMemory { get; set; }
+				public long TotalMemory { get; set; }
 			}
 		}
 

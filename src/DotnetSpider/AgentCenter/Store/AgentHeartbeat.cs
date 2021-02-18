@@ -32,7 +32,7 @@ namespace DotnetSpider.AgentCenter.Store
 		/// 空闲内存
 		/// </summary>
 		[Column("free_memory")]
-		public int FreeMemory { get; private set; }
+		public long FreeMemory { get; private set; }
 
 		/// <summary>
 		/// CPU 负载
@@ -46,7 +46,7 @@ namespace DotnetSpider.AgentCenter.Store
 		[Column("creation_time")]
 		public DateTimeOffset CreationTime { get; private set; }
 
-		public AgentHeartbeat(string agentId, string agentName, int freeMemory, int cpuLoad)
+		public AgentHeartbeat(string agentId, string agentName, long freeMemory, int cpuLoad)
 		{
 			agentId.NotNullOrWhiteSpace(nameof(agentId));
 

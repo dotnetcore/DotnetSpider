@@ -14,9 +14,9 @@ namespace DotnetSpider.Infrastructure
 {
 	public struct MemoryStatus
 	{
-		public int FreeMemory;
-		public int UsedMemory;
-		public int TotalMemory;
+		public long FreeMemory;
+		public long UsedMemory;
+		public long TotalMemory;
 	}
 
 	public static class SystemInformation
@@ -26,7 +26,7 @@ namespace DotnetSpider.Infrastructure
 		{
 			private static readonly int _structLength = Marshal.SizeOf<VmStatistics>();
 			private static readonly int _pageSize;
-			private static readonly int _totalMemory;
+			private static readonly long _totalMemory;
 
 			static OSX()
 			{
@@ -50,20 +50,17 @@ namespace DotnetSpider.Infrastructure
 					   statistics.compressor_page_count) *
 					  _pageSize) / 1024 / 1024;
 
-				return new MemoryStatus
-				{
-					TotalMemory = _totalMemory, UsedMemory = (int)(used), FreeMemory = (int)(free)
-				};
+				return new MemoryStatus {TotalMemory = _totalMemory, UsedMemory = (used), FreeMemory = (free)};
 			}
 
 			/// <summary>
 			/// MB
 			/// </summary>
 			/// <returns></returns>
-			private static int GetTotalMemory()
+			private static long GetTotalMemory()
 			{
 				var n = GetNumber("hw.memsize");
-				return (int)(n / 1024 / 1024);
+				return (n / 1024 / 1024);
 			}
 
 			[DllImport("libc", CallingConvention = CallingConvention.Cdecl)]
@@ -166,7 +163,7 @@ namespace DotnetSpider.Infrastructure
 		private static class Windows
 		{
 			private static readonly uint _structLength = (uint)Marshal.SizeOf<WindowsMemoryStatus>();
-			private static readonly int _totalMemory;
+			private static readonly long _totalMemory;
 
 			static Windows()
 			{
@@ -188,11 +185,11 @@ namespace DotnetSpider.Infrastructure
 				};
 			}
 
-			private static int GetTotalMemory()
+			private static long GetTotalMemory()
 			{
 				var memoryInfo = new WindowsMemoryStatus {DwLength = _structLength};
 				GlobalMemoryStatusEx(ref memoryInfo);
-				return memoryInfo.Equals(default) ? 0 : (int)(memoryInfo.UllTotalPhys / 1024 / 1024);
+				return memoryInfo.Equals(default) ? 0 : (memoryInfo.UllTotalPhys / 1024 / 1024);
 			}
 
 			[StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -217,7 +214,7 @@ namespace DotnetSpider.Infrastructure
 			private static extern bool GlobalMemoryStatusEx(ref WindowsMemoryStatus mi);
 		}
 
-		private static class Linux
+		internal static class Linux
 		{
 			/// <summary>
 			/// eg. "MemTotal:      12345 kB"
@@ -227,25 +224,62 @@ namespace DotnetSpider.Infrastructure
 				RegexOptions.Multiline | RegexOptions.Compiled
 			);
 
-			private static readonly int _totalMemory;
+			private static readonly long _totalMemory;
 
 			static Linux()
 			{
-				var dict = GetDict();
-				_totalMemory = (int)dict["MemTotal"];
+				_totalMemory = GetTotalMemory(GetMeminfo());
 			}
 
 			public static MemoryStatus GetMemoryStatus()
 			{
-				var dict = GetDict();
-				var free = (int)dict["MemAvailable"];
+				var free = GetFreeMemory(GetMeminfo());
 				return new MemoryStatus
 				{
 					TotalMemory = _totalMemory, FreeMemory = free, UsedMemory = _totalMemory - free
 				};
 			}
 
-			private static IDictionary<string, ulong> GetDict()
+			internal static long GetTotalMemory(string output)
+			{
+				if (string.IsNullOrWhiteSpace(output))
+				{
+					return 0;
+				}
+
+				var dict = GetDict(output);
+				var total = dict["MemTotal"];
+				return total;
+			}
+
+			internal static long GetFreeMemory(string output)
+			{
+				if (string.IsNullOrWhiteSpace(output))
+				{
+					return 0;
+				}
+
+				var dict = GetDict(output);
+				var free = dict["MemAvailable"];
+				return free;
+			}
+
+			internal static IDictionary<string, long> GetDict(string output)
+			{
+				if (string.IsNullOrWhiteSpace(output))
+				{
+					return new Dictionary<string, long>();
+				}
+
+				var lines = output;
+				// ReSharper disable once RedundantEnumerableCastCall
+				var dict = _linuxMemoryInfoLineRegex.Matches(lines).Cast<Match>().ToDictionary(match =>
+						match.Groups["name"].Value.TrimStart()
+					, match => long.Parse(match.Groups["value"].Value) / 1024);
+				return dict;
+			}
+
+			private static string GetMeminfo()
 			{
 				var path = "/proc/meminfo";
 				if (!File.Exists(path))
@@ -253,13 +287,7 @@ namespace DotnetSpider.Infrastructure
 					return default;
 				}
 
-				var lines = File.ReadAllText(path);
-
-				// ReSharper disable once RedundantEnumerableCastCall
-				var dict = _linuxMemoryInfoLineRegex.Matches(lines).Cast<Match>().ToDictionary(match =>
-						match.Groups["name"].Value.TrimStart()
-					, match => ulong.Parse(match.Groups["value"].Value) * 1024);
-				return dict;
+				return File.ReadAllText(path);
 			}
 		}
 
