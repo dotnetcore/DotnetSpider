@@ -11,7 +11,8 @@ namespace DotnetSpider.Proxy
 	{
 		private readonly IProxyService _proxyService;
 
-		public ProxyHttpMessageHandlerBuilder(IServiceProvider services, IProxyService proxyService)
+		public ProxyHttpMessageHandlerBuilder(IServiceProvider services,
+			IProxyService proxyService)
 		{
 			services.NotNull(nameof(services));
 			proxyService.NotNull(nameof(proxyService));
@@ -36,7 +37,7 @@ namespace DotnetSpider.Proxy
 			if (!Name.StartsWith(Const.ProxyPrefix))
 			{
 				throw new SpiderException(
-					"You are using proxy http client builder, but looks like your http client name is incorrect");
+					"you are using proxy http client builder, but looks like your http client name is incorrect");
 			}
 
 			var uri = Name.Replace(Const.ProxyPrefix, string.Empty);
@@ -52,7 +53,8 @@ namespace DotnetSpider.Proxy
 			DefaultHttpMessageHandlerBuilder.SetServerCertificateCustomValidationCallback(Services, handler);
 			PrimaryHandler = handler;
 
-			return CreateHandlerPipeline(PrimaryHandler, AdditionalHandlers);
+			var result = CreateHandlerPipeline(PrimaryHandler, AdditionalHandlers);
+			return result;
 		}
 
 		public override string Name { get; set; }

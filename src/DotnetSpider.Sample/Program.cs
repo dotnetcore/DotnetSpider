@@ -1,13 +1,7 @@
 ﻿using System;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Sample.samples;
-using DotnetSpider.Scheduler;
-using DotnetSpider.Scheduler.Component;
-using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
 
@@ -32,9 +26,9 @@ namespace DotnetSpider.Sample
 
 
 			// // await DistributedSpider.RunAsync();
-			await ProxySpider.RunAsync();
+			// await ProxySpider.RunAsync();
 			// await EntitySpider.RunMySqlQueueAsync();
-			// await EntitySpider.RunAsync();
+			await EntitySpider.RunAsync();
 
 			Console.WriteLine("Bye!");
 		}

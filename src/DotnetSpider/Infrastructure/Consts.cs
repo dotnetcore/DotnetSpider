@@ -3,6 +3,7 @@ namespace DotnetSpider.Infrastructure
 	public static class Const
 	{
 		public const string ProxyPrefix = "DotnetSpider_Proxy_";
+		public const string ProxyTestUrl = "DotnetSpider_Proxy_Test_Url";
 		public const string IgnoreSslError = "DotnetSpider_Ignore_SSL_Error";
 		public const string DefaultDownloader = "DotnetSpider_Default_Downloader";
 		public const string PPPoEPattern = "DotnetSpconider_PPPOE_Pattern";
