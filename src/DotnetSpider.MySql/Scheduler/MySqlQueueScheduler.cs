@@ -52,7 +52,7 @@ namespace DotnetSpider.MySql.Scheduler
 
 			await using var conn = new MySqlConnection(_options.ConnectionString);
 			await conn.ExecuteAsync($@"
-CREATE TABLE IF NOT EXISTS {spiderId}_set
+CREATE TABLE IF NOT EXISTS `{spiderId}_set`
 (
     hash          varchar(32) not null primary key,
     request mediumblob not null,
@@ -60,19 +60,19 @@ CREATE TABLE IF NOT EXISTS {spiderId}_set
     creation_time timestamp default CURRENT_TIMESTAMP not null
 );");
 			await conn.ExecuteAsync($@"
-CREATE TABLE IF NOT EXISTS {spiderId}_queue
+CREATE TABLE IF NOT EXISTS `{spiderId}_queue`
 (
 	id       int auto_increment primary key,
     hash          varchar(32) not null,
     request mediumblob not null,
 	constraint {spiderId}_queue_hash_uindex unique (hash)
 );");
-			_totalSql = $"SELECT COUNT(*) FROM {_spiderId}_set";
-			_resetDuplicateCheckSql = $"TRUNCATE {_spiderId}_set; TRUNCATE {_spiderId}_queue;";
-			_insertSetSql = $"INSERT IGNORE INTO {_spiderId}_set (hash, request) VALUES (@Hash, @Request); ";
-			_insertQueueSql = $"INSERT IGNORE INTO {_spiderId}_queue (hash, request) VALUES (@Hash, @Request);";
-			_successSql = $"UPDATE {_spiderId}_set SET state = 'S' WHERE hash = @Hash;";
-			_failSql = $"UPDATE {_spiderId}_set SET state = 'E' WHERE hash = @Hash;";
+			_totalSql = $"SELECT COUNT(*) FROM `{_spiderId}_set`";
+			_resetDuplicateCheckSql = $"TRUNCATE `{_spiderId}_set`; TRUNCATE {_spiderId}_queue;";
+			_insertSetSql = $"INSERT IGNORE INTO `{_spiderId}_set` (hash, request) VALUES (@Hash, @Request); ";
+			_insertQueueSql = $"INSERT IGNORE INTO `{_spiderId}_queue` (hash, request) VALUES (@Hash, @Request);";
+			_successSql = $"UPDATE `{_spiderId}_set` SET state = 'S' WHERE hash = @Hash;";
+			_failSql = $"UPDATE `{_spiderId}_set` SET state = 'E' WHERE hash = @Hash;";
 		}
 
 		public async Task<IEnumerable<Request>> DequeueAsync(int count = 1)
@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS {spiderId}_queue
 				var ids = string.Join(",", rows.Select(x => $"'{x["id"]}'"));
 				var hashes = string.Join(",", rows.Select(x => $"'{x["hash"]}'"));
 				await conn.ExecuteAsync(
-					$"DELETE FROM {_spiderId}_queue WHERE id IN ({ids}); UPDATE {_spiderId}_set SET state = 'P' WHERE hash IN ({hashes});",
+					$"DELETE FROM `{_spiderId}_queue` WHERE id IN ({ids}); UPDATE `{_spiderId}_set` SET state = 'P' WHERE hash IN ({hashes});",
 					null, transaction);
 				await transaction.CommitAsync();
 				var list = new List<Request>();
@@ -189,15 +189,15 @@ CREATE TABLE IF NOT EXISTS {spiderId}_queue
 		public async Task CleanAsync()
 		{
 			await using var conn = new MySqlConnection(_options.ConnectionString);
-			await conn.ExecuteAsync($"DROP table {_spiderId}_set");
-			await conn.ExecuteAsync($"DROP table {_spiderId}_queue");
+			await conn.ExecuteAsync($"DROP table `{_spiderId}_set`");
+			await conn.ExecuteAsync($"DROP table `{_spiderId}_queue`");
 		}
 
 		public async Task ReloadAsync()
 		{
 			await using var conn = new MySqlConnection(_options.ConnectionString);
 			await conn.ExecuteAsync(
-				$@"INSERT IGNORE INTO {_spiderId}_queue (hash, request) SELECT hash, request FROM {_spiderId}_set where state = 'P'");
+				$@"INSERT IGNORE INTO `{_spiderId}_queue` (hash, request) SELECT hash, request FROM `{_spiderId}_set` where state = 'P'");
 		}
 
 		public async Task SuccessAsync(Request request)
