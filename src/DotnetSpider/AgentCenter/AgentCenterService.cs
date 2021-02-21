@@ -65,7 +65,7 @@ namespace DotnetSpider.AgentCenter
 
 							await _agentStore.RegisterAsync(new AgentInfo(register.AgentId, register.AgentName,
 								register.ProcessorCount,
-								register.TotalMemory));
+								register.Memory));
 							break;
 						}
 						case Messages.Agent.Heartbeat heartbeat:
@@ -77,7 +77,7 @@ namespace DotnetSpider.AgentCenter
 							}
 
 							await _agentStore.HeartbeatAsync(new AgentHeartbeat(heartbeat.AgentId, heartbeat.AgentName,
-								heartbeat.FreeMemory, heartbeat.CpuLoad));
+								heartbeat.AvailableMemory, heartbeat.CpuLoad));
 							break;
 						}
 						default:

@@ -23,13 +23,12 @@ namespace DotnetSpider.Tests
 				_testOutput.WriteLine(File.ReadAllText("/proc/meminfo"));
 			}
 
-			var memoryStatus = SystemInformation.MemoryStatus;
+			var memoryStatus = MachineInfo.Current;
 
 			_testOutput.WriteLine(
-				$"Free: {memoryStatus.FreeMemory}, Total: {memoryStatus.TotalMemory}, Used: {memoryStatus.UsedMemory}");
-			Assert.True(memoryStatus.FreeMemory > 0);
-			Assert.True(memoryStatus.TotalMemory > 0);
-			Assert.True(memoryStatus.UsedMemory > 0);
+				$"Free: {memoryStatus.AvailableMemory}, Total: {memoryStatus.Memory}");
+			Assert.True(memoryStatus.AvailableMemory > 0);
+			Assert.True(memoryStatus.Memory > 0);
 		}
 
 		[Fact]
@@ -83,8 +82,8 @@ DirectMap4k:      123576 kB
 DirectMap2M:     3790848 kB
 DirectMap1G:     4194304 kB";
 
-			var total = SystemInformation.Linux.GetTotalMemory(msg);
-			var free = SystemInformation.Linux.GetFreeMemory(msg);
+			var total = MachineInfo.Linux.GetTotalMemory(msg);
+			var free = MachineInfo.Linux.GetFreeMemory(msg);
 			Assert.Equal(7551, total);
 			Assert.Equal(3550, free);
 		}

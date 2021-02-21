@@ -20,7 +20,7 @@ namespace DotnetSpider.Portal.ViewObject
 		/// <summary>
 		/// 空闲内存
 		/// </summary>
-		public int FreeMemory { get; set; }
+		public int AvailableMemory { get; set; }
 
 		public int CpuLoad { get; set; }
 

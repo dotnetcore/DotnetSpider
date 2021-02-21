@@ -31,8 +31,8 @@ namespace DotnetSpider.AgentCenter.Store
 		/// <summary>
 		/// 空闲内存
 		/// </summary>
-		[Column("free_memory")]
-		public long FreeMemory { get; private set; }
+		[Column("available_memory")]
+		public long AvailableMemory { get; private set; }
 
 		/// <summary>
 		/// CPU 负载
@@ -52,7 +52,7 @@ namespace DotnetSpider.AgentCenter.Store
 
 			AgentId = agentId;
 			AgentName = agentName;
-			FreeMemory = freeMemory;
+			AvailableMemory = freeMemory;
 			CpuLoad = cpuLoad;
 			CreationTime = DateTimeOffset.Now;
 		}

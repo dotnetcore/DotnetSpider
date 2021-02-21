@@ -12,15 +12,11 @@ using System.Threading.Tasks;
 
 namespace DotnetSpider.Infrastructure
 {
-	public struct MemoryStatus
+	public class MachineInfo
 	{
-		public long FreeMemory;
-		public long UsedMemory;
-		public long TotalMemory;
-	}
+		public long AvailableMemory { get; private set; }
+		public long Memory { get; private set; }
 
-	public static class SystemInformation
-	{
 		// ReSharper disable once InconsistentNaming
 		private static class OSX
 		{
@@ -35,7 +31,7 @@ namespace DotnetSpider.Infrastructure
 				_totalMemory = GetTotalMemory();
 			}
 
-			public static MemoryStatus GetMemoryStatus()
+			public static MachineInfo GetMemoryStatus()
 			{
 				var statistics = new VmStatistics();
 				var host = mach_host_self();
@@ -43,14 +39,8 @@ namespace DotnetSpider.Infrastructure
 				host_statistics64(host, 2, ref statistics, ref count);
 				var free = (statistics.Equals(default)
 					? 0
-					: (((long)statistics.free_count + statistics.inactive_count) * _pageSize)) / 1024 / 1024;
-				var used = (statistics.Equals(default)
-					? 0L
-					: (statistics.active_count + (long)statistics.speculative_count + statistics.wire_count +
-					   statistics.compressor_page_count) *
-					  _pageSize) / 1024 / 1024;
-
-				return new MemoryStatus {TotalMemory = _totalMemory, UsedMemory = (used), FreeMemory = (free)};
+					: (((long)statistics.free_count + statistics.inactive_count) * _pageSize));
+				return new MachineInfo {Memory = _totalMemory, AvailableMemory = (free)};
 			}
 
 			/// <summary>
@@ -59,8 +49,7 @@ namespace DotnetSpider.Infrastructure
 			/// <returns></returns>
 			private static long GetTotalMemory()
 			{
-				var n = GetNumber("hw.memsize");
-				return (n / 1024 / 1024);
+				return GetNumber("hw.memsize");
 			}
 
 			[DllImport("libc", CallingConvention = CallingConvention.Cdecl)]
@@ -162,7 +151,7 @@ namespace DotnetSpider.Infrastructure
 
 		private static class Windows
 		{
-			private static readonly uint _structLength = (uint)Marshal.SizeOf<WindowsMemoryStatus>();
+			private static readonly uint _structLength = checked((uint)Marshal.SizeOf<WindowsMemoryStatus>());
 			private static readonly long _totalMemory;
 
 			static Windows()
@@ -170,18 +159,14 @@ namespace DotnetSpider.Infrastructure
 				_totalMemory = GetTotalMemory();
 			}
 
-			public static MemoryStatus GetMemoryStatus()
+			public static MachineInfo GetMemoryStatus()
 			{
 				var memoryInfo = new WindowsMemoryStatus {DwLength = _structLength};
 				GlobalMemoryStatusEx(ref memoryInfo);
-				return new MemoryStatus
+				return new MachineInfo
 				{
-					TotalMemory = _totalMemory,
-					UsedMemory =
-						memoryInfo.Equals(default)
-							? 0
-							: (int)((_totalMemory - memoryInfo.UllAvailPhys) / 1024 / 1024),
-					FreeMemory = memoryInfo.Equals(default) ? 0 : (int)(memoryInfo.UllAvailPhys / 1024 / 1024)
+					Memory = _totalMemory,
+					AvailableMemory = memoryInfo.Equals(default) ? 0 : memoryInfo.UllAvailPhys
 				};
 			}
 
@@ -189,7 +174,7 @@ namespace DotnetSpider.Infrastructure
 			{
 				var memoryInfo = new WindowsMemoryStatus {DwLength = _structLength};
 				GlobalMemoryStatusEx(ref memoryInfo);
-				return memoryInfo.Equals(default) ? 0 : (memoryInfo.UllTotalPhys / 1024 / 1024);
+				return memoryInfo.Equals(default) ? 0 : (memoryInfo.UllTotalPhys);
 			}
 
 			[StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -209,7 +194,7 @@ namespace DotnetSpider.Infrastructure
 				public readonly long UllAvailExtendedVirtual; // 保留 这个值始终为0
 			}
 
-			[DllImport("kernel32.dll", SetLastError = true)]
+			[DllImport("Kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
 			[return: MarshalAs(UnmanagedType.Bool)]
 			private static extern bool GlobalMemoryStatusEx(ref WindowsMemoryStatus mi);
 		}
@@ -228,16 +213,13 @@ namespace DotnetSpider.Infrastructure
 
 			static Linux()
 			{
-				_totalMemory = GetTotalMemory(GetMeminfo());
+				_totalMemory = GetTotalMemory(GetMemInfo());
 			}
 
-			public static MemoryStatus GetMemoryStatus()
+			public static MachineInfo GetMemoryStatus()
 			{
-				var free = GetFreeMemory(GetMeminfo());
-				return new MemoryStatus
-				{
-					TotalMemory = _totalMemory, FreeMemory = free, UsedMemory = _totalMemory - free
-				};
+				var free = GetFreeMemory(GetMemInfo());
+				return new MachineInfo {Memory = _totalMemory, AvailableMemory = free};
 			}
 
 			internal static long GetTotalMemory(string output)
@@ -275,11 +257,11 @@ namespace DotnetSpider.Infrastructure
 				// ReSharper disable once RedundantEnumerableCastCall
 				var dict = _linuxMemoryInfoLineRegex.Matches(lines).Cast<Match>().ToDictionary(match =>
 						match.Groups["name"].Value.TrimStart()
-					, match => long.Parse(match.Groups["value"].Value) / 1024);
+					, match => (long)int.Parse(match.Groups["value"].Value) * 1024);
 				return dict;
 			}
 
-			private static string GetMeminfo()
+			private static string GetMemInfo()
 			{
 				var path = "/proc/meminfo";
 				if (!File.Exists(path))
@@ -305,11 +287,11 @@ namespace DotnetSpider.Infrastructure
 			return cpuUsageTotal * 100;
 		}
 
-		public static MemoryStatus MemoryStatus
+		public static MachineInfo Current
 		{
 			get
 			{
-				lock (typeof(SystemInformation))
+				lock (typeof(MachineInfo))
 				{
 					try
 					{

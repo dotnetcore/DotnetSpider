@@ -25,7 +25,7 @@ namespace DotnetSpider.MySql.AgentCenter
 			var sql1 =
 				$"create table if not exists {_options.Database}.agent (id varchar(36) primary key, `name` varchar(255) null, processor_count int null, total_memory int null, is_deleted tinyint(1) default 0 null, creation_time timestamp default CURRENT_TIMESTAMP not null, last_modification_time timestamp default CURRENT_TIMESTAMP not null, key NAME_INDEX (`name`));";
 			var sql2 =
-				$"create table if not exists {_options.Database}.agent_heartbeat(id bigint AUTO_INCREMENT primary key, agent_id varchar(36) not null, `agent_name` varchar(255) null, cpu_load int, free_memory int null, creation_time timestamp default CURRENT_TIMESTAMP not null, key NAME_INDEX (`agent_name`), key ID_INDEX (`agent_id`));";
+				$"create table if not exists {_options.Database}.agent_heartbeat(id bigint AUTO_INCREMENT primary key, agent_id varchar(36) not null, `agent_name` varchar(255) null, cpu_load int, available_memory int null, creation_time timestamp default CURRENT_TIMESTAMP not null, key NAME_INDEX (`agent_name`), key ID_INDEX (`agent_id`));";
 			await conn.ExecuteAsync(sql1);
 			await conn.ExecuteAsync(sql2);
 		}
@@ -49,8 +49,8 @@ namespace DotnetSpider.MySql.AgentCenter
 		{
 			await using var conn = new MySqlConnection(_options.ConnectionString);
 			await conn.ExecuteAsync(
-				$"INSERT IGNORE INTO {_options.Database}.agent_heartbeat (agent_id, agent_name, free_memory, cpu_load, creation_time) VALUES (@AgentId, @AgentName, @FreeMemory, @CpuLoad, CURRENT_TIMESTAMP);",
-				new {heartbeat.AgentId, heartbeat.AgentName, heartbeat.FreeMemory, heartbeat.CpuLoad});
+				$"INSERT IGNORE INTO {_options.Database}.agent_heartbeat (agent_id, agent_name, available_memory, cpu_load, creation_time) VALUES (@AgentId, @AgentName, @FreeMemory, @CpuLoad, CURRENT_TIMESTAMP);",
+				new {heartbeat.AgentId, heartbeat.AgentName, heartbeat.AvailableMemory, heartbeat.CpuLoad});
 			await conn.ExecuteAsync(
 				$"UPDATE {_options.Database}.agent SET last_modification_time = CURRENT_TIMESTAMP WHERE id = @AgentId",
 				new {heartbeat.AgentId,});
