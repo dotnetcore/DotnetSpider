@@ -33,6 +33,11 @@ namespace DotnetSpider.Scheduler
 		/// <param name="request">请求</param>
 		protected override Task PushWhenNoDuplicate(Request request)
 		{
+			if (request == null)
+			{
+				return Task.CompletedTask;
+			}
+
 			_requests.Add(request);
 			return Task.CompletedTask;
 		}
