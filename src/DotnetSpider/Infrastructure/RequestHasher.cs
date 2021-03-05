@@ -26,7 +26,7 @@ namespace DotnetSpider.Infrastructure
 				request.RequestedTimes,
 				request.Content
 			}.Serialize();
-			request.Hash = Convert.ToBase64String(_hashAlgorithmService.ComputeHash(bytes));
+			request.Hash = Convert.ToBase64String(_hashAlgorithmService.ComputeHash(bytes)).TrimEnd('=');
 			// return request.Hash;
 		}
 	}
