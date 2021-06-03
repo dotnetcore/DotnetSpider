@@ -4,7 +4,7 @@ using Dapper;
 using DotnetSpider.AgentCenter;
 using DotnetSpider.AgentCenter.Store;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 
 namespace DotnetSpider.MySql.AgentCenter
 {

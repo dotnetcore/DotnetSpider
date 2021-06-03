@@ -54,7 +54,7 @@ namespace DotnetSpider.Portal
 				case "mysql":
 				{
 					dbContextOptionsBuilder = b =>
-						b.UseMySql(options.ConnectionString,
+						b.UseMySql(ServerVersion.AutoDetect(options.ConnectionString),
 							sql => sql.MigrationsAssembly(migrationsAssembly));
 					break;
 				}

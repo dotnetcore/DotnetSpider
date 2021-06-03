@@ -56,16 +56,16 @@ namespace DotnetSpider.Portal.Data
 			switch (options.DatabaseType?.ToLower())
 			{
 				case "mysql":
-				{
-					builder.UseMySql(options.ConnectionString);
-					break;
-				}
+					{
+						builder.UseMySql(ServerVersion.AutoDetect(options.ConnectionString));
+						break;
+					}
 
 				default:
-				{
-					builder.UseSqlServer(options.ConnectionString);
-					break;
-				}
+					{
+						builder.UseSqlServer(options.ConnectionString);
+						break;
+					}
 			}
 
 			return new PortalDbContext(builder.Options, true);

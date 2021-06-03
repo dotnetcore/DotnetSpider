@@ -258,55 +258,55 @@ namespace DotnetSpider
 				switch (message)
 				{
 					case Messages.Spider.Exit exit:
-					{
-						Logger.LogInformation(
-							$"{SpiderId} receive exit message {System.Text.Json.JsonSerializer.Serialize(exit)}");
-						if (exit.SpiderId == SpiderId.Id)
 						{
-							await ExitAsync();
-						}
+							Logger.LogInformation(
+								$"{SpiderId} receive exit message {System.Text.Json.JsonSerializer.Serialize(exit)}");
+							if (exit.SpiderId == SpiderId.Id)
+							{
+								await ExitAsync();
+							}
 
-						break;
-					}
+							break;
+						}
 					case Response response:
-					{
-						// 1. 从请求队列中去除请求
-						// 2. 若是 timeout 的请求，无法通过 Dequeue 获取，会通过 _requestedQueue.GetAllTimeoutList() 获取得到
-						var request = _requestedQueue.Dequeue(response.RequestHash);
-
-						if (request != null)
 						{
-							if (response.StatusCode.IsSuccessStatusCode())
-							{
-								request.Agent = response.Agent;
+							// 1. 从请求队列中去除请求
+							// 2. 若是 timeout 的请求，无法通过 Dequeue 获取，会通过 _requestedQueue.GetAllTimeoutList() 获取得到
+							var request = _requestedQueue.Dequeue(response.RequestHash);
 
-								if (IsDistributed)
+							if (request != null)
+							{
+								if (response.StatusCode.IsSuccessStatusCode())
 								{
-									Logger.LogInformation(
-										$"{SpiderId} download {request.RequestUri}, {request.Hash} via {request.Agent} success");
+									request.Agent = response.Agent;
+
+									if (IsDistributed)
+									{
+										Logger.LogInformation(
+											$"{SpiderId} download {request.RequestUri}, {request.Hash} via {request.Agent} success");
+									}
+
+									// 是否下载成功由爬虫来决定，则非 Agent 自身
+									await _services.StatisticsClient.IncreaseAgentSuccessAsync(response.Agent,
+										response.ElapsedMilliseconds);
+									await HandleResponseAsync(request, response, bytes);
 								}
+								else
+								{
+									await _services.StatisticsClient.IncreaseAgentFailureAsync(response.Agent,
+										response.ElapsedMilliseconds);
+									Logger.LogError(
+										$"{SpiderId} download {request.RequestUri}, {request.Hash} status code: {response.StatusCode} failed: {response.ReasonPhrase}");
 
-								// 是否下载成功由爬虫来决定，则非 Agent 自身
-								await _services.StatisticsClient.IncreaseAgentSuccessAsync(response.Agent,
-									response.ElapsedMilliseconds);
-								await HandleResponseAsync(request, response, bytes);
+									// 每次调用添加会导致 Requested + 1, 因此失败多次的请求最终会被过滤不再加到调度队列
+									await AddRequestsAsync(request);
+
+									OnRequestError?.Invoke(request, response);
+								}
 							}
-							else
-							{
-								await _services.StatisticsClient.IncreaseAgentFailureAsync(response.Agent,
-									response.ElapsedMilliseconds);
-								Logger.LogError(
-									$"{SpiderId} download {request.RequestUri}, {request.Hash} status code: {response.StatusCode} failed: {response.ReasonPhrase}");
 
-								// 每次调用添加会导致 Requested + 1, 因此失败多次的请求最终会被过滤不再加到调度队列
-								await AddRequestsAsync(request);
-
-								OnRequestError?.Invoke(request, response);
-							}
+							break;
 						}
-
-						break;
-					}
 					default:
 						Logger.LogError(
 							$"{SpiderId} receive error message {System.Text.Json.JsonSerializer.Serialize(message)}");
@@ -360,8 +360,18 @@ namespace DotnetSpider
 			}
 		}
 
+		/// <summary>
+		/// 若是没有数据解析器，则认为是不需要数据解析器，直接通到存储器，返回 true
+		/// </summary>
+		/// <param name="request"></param>
+		/// <returns></returns>
 		private bool IsValidRequest(Request request)
 		{
+			if (_dataParsers == null || _dataParsers.Count == 0)
+			{
+				return true;
+			}
+
 			return _dataParsers.Count > 0 && _dataParsers.Any(x => x.IsValidRequest(request));
 		}
 
@@ -551,21 +561,21 @@ namespace DotnetSpider
 						{
 							// 非初始请求如果是链式模式则使用旧的下载器
 							case RequestPolicy.Chained:
-							{
-								topic = $"{request.Agent}";
-								break;
-							}
+								{
+									topic = $"{request.Agent}";
+									break;
+								}
 							case RequestPolicy.Random:
-							{
-								topic = string.IsNullOrEmpty(request.Downloader)
-									? Downloaders.HttpClient
-									: request.Downloader;
-								break;
-							}
+								{
+									topic = string.IsNullOrEmpty(request.Downloader)
+										? Downloaders.HttpClient
+										: request.Downloader;
+									break;
+								}
 							default:
-							{
-								throw new ApplicationException($"Not supported policy: {request.Policy}");
-							}
+								{
+									throw new ApplicationException($"Not supported policy: {request.Policy}");
+								}
 						}
 					}
 

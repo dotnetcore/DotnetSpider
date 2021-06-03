@@ -18,10 +18,12 @@ namespace DotnetSpider.DataFlow
 			return context.Response == null || context.Response.Content.Bytes.Length == 0;
 		}
 
-		public string[] ImageExtensions { get; set; } = {"jpeg", "gif", "jpg", "bmp", "png", "ico"};
+		public string[] ImageExtensions { get; set; } = {"jpeg", "gif", "jpg", "bmp", "png", "ico", "svg"};
 
 		public override Task InitializeAsync()
 		{
+			base.InitializeAsync();
+
 			_imageExtensions = new HashSet<string>(ImageExtensions);
 			return Task.CompletedTask;
 		}

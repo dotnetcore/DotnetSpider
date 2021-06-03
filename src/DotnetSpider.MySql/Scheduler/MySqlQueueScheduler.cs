@@ -9,7 +9,7 @@ using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
 using DotnetSpider.Scheduler;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 
 namespace DotnetSpider.MySql.Scheduler
 {
