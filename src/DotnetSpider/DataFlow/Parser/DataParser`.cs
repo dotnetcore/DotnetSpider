@@ -87,6 +87,11 @@ namespace DotnetSpider.DataFlow.Parser
 			return Task.CompletedTask;
 		}
 
+		public virtual string ProcessPropertyValue(string propertyName, string value)
+		{
+			return value;
+		}
+
 		protected virtual TEntity ConfigureDataObject(TEntity t)
 		{
 			return t;
@@ -218,6 +223,8 @@ namespace DotnetSpider.DataFlow.Parser
 						}
 					}
 				}
+
+				value = ProcessPropertyValue(field.PropertyInfo.Name, value);
 
 				var newValue = value == null ? null : Convert.ChangeType(value, field.PropertyInfo.PropertyType);
 				if (newValue == null && field.NotNull)

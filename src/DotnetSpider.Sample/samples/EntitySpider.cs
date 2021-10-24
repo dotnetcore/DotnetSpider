@@ -59,6 +59,7 @@ namespace DotnetSpider.Sample.samples
 
 		protected override async Task InitializeAsync(CancellationToken stoppingToken = default)
 		{
+			//AddDataFlow(new CnblogsParser()); //可通过继承默认的DataParser<T>并重写ProcessPropertyValue()方法，来实现对实体属性的自定义处理（比Formatters更加灵活）
 			AddDataFlow(new DataParser<CnblogsEntry>());
 			AddDataFlow(GetDefaultStorage());
 			await AddRequestsAsync(
@@ -117,6 +118,21 @@ namespace DotnetSpider.Sample.samples
 
 			[ValueSelector(Expression = "DATETIME", Type = SelectorType.Environment)]
 			public DateTime CreationTime { get; set; }
+		}
+
+		public class CnblogsParser : DataParser<CnblogsEntry>
+		{
+			public override string ProcessPropertyValue(string propertyName, string value)
+			{
+				switch (propertyName)
+				{
+					case "Title":
+						//可对任一实体属性执行自定义处理
+						return $"{value}_{DateTime.Now.Ticks}";
+					default:
+						return value;
+				}
+			}
 		}
 	}
 }
