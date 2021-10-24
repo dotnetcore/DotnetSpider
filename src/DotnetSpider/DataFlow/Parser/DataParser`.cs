@@ -30,46 +30,46 @@ namespace DotnetSpider.DataFlow.Parser
 					switch (followSelector.SelectorType)
 					{
 						case SelectorType.Css:
-						{
-							foreach (var expression in followSelector.Expressions)
 							{
-								AddFollowRequestQuerier(Selectors.Css(expression));
-							}
+								foreach (var expression in followSelector.Expressions)
+								{
+									AddFollowRequestQuerier(Selectors.Css(expression));
+								}
 
-							break;
-						}
+								break;
+							}
 						case SelectorType.Regex:
-						{
-							foreach (var expression in followSelector.Expressions)
 							{
-								AddFollowRequestQuerier(Selectors.Regex(expression));
-							}
+								foreach (var expression in followSelector.Expressions)
+								{
+									AddFollowRequestQuerier(Selectors.Regex(expression));
+								}
 
-							break;
-						}
+								break;
+							}
 						case SelectorType.XPath:
-						{
-							foreach (var expression in followSelector.Expressions)
 							{
-								AddFollowRequestQuerier(Selectors.XPath(expression));
-							}
+								foreach (var expression in followSelector.Expressions)
+								{
+									AddFollowRequestQuerier(Selectors.XPath(expression));
+								}
 
-							break;
-						}
+								break;
+							}
 						case SelectorType.Environment:
-						{
-							Logger.LogWarning("SelectorType of follow selector is not supported");
-							break;
-						}
-						case SelectorType.JsonPath:
-						{
-							foreach (var expression in followSelector.Expressions)
 							{
-								AddFollowRequestQuerier(Selectors.JsonPath(expression));
+								Logger.LogWarning("SelectorType of follow selector is not supported");
+								break;
 							}
+						case SelectorType.JsonPath:
+							{
+								foreach (var expression in followSelector.Expressions)
+								{
+									AddFollowRequestQuerier(Selectors.JsonPath(expression));
+								}
 
-							break;
-						}
+								break;
+							}
 					}
 
 					foreach (var pattern in followSelector.Patterns)
@@ -85,6 +85,11 @@ namespace DotnetSpider.DataFlow.Parser
 			}
 
 			return Task.CompletedTask;
+		}
+
+		public virtual string ProcessPropertyValue(string propertyName, string value)
+		{
+			return value;
 		}
 
 		protected virtual TEntity ConfigureDataObject(TEntity t)
@@ -219,6 +224,8 @@ namespace DotnetSpider.DataFlow.Parser
 					}
 				}
 
+				value = ProcessPropertyValue(field.PropertyInfo.Name, value);
+
 				var newValue = value == null ? null : Convert.ChangeType(value, field.PropertyInfo.PropertyType);
 				if (newValue == null && field.NotNull)
 				{
@@ -240,60 +247,60 @@ namespace DotnetSpider.DataFlow.Parser
 			switch (field.Expression?.ToUpper())
 			{
 				case Const.EnvironmentNames.EntityIndex:
-				{
-					value = index.ToString();
-					break;
-				}
+					{
+						value = index.ToString();
+						break;
+					}
 
 				case Const.EnvironmentNames.Guid:
-				{
-					value = Guid.NewGuid().ToString();
-					break;
-				}
+					{
+						value = Guid.NewGuid().ToString();
+						break;
+					}
 
 				case Const.EnvironmentNames.Date:
 				case Const.EnvironmentNames.Today:
-				{
-					value = DateTimeOffset.Now.Date.ToString("yyyy-MM-dd");
-					break;
-				}
+					{
+						value = DateTimeOffset.Now.Date.ToString("yyyy-MM-dd");
+						break;
+					}
 
 				case Const.EnvironmentNames.Datetime:
 				case Const.EnvironmentNames.Now:
-				{
-					value = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss");
-					break;
-				}
+					{
+						value = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss");
+						break;
+					}
 
 				case Const.EnvironmentNames.Month:
-				{
-					value = DateTimeHelper.FirstDayOfMonth.ToString("yyyy-MM-dd");
-					break;
-				}
+					{
+						value = DateTimeHelper.FirstDayOfMonth.ToString("yyyy-MM-dd");
+						break;
+					}
 
 				case Const.EnvironmentNames.Monday:
-				{
-					value = DateTimeHelper.Monday.ToString("yyyy-MM-dd");
-					break;
-				}
+					{
+						value = DateTimeHelper.Monday.ToString("yyyy-MM-dd");
+						break;
+					}
 
 				case Const.EnvironmentNames.SpiderId:
-				{
-					value = context.Request.Owner;
-					break;
-				}
+					{
+						value = context.Request.Owner;
+						break;
+					}
 
 				case Const.EnvironmentNames.RequestHash:
-				{
-					value = context.Request.Hash;
-					break;
-				}
+					{
+						value = context.Request.Hash;
+						break;
+					}
 				default:
-				{
-					value = string.IsNullOrWhiteSpace(field.Expression) ? null :
-						properties.ContainsKey(field.Expression) ? properties[field.Expression]?.ToString() : null;
-					break;
-				}
+					{
+						value = string.IsNullOrWhiteSpace(field.Expression) ? null :
+							properties.ContainsKey(field.Expression) ? properties[field.Expression]?.ToString() : null;
+						break;
+					}
 			}
 
 			return value;

@@ -59,11 +59,12 @@ namespace DotnetSpider.Sample.samples
 
 		protected override async Task InitializeAsync(CancellationToken stoppingToken = default)
 		{
+			//AddDataFlow(new CnblogsParser()); //可通过继承默认的DataParser<T>并重写ProcessPropertyValue()方法，来实现对实体属性的自定义处理（比Formatters更加灵活）
 			AddDataFlow(new DataParser<CnblogsEntry>());
 			AddDataFlow(GetDefaultStorage());
 			await AddRequestsAsync(
 				new Request(
-					"https://news.cnblogs.com/n/page/1", new Dictionary<string, object> {{"网站", "博客园"}}));
+					"https://news.cnblogs.com/n/page/1", new Dictionary<string, object> { { "网站", "博客园" } }));
 		}
 
 		protected override SpiderId GenerateSpiderId()
@@ -75,13 +76,13 @@ namespace DotnetSpider.Sample.samples
 		[EntitySelector(Expression = ".//div[@class='news_block']", Type = SelectorType.XPath)]
 		[GlobalValueSelector(Expression = ".//a[@class='current']", Name = "类别", Type = SelectorType.XPath)]
 		[GlobalValueSelector(Expression = "//title", Name = "Title", Type = SelectorType.XPath)]
-		[FollowRequestSelector(Expressions = new[] {"//div[@class='pager']"})]
+		[FollowRequestSelector(Expressions = new[] { "//div[@class='pager']" })]
 		public class CnblogsEntry : EntityBase<CnblogsEntry>
 		{
 			protected override void Configure()
 			{
 				HasIndex(x => x.Title);
-				HasIndex(x => new {x.WebSite, x.Guid}, true);
+				HasIndex(x => new { x.WebSite, x.Guid }, true);
 			}
 
 			public int Id { get; set; }
@@ -117,6 +118,21 @@ namespace DotnetSpider.Sample.samples
 
 			[ValueSelector(Expression = "DATETIME", Type = SelectorType.Environment)]
 			public DateTime CreationTime { get; set; }
+		}
+
+		public class CnblogsParser : DataParser<CnblogsEntry>
+		{
+			public override string ProcessPropertyValue(string propertyName, string value)
+			{
+				switch (propertyName)
+				{
+					case "Title":
+						//可对任一实体属性执行自定义处理
+						return $"{value}_{DateTime.Now.Ticks}";
+					default:
+						return value;
+				}
+			}
 		}
 	}
 }
