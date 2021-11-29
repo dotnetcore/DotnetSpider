@@ -193,10 +193,6 @@ Coming soon
  | RabbitMQ.Client  |  Apache 2.0   |
  | Polly  | BSD 3-C   |
 
-### Buy me a coffee
-
-![](https://github.com/zlzforever/ClickHouseMigrator/raw/master/images/alipay.jpeg)
-
 ### AREAS FOR IMPROVEMENTS
 
 QQ Group: 477731655
