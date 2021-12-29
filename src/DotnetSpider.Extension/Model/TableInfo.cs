@@ -38,7 +38,7 @@ namespace DotnetSpider.Extension.Model
 
 			var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
 
-			Columns = new HashSet<Column>();
+			Columns = new HashSet<Column>(new ColumnNameComparer());
 			Primary = new List<Column>();
 			Indexes = new Dictionary<string, List<Column>>();
 			Uniques = new Dictionary<string, List<Column>>();
@@ -63,7 +63,10 @@ namespace DotnetSpider.Extension.Model
 					column.DataType = ConvertDataType(property.PropertyType);
 				}
 
-				Columns.Add(column);
+				if (Columns.Add(column) == false)
+				{
+					throw new ArgumentException("Column names should not be same");
+				}
 
 				var primary = property.GetCustomAttributes(typeof(Primary), true).FirstOrDefault() as Primary;
 				if (primary != null)
@@ -112,11 +115,6 @@ namespace DotnetSpider.Extension.Model
 				}
 			}
 
-			if (Columns.Count != properties.Length)
-			{
-				throw new ArgumentException("Column names should not be same");
-			}
-
 			if (Columns.Count == 0)
 			{
 				throw new ArgumentException("Table should contains at least one column");
@@ -163,6 +161,19 @@ namespace DotnetSpider.Extension.Model
 				{
 					return DataType.String;
 				}
+			}
+		}
+
+		private class ColumnNameComparer : IEqualityComparer<Column>
+		{
+			public bool Equals(Column x, Column y)
+			{
+				return x.Name == y.Name;
+			}
+
+			public int GetHashCode(Column obj)
+			{
+				return obj.GetHashCode();
 			}
 		}
 	}
