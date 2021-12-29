@@ -41,6 +41,8 @@ namespace DotnetSpider.Sample.docs
 
 				[Column]
 				[Field(Expression = ".//h3[@class='news-title_1YtI1']/a")]
+				[ReplaceFormatter(NewValue = "", OldValue = "<!--s-text-->")]
+				[ReplaceFormatter(NewValue = "", OldValue = "<!--/s-text-->")]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				public string Title { get; set; }
