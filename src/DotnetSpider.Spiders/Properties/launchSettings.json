@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "DotnetSpider.Spiders": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_SPIDER_TYPE": "EntitySpider"
+      }
+    }
+  }
+}
