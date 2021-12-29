@@ -32,7 +32,7 @@ namespace DotnetSpider.Sample.docs
 			}
 
 			[Schema("baidu", "baidu_search_entity_model")]
-			[Entity(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
+			[Entity(Expression = ".//div[contains(@class,'result-op')]", Type = SelectorType.XPath)]
 			class BaiduSearchEntry : BaseEntity
 			{
 				[Column]
@@ -40,13 +40,13 @@ namespace DotnetSpider.Sample.docs
 				public string Keyword { get; set; }
 
 				[Column]
-				[Field(Expression = ".//h3[@class='c-title']/a")]
+				[Field(Expression = ".//h3[@class='news-title_1YtI1']/a")]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				public string Title { get; set; }
 
 				[Column]
-				[Field(Expression = ".//h3[@class='c-title']/a/@href")]
+				[Field(Expression = ".//h3[@class='news-title_1YtI1']/a/@href")]
 				public string Url { get; set; }
 
 				[Column]
