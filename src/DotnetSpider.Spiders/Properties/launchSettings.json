@@ -3,7 +3,7 @@
     "DotnetSpider.Spiders": {
       "commandName": "Project",
       "environmentVariables": {
-        "DOTNET_SPIDER_TYPE": "EntitySpider"
+        "DOTNET_SPIDER_TYPE": "DotnetSpider.Spiders.EntitySpider"
       }
     }
   }
