@@ -63,13 +63,12 @@ namespace DotnetSpider.Extension.Pipeline
 							break;
 						}
 					}
-
-					foreach (var kv2 in typeMapEntities)
-					{
-						resultItem.Request.AddCountOfResults(kv2.Value.Count);
-						int effectedRows = Process(kv2.Value, sender);
-						resultItem.Request.AddEffectedRows(effectedRows);
-					}
+				} 
+				foreach (var kv2 in typeMapEntities)
+				{
+					resultItem.Request.AddCountOfResults(kv2.Value.Count);
+					int effectedRows = Process(kv2.Value, sender);
+					resultItem.Request.AddEffectedRows(effectedRows);
 				}
 			}
 
