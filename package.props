@@ -1,0 +1,25 @@
+<Project>
+
+  <PropertyGroup>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <Version>5.0.9</Version>
+    <FileVersion>5.0.9.0</FileVersion>
+    <AssemblyVersion>5.0.9.0</AssemblyVersion>
+    <Authors>zlzforever@163.com;</Authors>
+    <Copyright>Copyright 2018 Lewis Zou</Copyright>
+    <Description>DotnetSpider, a .NET Standard web crawling library. It is lightweight, efficient and fast high-level web crawling &amp; scraping framework</Description>
+    <PackageTags>DotnetSpider;crawler;dotnet core</PackageTags>
+    <PackageProjectUrl>https://github.com/dotnetcore/DotnetSpider</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/dotnetcore/DotnetSpider</RepositoryUrl>
+    <LangVersion>latest</LangVersion>
+    <PackageIcon>icon.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="LICENSE.txt"/>
+    <None Include="..\..\images\icon.png" Pack="true" PackagePath="icon.png"/>
+  </ItemGroup>
+
+</Project>

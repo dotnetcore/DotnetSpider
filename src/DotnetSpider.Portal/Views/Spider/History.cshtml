@@ -1,0 +1,65 @@
+@{
+    ViewData["Title"] = "Spider History";
+}
+<div class="row">
+    <div class="col-sm-8">
+        <h5>
+            Spider History
+            <small></small>
+        </h5>
+    </div>
+</div>
+<br/>
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-bordered" style="width: 100%">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>BATCH</th>
+                <th>STATUS</th>
+                <th>TOTAL</th>
+                <th>SUCCESS</th>
+                <th>FAILURE</th>
+                <th>START</th>
+                <th>EXIT</th>
+                <th>ACTION</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-if="items.length===0">
+                <td colspan="9">None</td>
+            </tr>
+            <tr :id="item.id" v-else v-for="item in items">
+                <td v-text="item.id"></td>
+                <td v-text="item.batch"></td>
+                <td v-text="item.status"></td>
+                <td v-text="item.total"></td>
+                <td v-text="item.success"></td>
+                <td v-text="item.failure"></td>
+                <td v-text="item.start"></td>
+                <td v-text="item.exit"></td>
+                <td>
+                    <button v-if="!item.exit" title="exit" class="btn btn-sm btn-outline-primary" v-on:click="exit">
+                        <i class="fa fa-fw fa-stop"></i>
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row" v-if="count > limit">
+    <div class="col-md-12">
+        <pagination :page="page" :count="count" :limit="limit"></pagination>
+    </div>
+</div>
+
+@section scripts{
+    <environment names="Development">
+        <script src="~/js/spiderHistory.js" asp-append-version="true"></script>
+    </environment>
+    <environment names="Staging,Production">
+        <script src="~/js/spiderHistory.min.js" asp-append-version="true"></script>
+    </environment>
+}

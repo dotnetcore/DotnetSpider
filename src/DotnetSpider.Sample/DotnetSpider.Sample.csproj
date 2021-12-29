@@ -1,29 +1,28 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
-    <LangVersion>latest</LangVersion>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Jil" Version="2.16.0" />
-    <PackageReference Include="MessagePack" Version="1.7.3.4" />
-    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="2.42.0.1" />
+    <ProjectReference Include="..\DotnetSpider.HBase\DotnetSpider.HBase.csproj" />
+    <ProjectReference Include="..\DotnetSpider.Mongo\DotnetSpider.Mongo.csproj" />
+    <ProjectReference Include="..\DotnetSpider.MySql\DotnetSpider.MySql.csproj" />
+    <ProjectReference Include="..\DotnetSpider.RabbitMQ\DotnetSpider.RabbitMQ.csproj" />
+    <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DotnetSpider.Extension\DotnetSpider.Extension.csproj" />
-    <ProjectReference Include="..\DotnetSpider.Extraction.ExcelExpression\DotnetSpider.Extraction.ExcelExpression.csproj" />
+    <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+    <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
+    <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="2.3.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="sohu.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="TextFile1.txt">
+    <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
 </Project>

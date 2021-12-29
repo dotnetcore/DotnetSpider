@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  dotnetspider.agent1:
+    image: 'dotnetspider/agent:latest'
+    restart: always
+    container_name: dotnetspider.agent1
+    volumes:
+      - ./agent1.json:/agent/appsettings.json
+  dotnetspider.agent2:
+    image: 'dotnetspider/agent:latest'
+    restart: always
+    container_name: dotnetspider.agent2
+    volumes:
+      - ./agent2.json:/agent/appsettings.json

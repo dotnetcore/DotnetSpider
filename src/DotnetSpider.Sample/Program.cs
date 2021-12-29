@@ -1,41 +1,36 @@
-﻿using DotnetSpider.Sample.docs;
-#if NETCOREAPP
-using System.Text;
-
-#else
+﻿using System;
 using System.Threading;
-#endif
+using System.Threading.Tasks;
+using DotnetSpider.Sample.samples;
+using Serilog;
+using Serilog.Events;
 
 namespace DotnetSpider.Sample
 {
-	static class Program
+	class Program
 	{
-		static void Main(string[] args)
+		static async Task Main(string[] args)
 		{
-#if NETCOREAPP
-			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-#else
-			ThreadPool.SetMinThreads(256, 256);
-#endif
+			ThreadPool.SetMaxThreads(255, 255);
+			ThreadPool.SetMinThreads(255, 255);
 
-			//HttpClientDownloader downloader = new HttpClientDownloader();
-			//var response = downloader.Download(new Request("http://www.163.com")
-			//{
-			//	Method = HttpMethod.Post,
-			//	Content = JsonConvert.SerializeObject(new { a = "bb" }),
-			//	ContentType = "application/json"
-			//});
-
- 
-			EntityModelSpider.Run();
-		}
+			Log.Logger = new LoggerConfiguration()
+				.MinimumLevel.Information()
+				.MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Warning)
+				.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+				.MinimumLevel.Override("System", LogEventLevel.Warning)
+				.MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Warning)
+				.Enrich.FromLogContext()
+				.WriteTo.Console().WriteTo.RollingFile("logs/spider.log")
+				.CreateLogger();
 
 
-		/// <summary>
-		/// <c>MyTest</c> is a method in the <c>Program</c>
-		/// </summary>
-		private static void MyTest()
-		{
+			// // await DistributedSpider.RunAsync();
+			// await ProxySpider.RunAsync();
+			// await EntitySpider.RunMySqlQueueAsync();
+			await ImageSpider.RunAsync();
+
+			Console.WriteLine("Bye!");
 		}
 	}
 }

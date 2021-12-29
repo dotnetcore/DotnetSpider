@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  dotnetspider.portal:
+    image: 'dotnetspider/portal:latest'
+    restart: always
+    container_name: dotnetspider.portal
+    ports:
+      - '7896:7896'

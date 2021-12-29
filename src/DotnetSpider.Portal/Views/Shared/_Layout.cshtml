@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@ViewData["Title"] - Spider Admin</title>
+    <environment names="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" asp-append-version="true"/>
+        <link rel="stylesheet" href="~/lib/select2/dist/css/select2.css" asp-append-version="true">
+        <link rel="stylesheet" href="~/css/sweetalert.css" asp-append-version="true"/>
+        <link rel="stylesheet" href="~/lib/font-awesome/css/font-awesome.css" asp-append-version="true"/>
+        <link rel="stylesheet" href="~/lib/icheck-bootstrap/icheck-bootstrap.css" asp-append-version="true"/>
+        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
+    </environment>
+    <environment names="Staging,Production">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true"/>
+        <link rel="stylesheet" href="~/lib/select2/dist/css/select2.min.css" asp-append-version="true">
+        <link rel="stylesheet" href="~/css/sweetalert.min.css" asp-append-version="true"/>
+        <link rel="stylesheet" href="~/lib/font-awesome/css/font-awesome.min.css" asp-append-version="true"/>
+        <link rel="stylesheet" href="~/lib/icheck-bootstrap/icheck-bootstrap.min.css" asp-append-version="true"/>
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true"/>
+    </environment>
+    @RenderSection("Styles", false)
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-light border-bottom box-shadow mb-3">
+        <div class="container">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Spider Admin</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                <ul class="navbar-nav flex-grow-1">
+                    @* <li class="nav-item"> *@
+                    @*     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Dashboard</a> *@
+                    @* </li> *@
+                    <li class="nav-item margin-left-10">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Agent" asp-action="Index">Agent</a>
+                    </li>
+                    <li class="nav-item margin-left-10">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Spider" asp-action="Index">Spider</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+<div class="container">
+    <main role="main" class="pb-3" id="app">
+        @RenderBody()
+    </main>
+</div>
+
+<footer class="border-top footer text-muted">
+    <div class="container">
+        &copy; 2019 - DotnetSpider
+    </div>
+</footer>
+<script src="~/lib/jquery/dist/jquery.min.js" asp-append-version="true"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+<script src="~/js/sweetalert.js" asp-append-version="true"></script>
+<script src="~/lib/select2/dist/js/select2.full.min.js" asp-append-version="true"></script>
+<script src="~/lib/vue/dist/vue.min.js" asp-append-version="true"></script>
+<environment names="Development">
+    <script src="~/js/site.js" asp-append-version="true"></script>
+</environment>
+<environment names="Staging,Production">
+    <script src="~/js/site.min.js" asp-append-version="true"></script>
+</environment>
+@await Html.PartialAsync("Pagination")
+@await Html.PartialAsync("Select2")
+@RenderSection("Scripts", false)
+</body>
+</html>

@@ -1,0 +1,46 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+  paths:
+    exclude:
+      - README.md
+      - Dockerfile
+      - DESIGN2.md
+      - runtests.sh
+      - build.sh
+
+pool:
+  vmImage: 'Ubuntu-16.04'
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+  - script: sudo apt-get remove mysql-server-5.7
+    displayName: 'UninstallDefaultMysql'
+
+  - task: DockerInstaller@0
+
+  - script: sudo docker run -p 3306:3306 -e MYSQL_ROOT_PASSWORD=1qazZAQ! -d mysql
+    displayName: 'DeployMysql'
+
+  - script: sudo docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=1qazZAQ!' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-latest
+    displayName: 'DeploySqlServer'
+
+  - script: sudo docker run -d --restart always --name rabbimq -p 4369:4369 -p 5671-5672:5671-5672 -p 25672:25672 -p 15671-15672:15671-15672 -e RABBITMQ_DEFAULT_USER=user -e RABBITMQ_DEFAULT_PASS=password rabbitmq:3-management
+    displayName: 'DeployRabbitMQ'
+
+  - task: DotNetCoreInstaller@0
+    inputs:
+      version: '5.0.102'
+
+  - script: sh runtests.sh
+    displayName: 'RunTestCases'
+

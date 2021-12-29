@@ -1,30 +1,62 @@
 # DotnetSpider
 
-[![Travis branch](https://travis-ci.org/dotnetcore/DotnetSpider.svg?branch=master)](https://travis-ci.org/dotnetcore/DotnetSpider)
-[![NuGet](https://img.shields.io/nuget/v/DotnetSpider.Extension.svg)](https://www.nuget.org/packages/DotnetSpider.Extension)
-[![Member project of .NET Core Community](https://img.shields.io/badge/member%20project%20of-NCC-9e20c9.svg)](https://github.com/dotnetcore)
-[![GitHub license](https://img.shields.io/aur/license/yaourt.svg)](https://raw.githubusercontent.com/dotnetcore/DotnetSpider/master/LICENSE)
+免责申明：本框架是为了帮助开发人员简化开发流程、提高开发效率，请勿使用此框架做任何违法国家法律的事情，使用者所做任何事情也与本框架的作者无关。
 
-DotnetSpider, a .NET Standard web crawling library similar to WebMagic and Scrapy. It is a lightweight, efficient and fast high-level web crawling & scraping framework for .NET
+[![Build Status](https://dev.azure.com/zlzforever/DotnetSpider/_apis/build/status/dotnetcore.DotnetSpider?branchName=master)](https://dev.azure.com/zlzforever/DotnetSpider/_build/latest?definitionId=3&branchName=master)
+[![NuGet](https://img.shields.io/nuget/vpre/DotnetSpider.svg)](https://www.nuget.org/packages/DotnetSpider)
+[![Member project of .NET Core Community](https://img.shields.io/badge/member%20project%20of-NCC-9e20c9.svg)](https://github.com/dotnetcore)
+[![GitHub license](https://img.shields.io/github/license/dotnetcore/DotnetSpider.svg)](https://github.com/dotnetcore/DotnetSpider/blob/master/LICENSE.txt)
+
+DotnetSpider, a .NET Standard web crawling library. It is lightweight, efficient and fast high-level web crawling & scraping framework.
+
+If you want get latest beta packages, you should add the myget feed:
+
+```
+<add key="myget.org" value="https://www.myget.org/F/zlzforever/api/v3/index.json" protocolVersion="3" />
+```
 
 ### DESIGN
 
-![DESIGN](https://github.com/dotnetcore/DotnetSpider/raw/master/images/DESIGN.jpg)
+![DESIGN IMAGE](https://github.com/dotnetcore/DotnetSpider/blob/master/images/%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86%E7%B3%BB%E7%BB%9F.png?raw=true)
 
 ### DEVELOP ENVIROMENT
 
-- Visual Studio 2017 (15.3 or later)
-- [.NET Core 2.0 or later](https://www.microsoft.com/net/download/windows)
-- Storage data to mysql. [Download MySql](https://dev.mysql.com/downloads/mysql/)
-  grant all on _._ to 'root'@'localhost' IDENTIFIED BY '' with grant option;
-  flush privileges;
+1. Visual Studio 2017 (15.3 or later) or Jetbrains Rider
+2. [.NET Core 2.2 or later](https://www.microsoft.com/net/download/windows)
+3. Docker
+4. MySql
 
-### OPTIONAL ENVIROMENT
+        docker run --name mysql -d -p 3306:3306 --restart always -e MYSQL_ROOT_PASSWORD=1qazZAQ! mysql:5.7
 
-- Distributed crawler. [Download Redis for Windows](https://github.com/MSOpenTech/redis/releases)
-- SqlServer.
-- PostgreSQL.
-- MongoDb
+5. Redis (option)
+
+        docker run --name redis -d -p 6379:6379 --restart always redis
+
+6. SqlServer
+
+        docker run --name sqlserver -d -p 1433:1433 --restart always  -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=1qazZAQ!' mcr.microsoft.com/mssql/server:2017-latest
+
+8. PostgreSQL (option)
+
+        docker run --name postgres -d  -p 5432:5432 --restart always -e POSTGRES_PASSWORD=1qazZAQ! postgres
+
+9. MongoDb  (option)
+
+        docker run --name mongo -d -p 27017:27017 --restart always mongo
+
+10. RabbitMQ
+
+        docker run -d --restart always --name rabbimq -p 4369:4369 -p 5671-5672:5671-5672 -p 25672:25672 -p 15671-15672:15671-15672 \
+               -e RABBITMQ_DEFAULT_USER=user -e RABBITMQ_DEFAULT_PASS=password \
+               rabbitmq:3-management
+
+11. Docker remote api for mac
+
+        docker run -d  --restart always --name socat -v /var/run/docker.sock:/var/run/docker.sock -p 2376:2375 bobrik/socat TCP4-LISTEN:2375,fork,reuseaddr UNIX-CONNECT:/var/run/docker.sock
+
+12. HBase
+
+        docker run -d --restart always --name hbase -p 20550:8080 -p 8085:8085 -p 9090:9090 -p 9095:9095 -p 16010:16010 dajobe/hbase
 
 ### MORE DOCUMENTS
 
@@ -32,123 +64,100 @@ https://github.com/dotnetcore/DotnetSpider/wiki
 
 ### SAMPLES
 
-    Please see the Projet DotnetSpider.Sample in the solution.
+    Please see the Project DotnetSpider.Sample in the solution.
 
 ### BASE USAGE
 
-[Base usage Codes](https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Sample/BaseUsage.cs)
+[Base usage Codes](https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Sample/samples/BaseUsage.cs)
 
 ### ADDITIONAL USAGE: Configurable Entity Spider
 
-[View complete Codes](https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Sample/JdSkuSampleSpider.cs)
+[View complete Codes](https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Sample/samples/EntitySpider.cs)
 
-    public class EntityModelSpider
-    {
-    	public static void Run()
-    	{
-    		Spider spider = new Spider();
-    		spider.Run();
-    	}
+		public class EntitySpider : Spider
+		{
+			public static async Task RunAsync()
+			{
+				var builder = Builder.CreateDefaultBuilder<EntitySpider>();
+				builder.UseSerilog();
+				builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
+				await builder.Build().RunAsync();
+			}
 
-    	private class Spider : EntitySpider
-    	{
-    		protected override void OnInit(params string[] arguments)
-    		{
-    			var word = "可乐|雪碧";
-    			AddRequest(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
-    			AddEntityType<BaiduSearchEntry>();
-    			AddPipeline(new ConsoleEntityPipeline());
-    		}
+			public EntitySpider(IOptions<SpiderOptions> options, SpiderServices services, ILogger<Spider> logger) : base(
+				options, services, logger)
+			{
+			}
 
-    		[Schema("baidu", "baidu_search_entity_model")]
-    		[Entity(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
-    		class BaiduSearchEntry : BaseEntity
-    		{
-    			[Column]
-    			[Field(Expression = "Keyword", Type = SelectorType.Enviroment)]
-    			public string Keyword { get; set; }
+			protected override async Task InitializeAsync(CancellationToken stoppingToken)
+			{
+				AddDataFlow(new DataParser<CnblogsEntry>());
+				AddDataFlow(GetDefaultStorage());
+				await AddRequestsAsync(
+					new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}}),
+					new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}}));
+			}
 
-    			[Column]
-    			[Field(Expression = ".//h3[@class='c-title']/a")]
-    			[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
-    			[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
-    			public string Title { get; set; }
+			protected override (string Id, string Name) GetIdAndName()
+			{
+				return (ObjectId.NewId.ToString(), "博客园");
+			}
 
-    			[Column]
-    			[Field(Expression = ".//h3[@class='c-title']/a/@href")]
-    			public string Url { get; set; }
+			[Schema("cnblogs", "news")]
+			[EntitySelector(Expression = ".//div[@class='news_block']", Type = SelectorType.XPath)]
+			[GlobalValueSelector(Expression = ".//a[@class='current']", Name = "类别", Type = SelectorType.XPath)]
+			[FollowRequestSelector(XPaths = new[] {"//div[@class='pager']"})]
+			public class CnblogsEntry : EntityBase<CnblogsEntry>
+			{
+				protected override void Configure()
+				{
+					HasIndex(x => x.Title);
+					HasIndex(x => new {x.WebSite, x.Guid}, true);
+				}
 
-    			[Column]
-    			[Field(Expression = ".//div/p[@class='c-author']/text()")]
-    			[ReplaceFormatter(NewValue = "-", OldValue = "&nbsp;")]
-    			public string Website { get; set; }
+				public int Id { get; set; }
 
-    			[Column]
-    			[Field(Expression = ".//div/span/a[@class='c-cache']/@href")]
-    			public string Snapshot { get; set; }
+				[Required]
+				[StringLength(200)]
+				[ValueSelector(Expression = "类别", Type = SelectorType.Environment)]
+				public string Category { get; set; }
 
-    			[Column]
-    			[Field(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText)]
-    			[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
-    			[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
-    			[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
-    			public string Details { get; set; }
+				[Required]
+				[StringLength(200)]
+				[ValueSelector(Expression = "网站", Type = SelectorType.Environment)]
+				public string WebSite { get; set; }
 
-    			[Column(Length = 0)]
-    			[Field(Expression = ".", Option = FieldOptions.InnerText)]
-    			[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
-    			[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
-    			[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
-    			public string PlainText { get; set; }
-    		}
-    	}
-    }
+				[StringLength(200)]
+				[ValueSelector(Expression = "//title")]
+				[ReplaceFormatter(NewValue = "", OldValue = " - 博客园")]
+				public string Title { get; set; }
 
-    public static void Main()
-    {
-    	EntityModelSpider.Run();
-    }
+				[StringLength(40)]
+				[ValueSelector(Expression = "GUID", Type = SelectorType.Environment)]
+				public string Guid { get; set; }
 
-#### Run via Startup
+				[ValueSelector(Expression = ".//h2[@class='news_entry']/a")]
+				public string News { get; set; }
 
-    Command: -s:[spider type name | TaskName attribute] -i:[identity] -a:[arg1,arg2...] --tid:[taskId] -n:[name] -c:[configuration file path or name]
+				[ValueSelector(Expression = ".//h2[@class='news_entry']/a/@href")]
+				public string Url { get; set; }
 
-1.  -s: Type name of spider or TaskNameAttribute for example: DotnetSpider.Sample.BaiduSearchSpiderl
-2.  -i: Set identity.
-3.  -a: Pass arguments to spider's Run method.
-4.  --tid: Set task id.
-5.  -n: Set name.
-6.  -c: Set config file path, for example you want to run with a customize config: -e:app.my.config
+				[ValueSelector(Expression = ".//div[@class='entry_summary']")]
+				public string PlainText { get; set; }
 
-#### WebDriver Support
+				[ValueSelector(Expression = "DATETIME", Type = SelectorType.Environment)]
+				public DateTime CreationTime { get; set; }
+			}
+		}
 
-When you want to collect a page JS loaded, there is only one thing to do, set the downloader to WebDriverDownloader.
+#### Distributed spider
 
-    Downloader=new WebDriverDownloader(Browser.Chrome);
 
-[See a complete sample](https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Sample/JdSkuWebDriverSample.cs)
+[Read this document](https://github.com/dotnetcore/DotnetSpider/wiki/3-Distributed-Spider)
 
-NOTE:
+#### Puppeteer downloader
 
-1.  Make sure there is a ChromeDriver.exe in bin forlder when you try to use Chrome. You can install it to your project via NUGET manager: Chromium.ChromeDriver
-2.  Make sure you already add a \*.webdriver Firefox profile when you try to use Firefox: https://support.mozilla.org/en-US/kb/profile-manager-create-and-remove-firefox-profiles
-3.  Make sure there is a PhantomJS.exe in bin folder when you try to use PhantomJS. You can install it to your project via NUGET manager: PhantomJS
-
-### Storage log and status to database
-
-### DotnetSpider.Hub
-
-https://github.com/zlzforever/DotnetSpider.Hub
-
-1.  Dependences a ci platform for example I use teamcity right now.
-2.  Dependences Scheduler.NET https://github.com/zlzforever/Scheduler.NET
-3.  More documents continue...
-
-![1](https://github.com/dotnetcore/DotnetSpider/raw/master/images/1.png)
-![2](https://github.com/dotnetcore/DotnetSpider/raw/master/images/2.png)
-![3](https://github.com/dotnetcore/DotnetSpider/raw/master/images/3.png)
-![4](https://github.com/dotnetcore/DotnetSpider/raw/master/images/4.png)
-![5](https://github.com/dotnetcore/DotnetSpider/raw/master/images/5.png)
+Coming soon
 
 ### NOTICE
 
@@ -157,9 +166,32 @@ https://github.com/zlzforever/DotnetSpider.Hub
     timeout 0
     tcp-keepalive 60
 
-### Buy me a coffee
+ ### Dependencies
 
-![](https://github.com/zlzforever/DotnetSpiderPictures/raw/master/pay.png)
+| Package | License |
+| --- | --- |
+| Bert.RateLimiters | Apache 2.0 |
+ | MessagePack  |  MIT   |
+ | Newtonsoft.Json  |  MIT   |
+ | Dapper  |  Apache 2.0   |
+ | HtmlAgilityPack  |  MIT   |
+ | ZCJ.HashedWheelTimer  |  MIT   |
+ | murmurhash  |  Apache 2.0   |
+ | Serilog.AspNetCore  |  Apache 2.0   |
+ | Serilog.Sinks.Console  |  Apache 2.0   |
+ | Serilog.Sinks.RollingFile  |  Apache 2.0   |
+ | Serilog.Sinks.PeriodicBatching  |  Apache 2.0   |
+ | MongoDB.Driver  |  Apache 2.0   |
+ | MySqlConnector  |  MIT   |
+ | AutoMapper.Extensions.Microsoft.DependencyInjection  | MIT   |
+ | Docker.DotNet  |  MIT   |
+ | BuildBundlerMinifier  |  Apache 2.0   |
+ | Pomelo.EntityFrameworkCore.MySql  |  MIT   |
+ | Quartz.AspNetCore  |  Apache 2.0    |
+ | Quartz.AspNetCore.MySqlConnector  | Apache 2.0  |
+ | Npgsql  |  PostgreSQL License   |
+ | RabbitMQ.Client  |  Apache 2.0   |
+ | Polly  | BSD 3-C   |
 
 ### AREAS FOR IMPROVEMENTS
 

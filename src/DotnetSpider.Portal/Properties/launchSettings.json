@@ -1,0 +1,10 @@
+﻿{
+  "profiles": {
+    "DotnetSpider.Portal": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
