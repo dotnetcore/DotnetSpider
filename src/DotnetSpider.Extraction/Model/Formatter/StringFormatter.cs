@@ -11,7 +11,7 @@ namespace DotnetSpider.Extraction.Model.Formatter
 		/// <summary>
 		/// A composite format string.
 		/// </summary>
-		public string Format { get; set; }
+		public new string Format { get; set; }
 
 		/// <summary>
 		/// 实现数值的转化
