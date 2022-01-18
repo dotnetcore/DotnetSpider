@@ -53,7 +53,7 @@ namespace DotnetSpider.Tests
 		protected virtual string GetConnectionString()
 		{
 			return
-				"Database='mysql';Data Source=localhost;password=1qazZAQ!;User ID=root;Port=3306;SslMode=None;Allow User Variables=True;AllowPublicKeyRetrieval=True";
+				"Database='mysql';Data Source=192.168.23.11;password=Spider2022;User ID=spider;Port=3306;SslMode=None;Allow User Variables=True;AllowPublicKeyRetrieval=True";
 		}
 
 		protected virtual IDbConnection CreateConnection()
