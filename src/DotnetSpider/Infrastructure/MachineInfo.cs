@@ -257,7 +257,7 @@ namespace DotnetSpider.Infrastructure
 				// ReSharper disable once RedundantEnumerableCastCall
 				var dict = _linuxMemoryInfoLineRegex.Matches(lines).Cast<Match>().ToDictionary(match =>
 						match.Groups["name"].Value.TrimStart()
-					, match => (long)int.Parse(match.Groups["value"].Value) * 1024);
+					, match => long.Parse(match.Groups["value"].Value) * 1024);
 				return dict;
 			}
 

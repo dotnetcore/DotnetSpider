@@ -84,8 +84,8 @@ DirectMap1G:     4194304 kB";
 
 			var total = MachineInfo.Linux.GetTotalMemory(msg);
 			var free = MachineInfo.Linux.GetFreeMemory(msg);
-			Assert.Equal(7551, total);
-			Assert.Equal(3550, free);
+			Assert.Equal(7551, total/ (1024 * 1024));
+			Assert.Equal(3550, free/ (1024 * 1024));
 		}
 	}
 }
