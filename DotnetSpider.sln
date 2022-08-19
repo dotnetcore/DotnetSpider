@@ -51,8 +51,6 @@ EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.AgentCenter", "src\DotnetSpider.AgentCenter\DotnetSpider.AgentCenter.csproj", "{05991456-8637-4BBA-ADEB-95A86C528CBA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Portal", "src\DotnetSpider.Portal\DotnetSpider.Portal.csproj", "{303543D4-1883-424F-89B9-5BA1B9F1B38A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Spiders", "src\DotnetSpider.Spiders\DotnetSpider.Spiders.csproj", "{F0A12ACB-F4AE-4527-891F-F316DDDE92CA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dockerfile", "dockerfile", "{95BE9DB1-2FAC-4419-B5FB-89B5A613B36F}"
@@ -118,10 +116,6 @@ Global
 		{05991456-8637-4BBA-ADEB-95A86C528CBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05991456-8637-4BBA-ADEB-95A86C528CBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05991456-8637-4BBA-ADEB-95A86C528CBA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{303543D4-1883-424F-89B9-5BA1B9F1B38A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{303543D4-1883-424F-89B9-5BA1B9F1B38A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{303543D4-1883-424F-89B9-5BA1B9F1B38A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{303543D4-1883-424F-89B9-5BA1B9F1B38A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F0A12ACB-F4AE-4527-891F-F316DDDE92CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F0A12ACB-F4AE-4527-891F-F316DDDE92CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0A12ACB-F4AE-4527-891F-F316DDDE92CA}.Release|Any CPU.ActiveCfg = Release|Any CPU

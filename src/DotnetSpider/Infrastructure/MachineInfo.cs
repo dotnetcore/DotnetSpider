@@ -40,7 +40,7 @@ namespace DotnetSpider.Infrastructure
 				var free = (statistics.Equals(default)
 					? 0
 					: (((long)statistics.free_count + statistics.inactive_count) * _pageSize));
-				return new MachineInfo {Memory = _totalMemory, AvailableMemory = (free)};
+				return new MachineInfo { Memory = _totalMemory, AvailableMemory = (free) };
 			}
 
 			/// <summary>
@@ -161,7 +161,7 @@ namespace DotnetSpider.Infrastructure
 
 			public static MachineInfo GetMemoryStatus()
 			{
-				var memoryInfo = new WindowsMemoryStatus {DwLength = _structLength};
+				var memoryInfo = new WindowsMemoryStatus { DwLength = _structLength };
 				GlobalMemoryStatusEx(ref memoryInfo);
 				return new MachineInfo
 				{
@@ -172,7 +172,7 @@ namespace DotnetSpider.Infrastructure
 
 			private static long GetTotalMemory()
 			{
-				var memoryInfo = new WindowsMemoryStatus {DwLength = _structLength};
+				var memoryInfo = new WindowsMemoryStatus { DwLength = _structLength };
 				GlobalMemoryStatusEx(ref memoryInfo);
 				return memoryInfo.Equals(default) ? 0 : (memoryInfo.UllTotalPhys);
 			}
@@ -219,7 +219,7 @@ namespace DotnetSpider.Infrastructure
 			public static MachineInfo GetMemoryStatus()
 			{
 				var free = GetFreeMemory(GetMemInfo());
-				return new MachineInfo {Memory = _totalMemory, AvailableMemory = free};
+				return new MachineInfo { Memory = _totalMemory, AvailableMemory = free };
 			}
 
 			internal static long GetTotalMemory(string output)
@@ -257,19 +257,17 @@ namespace DotnetSpider.Infrastructure
 				// ReSharper disable once RedundantEnumerableCastCall
 				var dict = _linuxMemoryInfoLineRegex.Matches(lines).Cast<Match>().ToDictionary(match =>
 						match.Groups["name"].Value.TrimStart()
-					, match => (long)int.Parse(match.Groups["value"].Value) * 1024);
+					, match =>
+					{
+						return long.Parse(match.Groups["value"].Value) * 1024;
+					});
 				return dict;
 			}
 
 			private static string GetMemInfo()
 			{
 				var path = "/proc/meminfo";
-				if (!File.Exists(path))
-				{
-					return default;
-				}
-
-				return File.ReadAllText(path);
+				return !File.Exists(path) ? default : File.ReadAllText(path);
 			}
 		}
 
