@@ -8,9 +8,9 @@ rm -rf src/DotnetSpider.PostgreSql/bin/Release
 rm -rf src/DotnetSpider.RabbitMQ/bin/Release
 dotnet build -c Release
 dotnet pack -c Release
-nuget push src/DotnetSpider/bin/Release/*.nupkg -Source $NUGET_SERVER
-nuget push src/DotnetSpider.HBase/bin/Release/*.nupkg  -Source $NUGET_SERVER
-nuget push src/DotnetSpider.Mongo/bin/Release/*.nupkg  -Source $NUGET_SERVER
-nuget push src/DotnetSpider.MySql/bin/Release/*.nupkg  -Source $NUGET_SERVER
-nuget push src/DotnetSpider.PostgreSql/bin/Release/*.nupkg  -Source $NUGET_SERVER
-nuget push src/DotnetSpider.RabbitMQ/bin/Release/*.nupkg  -Source $NUGET_SERVER
+dotnet nuget push src/DotnetSpider/bin/Release/*.nupkg --source $NUGET_SERVER --api-key $NUGET_KEY
+dotnet nuget push src/DotnetSpider.HBase/bin/Release/*.nupkg --source $NUGET_SERVER --api-key $NUGET_KEY
+dotnet nuget push src/DotnetSpider.Mongo/bin/Release/*.nupkg --source $NUGET_SERVER --api-key $NUGET_KEY
+dotnet nuget push src/DotnetSpider.MySql/bin/Release/*.nupkg --source $NUGET_SERVER --api-key $NUGET_KEY
+dotnet nuget push src/DotnetSpider.PostgreSql/bin/Release/*.nupkg --source $NUGET_SERVER --api-key $NUGET_KEY
+dotnet nuget push src/DotnetSpider.RabbitMQ/bin/Release/*.nupkg --source $NUGET_SERVER --api-key $NUGET_KEY
