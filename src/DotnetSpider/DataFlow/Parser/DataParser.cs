@@ -132,7 +132,7 @@ namespace DotnetSpider.DataFlow.Parser
 				else
 				{
 					var text = context.Response.ReadAsString().TrimStart();
-					if (text.StartsWith("<!DOCTYPE html>") || text.StartsWith("<html>"))
+					if (text.StartsWith("<!DOCTYPE html") || text.StartsWith("<html"))
 					{
 						context.Selectable = CreateHtmlSelectable(context, text);
 					}
