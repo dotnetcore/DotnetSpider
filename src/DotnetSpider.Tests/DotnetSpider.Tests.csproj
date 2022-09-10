@@ -23,7 +23,7 @@
     <ProjectReference Include="..\DotnetSpider.Mongo\DotnetSpider.Mongo.csproj" />
     <ProjectReference Include="..\DotnetSpider.MySql\DotnetSpider.MySql.csproj" />
     <ProjectReference Include="..\DotnetSpider.RabbitMQ\DotnetSpider.RabbitMQ.csproj" />
-    <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj" />
+    
   </ItemGroup>
 
   <ItemGroup>

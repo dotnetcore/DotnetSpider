@@ -10,13 +10,13 @@
     <ProjectReference Include="..\DotnetSpider.Mongo\DotnetSpider.Mongo.csproj" />
     <ProjectReference Include="..\DotnetSpider.MySql\DotnetSpider.MySql.csproj" />
     <ProjectReference Include="..\DotnetSpider.RabbitMQ\DotnetSpider.RabbitMQ.csproj" />
-    <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj" />
+    
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Serilog.AspNetCore" Version="6.0.1" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
-    <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
+    
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="2.3.1" />
   </ItemGroup>
 

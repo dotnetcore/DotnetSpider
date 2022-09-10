@@ -6,19 +6,19 @@
     <TargetFrameworks>netstandard2.1;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
 
-  <Import Project="../../package.props" />
+  <Import Project="../../package.props"></Import>
 
   <ItemGroup>
     <PackageReference Include="Bert.RateLimiters" Version="1.0.15" />
     <PackageReference Include="MessagePack" Version="2.4.35" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
     <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.45" />
-    <PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
+    
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
     <PackageReference Include="System.Text.Json" Version="6.0.5" />
