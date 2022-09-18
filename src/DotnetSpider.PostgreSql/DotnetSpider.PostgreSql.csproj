@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="../../package.props" />
+  <Import Project="../../package.props"></Import>
   <PropertyGroup>
     <PackageId>DotnetSpider.PostgreSql</PackageId>
     <TargetFrameworks>netstandard2.1;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Npgsql" Version="6.0.6" />
+    <PackageReference Include="Npgsql" Version="6.0.7" />
   </ItemGroup>
 
   <ItemGroup>
