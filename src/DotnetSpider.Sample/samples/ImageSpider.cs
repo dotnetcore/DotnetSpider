@@ -38,7 +38,10 @@ namespace DotnetSpider.Sample.samples
 		protected override async Task InitializeAsync(CancellationToken stoppingToken = default)
 		{
 			await AddRequestsAsync(
-				new Request("https://www.cnblogs.com/images/logo.svg?v=R9M0WmLAIPVydmdzE2keuvnjl-bPR7_35oHqtiBzGsM"));
+				new Request("https://www.cnblogs.com/images/logo.svg?v=R9M0WmLAIPVydmdzE2keuvnjl-bPR7_35oHqtiBzGsM")
+				{
+					Headers = { { "test", "a" } }
+				});
 			AddDataFlow(new ImageStorage());
 		}
 	}

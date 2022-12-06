@@ -7,13 +7,13 @@
 [![Member project of .NET Core Community](https://img.shields.io/badge/member%20project%20of-NCC-9e20c9.svg)](https://github.com/dotnetcore)
 [![GitHub license](https://img.shields.io/github/license/dotnetcore/DotnetSpider.svg)](https://github.com/dotnetcore/DotnetSpider/blob/master/LICENSE.txt)
 
-DotnetSpider, a .NET Standard web crawling library. It is lightweight, efficient and fast high-level web crawling & scraping framework.
+DotnetSpider, a .NET Standard web crawling library. It is a lightweight, efficient, and fast high-level web crawling & scraping framework.
 
-If you want get latest beta packages, you should add the myget feed:
+If you want to get the latest beta packages, you should add the myget feed:
 
-```
+````html
 <add key="myget.org" value="https://www.myget.org/F/zlzforever/api/v3/index.json" protocolVersion="3" />
-```
+````
 
 ### DESIGN
 
@@ -74,81 +74,104 @@ https://github.com/dotnetcore/DotnetSpider/wiki
 
 [View complete Codes](https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Sample/samples/EntitySpider.cs)
 
-		public class EntitySpider : Spider
-		{
-			public static async Task RunAsync()
-			{
-				var builder = Builder.CreateDefaultBuilder<EntitySpider>();
-				builder.UseSerilog();
-				builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
-				await builder.Build().RunAsync();
-			}
+````csharp
+public class EntitySpider : Spider
+{
+    public EntitySpider(IOptions<SpiderOptions> options, SpiderServices services, ILogger<Spider> logger) : base(
+        options, services, logger)
+    {
+    }
 
-			public EntitySpider(IOptions<SpiderOptions> options, SpiderServices services, ILogger<Spider> logger) : base(
-				options, services, logger)
-			{
-			}
+    #region Nested type: CnblogsEntry
 
-			protected override async Task InitializeAsync(CancellationToken stoppingToken)
-			{
-				AddDataFlow(new DataParser<CnblogsEntry>());
-				AddDataFlow(GetDefaultStorage());
-				await AddRequestsAsync(
-					new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}}),
-					new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}}));
-			}
+    [Schema("cnblogs", "news")]
+    [EntitySelector(Expression = ".//div[@class='news_block']", Type = SelectorType.XPath)]
+    [GlobalValueSelector(Expression = ".//a[@class='current']", Name = "类别", Type = SelectorType.XPath)]
+    [FollowRequestSelector(XPaths = new[]
+    {
+        "//div[@class='pager']"
+    })]
+    public class CnblogsEntry : EntityBase<CnblogsEntry>
+    {
+        public int Id { get; set; }
 
-			protected override (string Id, string Name) GetIdAndName()
-			{
-				return (ObjectId.NewId.ToString(), "博客园");
-			}
+        [Required]
+        [StringLength(200)]
+        [ValueSelector(Expression = "类别", Type = SelectorType.Environment)]
+        public string Category { get; set; }
 
-			[Schema("cnblogs", "news")]
-			[EntitySelector(Expression = ".//div[@class='news_block']", Type = SelectorType.XPath)]
-			[GlobalValueSelector(Expression = ".//a[@class='current']", Name = "类别", Type = SelectorType.XPath)]
-			[FollowRequestSelector(XPaths = new[] {"//div[@class='pager']"})]
-			public class CnblogsEntry : EntityBase<CnblogsEntry>
-			{
-				protected override void Configure()
-				{
-					HasIndex(x => x.Title);
-					HasIndex(x => new {x.WebSite, x.Guid}, true);
-				}
+        [Required]
+        [StringLength(200)]
+        [ValueSelector(Expression = "网站", Type = SelectorType.Environment)]
+        public string WebSite { get; set; }
 
-				public int Id { get; set; }
+        [StringLength(200)]
+        [ValueSelector(Expression = "//title")]
+        [ReplaceFormatter(NewValue = "", OldValue = " - 博客园")]
+        public string Title { get; set; }
 
-				[Required]
-				[StringLength(200)]
-				[ValueSelector(Expression = "类别", Type = SelectorType.Environment)]
-				public string Category { get; set; }
+        [StringLength(40)]
+        [ValueSelector(Expression = "GUID", Type = SelectorType.Environment)]
+        public string Guid { get; set; }
 
-				[Required]
-				[StringLength(200)]
-				[ValueSelector(Expression = "网站", Type = SelectorType.Environment)]
-				public string WebSite { get; set; }
+        [ValueSelector(Expression = ".//h2[@class='news_entry']/a")]
+        public string News { get; set; }
 
-				[StringLength(200)]
-				[ValueSelector(Expression = "//title")]
-				[ReplaceFormatter(NewValue = "", OldValue = " - 博客园")]
-				public string Title { get; set; }
+        [ValueSelector(Expression = ".//h2[@class='news_entry']/a/@href")]
+        public string Url { get; set; }
 
-				[StringLength(40)]
-				[ValueSelector(Expression = "GUID", Type = SelectorType.Environment)]
-				public string Guid { get; set; }
+        [ValueSelector(Expression = ".//div[@class='entry_summary']")]
+        public string PlainText { get; set; }
 
-				[ValueSelector(Expression = ".//h2[@class='news_entry']/a")]
-				public string News { get; set; }
+        [ValueSelector(Expression = "DATETIME", Type = SelectorType.Environment)]
+        public DateTime CreationTime { get; set; }
 
-				[ValueSelector(Expression = ".//h2[@class='news_entry']/a/@href")]
-				public string Url { get; set; }
+        protected override void Configure()
+        {
+            HasIndex(x => x.Title);
+            HasIndex(x => new
+            {
+                x.WebSite,
+                x.Guid
+            }, true);
+        }
+    }
 
-				[ValueSelector(Expression = ".//div[@class='entry_summary']")]
-				public string PlainText { get; set; }
+    #endregion
 
-				[ValueSelector(Expression = "DATETIME", Type = SelectorType.Environment)]
-				public DateTime CreationTime { get; set; }
-			}
-		}
+    public static async Task RunAsync()
+    {
+        var builder = Builder.CreateDefaultBuilder<EntitySpider>();
+        builder.UseSerilog();
+        builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
+        await builder.Build()
+            .RunAsync();
+    }
+
+    protected override async Task InitializeAsync(CancellationToken stoppingToken)
+    {
+        AddDataFlow(new DataParser<CnblogsEntry>());
+        AddDataFlow(GetDefaultStorage());
+        await AddRequestsAsync(new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string>
+        {
+            {
+                "网站", "博客园"
+            }
+        }), new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string>
+        {
+            {
+                "网站", "博客园"
+            }
+        }));
+    }
+
+    protected override (string Id, string Name) GetIdAndName()
+    {
+        return (ObjectId.NewId.ToString(), "博客园");
+    }
+}
+
+````
 
 #### Distributed spider
 
