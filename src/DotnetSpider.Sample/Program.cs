@@ -28,7 +28,7 @@ namespace DotnetSpider.Sample
 			// // await DistributedSpider.RunAsync();
 			// await ProxySpider.RunAsync();
 			// await EntitySpider.RunMySqlQueueAsync();
-			await ImageSpider.RunAsync();
+			await CnblogsSpider.RunAsync();
 
 			Console.WriteLine("Bye!");
 		}

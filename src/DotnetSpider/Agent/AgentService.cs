@@ -46,7 +46,7 @@ namespace DotnetSpider.Agent
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			_logger.LogInformation(
+			_logger.LogDebug(
 				_messageQueue.IsDistributed
 					? $"Agent {_options.AgentId}, {_options.AgentName} is starting"
 					: "Agent is starting");
@@ -66,26 +66,23 @@ namespace DotnetSpider.Agent
 					});
 			}
 
-			// 同类型下载器注册于相同的 topic，用于负载均衡
+			// 同类型下载器注册于相同的 topic， 用于负载均衡
 			await RegisterAgentAsync(_downloader.Name, stoppingToken);
 
 			if (_messageQueue.IsDistributed)
 			{
 				// 注册 agent_{id} 用于固定节点下载
 				await RegisterAgentAsync(string.Format(Topics.Spider, _options.AgentId), stoppingToken);
-			}
 
-			// 分布式才需要发送心跳
-			if (_messageQueue.IsDistributed)
-			{
-				await Task.Factory.StartNew(async () =>
+				// 分布式才需要发送心跳
+				Task.Factory.StartNew(async () =>
 				{
 					while (!stoppingToken.IsCancellationRequested)
 					{
 						await HeartbeatAsync();
 						await Task.Delay(5000, stoppingToken);
 					}
-				}, stoppingToken);
+				}, stoppingToken).ConfigureAwait(true).GetAwaiter();
 			}
 
 			_logger.LogInformation(_messageQueue.IsDistributed
@@ -121,14 +118,14 @@ namespace DotnetSpider.Agent
 			switch (message)
 			{
 				case Messages.Agent.Exit exit:
-				{
-					if (exit.AgentId == _options.AgentId)
 					{
-						_applicationLifetime.StopApplication();
-					}
+						if (exit.AgentId == _options.AgentId)
+						{
+							_applicationLifetime.StopApplication();
+						}
 
-					break;
-				}
+						break;
+					}
 				case Request request:
 					Task.Factory.StartNew(async () =>
 					{
@@ -150,11 +147,11 @@ namespace DotnetSpider.Agent
 					}).ConfigureAwait(false).GetAwaiter();
 					break;
 				default:
-				{
-					var msg = JsonSerializer.Serialize(message);
-					_logger.LogWarning($"Message not supported: {msg}");
-					break;
-				}
+					{
+						var msg = JsonSerializer.Serialize(message);
+						_logger.LogWarning($"Message not supported: {msg}");
+						break;
+					}
 			}
 		}
 
@@ -167,7 +164,7 @@ namespace DotnetSpider.Agent
 				{
 					AgentId = _options.AgentId,
 					AgentName = _options.AgentName,
-					AvailableMemory =  MachineInfo.Current.AvailableMemory,
+					AvailableMemory = MachineInfo.Current.AvailableMemory,
 					CpuLoad = 0
 				});
 		}

@@ -30,7 +30,7 @@ namespace DotnetSpider.Statistics
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			_logger.LogInformation("Statistics service starting");
+			_logger.LogDebug("Statistics service starting");
 			await _statisticsStore.EnsureDatabaseAndTableCreatedAsync();
 
 			_consumer = new AsyncMessageConsumer<byte[]>(Topics.Statistics);

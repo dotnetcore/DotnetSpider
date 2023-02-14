@@ -40,8 +40,11 @@ namespace DotnetSpider.Sample.samples
 		{
 			AddDataFlow(new ListNewsParser());
 			AddDataFlow(new NewsParser());
-			AddDataFlow(new MyConsoleStorage());
-			await AddRequestsAsync(new Request("https://news.cnblogs.com/n/page/1/"));
+			var request = new Request("https://news.cnblogs.com/n/page/1")
+			{
+			};
+			request.Headers.UserAgent = "";
+			await AddRequestsAsync(request);
 		}
 
 		protected override SpiderId GenerateSpiderId()
@@ -49,45 +52,14 @@ namespace DotnetSpider.Sample.samples
 			return new(ObjectId.CreateId().ToString(), "博客园");
 		}
 
-		protected class MyConsoleStorage : DataFlowBase
-		{
-			public override Task InitializeAsync()
-			{
-				return Task.CompletedTask;
-			}
-
-			public override Task HandleAsync(DataFlowContext context)
-			{
-				if (IsNullOrEmpty(context))
-				{
-					Logger.LogWarning("数据流上下文不包含解析结果");
-					return Task.CompletedTask;
-				}
-
-				var typeName = typeof(News).FullName;
-				var data = context.GetData(typeName);
-				if (data is News news)
-				{
-					Console.WriteLine($"URL: {news.Url}, TITLE: {news.Title}, VIEWS: {news.Views}");
-				}
-
-				return Task.CompletedTask;
-			}
-		}
 
 		protected class ListNewsParser : DataParser
 		{
 			public override Task InitializeAsync()
 			{
-				// AddRequiredValidator("news\\.cnblogs\\.com/n/page");
-				AddRequiredValidator((request =>
-				{
-					var host = request.RequestUri.Host;
-					var regex = host + "/$";
-					return Regex.IsMatch(request.RequestUri.ToString(), regex);
-				}));
+				AddRequiredValidator("news\\.cnblogs\\.com/n/page");
 				// if you want to collect every pages
-				// AddFollowRequestQuerier(Selectors.XPath(".//div[@class='pager']"));
+				AddFollowRequestQuerier(Selectors.XPath(".//div[@class='pager']"));
 				return Task.CompletedTask;
 			}
 
@@ -128,16 +100,22 @@ namespace DotnetSpider.Sample.samples
 			protected override Task ParseAsync(DataFlowContext context)
 			{
 				var typeName = typeof(News).FullName;
+				var url = context.Request.RequestUri.ToString();
+				var title = context.Request.Properties["title"]?.ToString()?.Trim();
+				var summary = context.Request.Properties["summary"]?.ToString()?.Trim();
+				var views = int.Parse(context.Request.Properties["views"]?.ToString()?.Trim() ?? "0");
+				var content = context.Selectable.Select(Selectors.XPath(".//div[@id='news_body']"))?.Value
+					?.Trim();
 				context.AddData(typeName,
 					new News
 					{
-						Url = context.Request.RequestUri.ToString(),
-						Title = context.Request.Properties["title"]?.ToString()?.Trim(),
-						Summary = context.Request.Properties["summary"]?.ToString()?.Trim(),
-						Views = int.Parse(context.Request.Properties["views"]?.ToString()?.Trim() ?? "0"),
-						Content = context.Selectable.Select(Selectors.XPath(".//div[@id='news_body']")).Value
-							?.Trim()
+						Url = url,
+						Title = title,
+						Summary = summary,
+						Views = views,
+						Content = content
 					});
+
 				return Task.CompletedTask;
 			}
 		}

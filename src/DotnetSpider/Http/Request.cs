@@ -16,7 +16,7 @@ namespace DotnetSpider.Http
 	[Serializable]
 	public class Request : IDisposable
 	{
-		private static HashSet<string> _hashBodyMethods = new() {"DELETE", "POST", "PATCH", "PUT"};
+		private static HashSet<string> _hashBodyMethods = new() { "DELETE", "POST", "PATCH", "PUT" };
 
 		private string _method;
 		private Uri _requestUri;
@@ -108,15 +108,12 @@ namespace DotnetSpider.Http
 		public Uri RequestUri
 		{
 			get => _requestUri;
-			set
-			{
+			set =>
 				/*if (value != null && value.IsAbsoluteUri && !UriUtilities.IsHttpUri(value))
 				{
 					throw new ArgumentException($"http base address required: {value}");
 				}*/
-
 				_requestUri = value;
-			}
 		}
 
 		public RequestHeaders Headers => _headers ??= new RequestHeaders();
@@ -141,16 +138,6 @@ namespace DotnetSpider.Http
 			}
 		}
 
-		/// <summary>
-		/// 设置 Cookie
-		/// </summary>
-		[IgnoreMember, JsonIgnore]
-		public string Cookie
-		{
-			get => Headers.Cookie;
-			set => Headers.Cookie = value;
-		}
-
 		public Request()
 			: this(null)
 		{
@@ -171,7 +158,6 @@ namespace DotnetSpider.Http
 			string.IsNullOrEmpty(requestUri) ? null : new Uri(requestUri, UriKind.RelativeOrAbsolute), properties)
 		{
 		}
-
 
 		public Request(string method = "GET", Uri requestUri = null, Dictionary<string, object> properties = null)
 		{
