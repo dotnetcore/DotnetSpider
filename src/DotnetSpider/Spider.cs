@@ -192,7 +192,6 @@ namespace DotnetSpider
 						$"Request {request.RequestUri}, {request.Hash} set to use PPPoE but PPPoERegex is empty");
 				}
 
-				request.RequestedTimes += 1;
 
 				// 1. 请求次数超过限制则跳过，并添加失败记录
 				// 2. 默认构造的请求次数为 0， 并且不允许用户更改，因此可以保证数据安全性
@@ -475,6 +474,8 @@ namespace DotnetSpider
 
 			foreach (var request in timeoutRequests)
 			{
+				request.RequestedTimes += 1;
+
 				Logger.LogWarning(
 					$"{SpiderId} request {request.RequestUri}, {request.Hash} timeout");
 			}
