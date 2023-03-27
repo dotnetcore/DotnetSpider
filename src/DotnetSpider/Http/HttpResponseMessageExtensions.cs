@@ -8,11 +8,11 @@ namespace DotnetSpider.Http
 	{
 		public static async Task<Response> ToResponseAsync(this HttpResponseMessage httpResponseMessage)
 		{
-			var response = new Response {StatusCode = httpResponseMessage.StatusCode};
+			var response = new Response { StatusCode = httpResponseMessage.StatusCode };
 
 			foreach (var header in httpResponseMessage.Headers)
 			{
-				response.Headers.Add(header.Key, header.Value?.ToString());
+				response.Headers.Add(header.Key, string.Join("; ", header.Value));
 			}
 
 			response.Version = httpResponseMessage.Version == null
@@ -25,7 +25,7 @@ namespace DotnetSpider.Http
 
 			foreach (var header in httpResponseMessage.Content.Headers)
 			{
-				response.Content.Headers.Add(header.Key, header.Value?.ToString());
+				response.Content.Headers.Add(header.Key, string.Join("; ", header.Value));
 			}
 
 			return response;
