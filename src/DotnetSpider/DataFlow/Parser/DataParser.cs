@@ -43,7 +43,7 @@ namespace DotnetSpider.DataFlow.Parser
 		{
 			_followRequestQueriers.Add(context =>
 			{
-				var requests = context.Selectable.SelectList(selector)
+				var requests = context.Selectable.SelectList(selector)?
 					.Where(x => x != null)
 					.SelectMany(x => x.Links())
 					.Select(x =>
