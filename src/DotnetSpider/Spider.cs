@@ -296,7 +296,7 @@ namespace DotnetSpider
 									Logger.LogError(
 										$"{SpiderId} download {request.RequestUri}, {request.Hash} status code: {response.StatusCode} failed: {response.ReasonPhrase}");
 
-									// 每次调用添加会导致 Requested + 1, 因此失败多次的请求最终会被过滤不再加到调度队列
+									request.RequestedTimes += 1;
 									await AddRequestsAsync(request);
 
 									OnRequestError?.Invoke(request, response);
@@ -394,7 +394,7 @@ namespace DotnetSpider
 						sleepTime += 10;
 
 						if (await WaitForContinueAsync(sleepTime, sleepTimeLimit, (end - start).TotalSeconds,
-							$"{SpiderId} too much requests enqueued"))
+							    $"{SpiderId} too much requests enqueued"))
 						{
 							continue;
 						}
