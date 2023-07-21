@@ -31,6 +31,7 @@ ProjectSection(SolutionItems) = preProject
 	publish_nuget.sh = publish_nuget.sh
 	publish_myget.sh = publish_myget.sh
 	publish_package.sh = publish_package.sh
+	build.sh = build.sh
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Agent", "src\DotnetSpider.Agent\DotnetSpider.Agent.csproj", "{FCCA37B0-FF8F-4C32-9286-26A39EFA94E5}"
