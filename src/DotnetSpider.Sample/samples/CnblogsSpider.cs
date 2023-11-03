@@ -17,11 +17,11 @@ using Serilog;
 
 namespace DotnetSpider.Sample.samples
 {
-	public class CnblogsSpider : Spider
+	public class CnBlogsSpider : Spider
 	{
 		public static async Task RunAsync()
 		{
-			var builder = Builder.CreateDefaultBuilder<CnblogsSpider>();
+			var builder = Builder.CreateDefaultBuilder<CnBlogsSpider>();
 			builder.UseSerilog();
 			builder.UseDownloader<HttpClientDownloader>();
 			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
@@ -29,7 +29,7 @@ namespace DotnetSpider.Sample.samples
 			await builder.Build().RunAsync();
 		}
 
-		public CnblogsSpider(IOptions<SpiderOptions> options,
+		public CnBlogsSpider(IOptions<SpiderOptions> options,
 			DependenceServices services,
 			ILogger<Spider> logger) : base(
 			options, services, logger)

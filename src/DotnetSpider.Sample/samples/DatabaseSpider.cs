@@ -14,7 +14,7 @@ using Serilog;
 
 namespace DotnetSpider.Sample.samples
 {
-	public class DatabaseSpider : CnblogsSpider
+	public class DatabaseSpider : CnBlogsSpider
 	{
 		public static new async Task RunAsync()
 		{
