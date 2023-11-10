@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
 using DotnetSpider.Scheduler.Component;
+using Microsoft.Extensions.Options;
 
 namespace DotnetSpider.Scheduler
 {
@@ -12,12 +13,14 @@ namespace DotnetSpider.Scheduler
 	/// </summary>
 	public class QueueDistinctBfsScheduler : SchedulerBase
 	{
+		readonly SpiderOptions _options;
 		private readonly List<Request> _requests =
 			new();
 
-		public QueueDistinctBfsScheduler(IDuplicateRemover duplicateRemover, IRequestHasher requestHasher)
+		public QueueDistinctBfsScheduler(IDuplicateRemover duplicateRemover, IRequestHasher requestHasher, IOptions<SpiderOptions> options)
 			: base(duplicateRemover, requestHasher)
 		{
+			_options = options.Value;
 		}
 
 		public override void Dispose()
@@ -47,10 +50,29 @@ namespace DotnetSpider.Scheduler
 		/// <returns>请求</returns>
 		protected override Task<IEnumerable<Request>> ImplDequeueAsync(int count = 1)
 		{
-			var requests = _requests.Take(count).ToArray();
-			if (requests.Length > 0)
+			Request[] requests = null;
+
+			if (_options.OneRequestDoneFirst)
 			{
-				_requests.RemoveRange(0, requests.Length);
+				requests = _requests
+					 .OrderByDescending(x => x.Depth)
+					 .Take(count).ToArray();
+
+				if (requests.Length > 0)
+				{
+					for (int i = 0; i < requests.Length; i++)
+					{
+						_requests.Remove(requests[i]);
+					}
+				}
+			}
+			else
+			{
+				requests = _requests.Take(count).ToArray();
+				if (requests.Length > 0)
+				{
+					_requests.RemoveRange(0, count);
+				}
 			}
 
 			return Task.FromResult(requests.Select(x => x.Clone()));

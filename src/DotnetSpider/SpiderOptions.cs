@@ -46,5 +46,10 @@ namespace DotnetSpider
 		/// 获取新代码的时间间隔
 		/// </summary>
 		public int RefreshProxy { get; set; } = 30;
+
+		/// <summary>
+		/// 优先处理 request -> sub request -> sub request -> .... -> IDataFlow
+		/// </summary>
+		public bool OneRequestDoneFirst { get; set; } = false;
 	}
 }
