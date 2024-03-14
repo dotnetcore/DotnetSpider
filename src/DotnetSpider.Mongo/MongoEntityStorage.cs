@@ -2,12 +2,15 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Storage;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 
 [assembly: InternalsVisibleTo("DotnetSpider.Tests")]
@@ -76,6 +79,11 @@ namespace DotnetSpider.Mongo
 
 				var db = _cache[tableMetadata.Schema.Database];
 				var collection = db.GetCollection<BsonDocument>(tableMetadata.Schema.Table);
+
+				BsonSerializer
+					.RegisterSerializer(new ObjectSerializer(type =>
+						ObjectSerializer.DefaultAllowedTypes(type) ||
+						list.Cast<object>().Any(o => o.GetType().FullName == type.FullName)));
 
 				var bsonDocs = new List<BsonDocument>();
 				foreach (var data in list)

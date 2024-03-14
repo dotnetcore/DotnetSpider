@@ -28,7 +28,7 @@ public class CollectNewRequestTests
 			var builder = Builder.CreateDefaultBuilder<TestSpider>(x =>
 			{
 				x.Speed = 1;
-				x.EmptySleepTime = 5;
+				x.EmptySleepTime = 10;
 			});
 			builder.UseDownloader<HttpClientDownloader>();
 			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
