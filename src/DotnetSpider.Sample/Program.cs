@@ -21,7 +21,7 @@ namespace DotnetSpider.Sample
 				.MinimumLevel.Override("System", LogEventLevel.Warning)
 				.MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Warning)
 				.Enrich.FromLogContext()
-				.WriteTo.Console().WriteTo.RollingFile("logs/spider.log")
+				.WriteTo.Console().WriteTo.File("logs/spider.log")
 				.CreateLogger();
 
 
