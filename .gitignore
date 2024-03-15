@@ -376,3 +376,5 @@ $RECYCLE.BIN/
 # Wechat App
 miniprogram_npm/
 
+# Environment variables file
+.env

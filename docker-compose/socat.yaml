@@ -1,0 +1,14 @@
+version: '3'
+name: dotnetspider
+
+services:
+  socat:
+    image: 'bobrik/socat'
+    command: TCP4-LISTEN:2375,fork,reuseaddr UNIX-CONNECT:/var/run/docker.sock
+    restart: always
+    ports:
+      - 2376:2375
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TZ=${TZ:-Asia/Shanghai}

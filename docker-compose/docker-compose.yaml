@@ -8,32 +8,39 @@ services:
     ports:
       - 3306:3306
     environment:
-      MYSQL_ROOT_PASSWORD: 1qazZAQ!
+      - TZ=${TZ:-Asia/Shanghai}
+      - MYSQL_ROOT_PASSWORD=1qazZAQ!
   redis:
     image: 'redis:latest'
     restart: always
     ports:
       - 6379:6379
+    environment:
+      - TZ=${TZ:-Asia/Shanghai}
   sqlserver:
     image: 'mcr.microsoft.com/mssql/server:2017-latest'
     restart: always
     ports:
       - 1433:1433
     environment:
-      SA_PASSWORD: 1qazZAQ!
-      ACCEPT_EULA: Y
+      - TZ=${TZ:-Asia/Shanghai}
+      - SA_PASSWORD=1qazZAQ!
+      - ACCEPT_EULA=Y
   postgres:
     image: 'postgres:latest'
     restart: always
     ports:
       - 5432:5432
     environment:
-      POSTGRES_PASSWORD: 1qazZAQ!
+      - TZ=${TZ:-Asia/Shanghai}
+      - POSTGRES_PASSWORD=1qazZAQ!
   mongo:
     image: 'mongo:latest'
     restart: always
     ports:
       - 27017:27017
+    environment:
+      - TZ=${TZ:-Asia/Shanghai}
   rabbitmq:
     image: 'rabbitmq:3-management'
     restart: always
@@ -45,8 +52,9 @@ services:
       - 15672:15672
       - 25672:25672
     environment:
-      RABBITMQ_DEFAULT_USER: user
-      RABBITMQ_DEFAULT_PASS: password
+      - TZ=${TZ:-Asia/Shanghai}
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
   hbase:
     image: 'dajobe/hbase:latest'
     restart: always
@@ -56,17 +64,5 @@ services:
       - 9095:9095
       - 16010:16010
       - 20550:20550
-  dotnetspider.agent1:
-    image: 'dotnetspider/agent:latest'
-    restart: always
-    volumes:
-      - ./agent1.json:/agent/appsettings.json
-  dotnetspider.agent2:
-    image: 'dotnetspider/agent:latest'
-    restart: always
-    volumes:
-      - ./agent2.json:/agent/appsettings.json
-
-networks:
-  dotnetspider:
-    driver: bridge
+    environment:
+      - TZ=${TZ:-Asia/Shanghai}
