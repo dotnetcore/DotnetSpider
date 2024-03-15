@@ -1,0 +1,72 @@
+version: '3'
+name: dotnetspider
+
+services:
+  mysql:
+    image: 'mysql:5.7'
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: 1qazZAQ!
+  redis:
+    image: 'redis:latest'
+    restart: always
+    ports:
+      - 6379:6379
+  sqlserver:
+    image: 'mcr.microsoft.com/mssql/server:2017-latest'
+    restart: always
+    ports:
+      - 1433:1433
+    environment:
+      SA_PASSWORD: 1qazZAQ!
+      ACCEPT_EULA: Y
+  postgres:
+    image: 'postgres:latest'
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: 1qazZAQ!
+  mongo:
+    image: 'mongo:latest'
+    restart: always
+    ports:
+      - 27017:27017
+  rabbitmq:
+    image: 'rabbitmq:3-management'
+    restart: always
+    ports:
+      - 4369:4369
+      - 5671:5671
+      - 5672:5672
+      - 15671:15671
+      - 15672:15672
+      - 25672:25672
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+  hbase:
+    image: 'dajobe/hbase:latest'
+    restart: always
+    ports:
+      - 8085:8085
+      - 9090:9090
+      - 9095:9095
+      - 16010:16010
+      - 20550:20550
+  dotnetspider.agent1:
+    image: 'dotnetspider/agent:latest'
+    restart: always
+    volumes:
+      - ./agent1.json:/agent/appsettings.json
+  dotnetspider.agent2:
+    image: 'dotnetspider/agent:latest'
+    restart: always
+    volumes:
+      - ./agent2.json:/agent/appsettings.json
+
+networks:
+  dotnetspider:
+    driver: bridge
