@@ -17,4 +17,4 @@ echo TZ=Europe/Stockholm > .env & docker-compose -f docker-compose.yaml -d
 docker-compose -f portal.yaml -f agent.yaml up -d
 ```
 
-**NOTE:** To run the above commands in a"attached mode, remove the `-d` flag from the commands.
+**NOTE:** To run the above commands in attached mode, remove the `-d` flag from the commands.
