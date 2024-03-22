@@ -379,7 +379,8 @@ namespace DotnetSpider
 			{
 				var sleepTimeLimit = Options.EmptySleepTime * 1000;
 
-				var bucket = CreateBucket(Options.Speed);
+				var speed = Options.Speed;
+				var bucket = CreateBucket(speed);
 				var sleepTime = 0;
 				var batch = (int)Options.Batch;
 				var start = DateTime.Now;
@@ -409,6 +410,12 @@ namespace DotnetSpider
 						continue;
 					}
 
+					// If the batch size is changed, we should update the batch size
+					if (batch != Options.Batch)
+					{
+						batch = (int)Options.Batch;
+					}
+
 					var requests = (await _services.Scheduler.DequeueAsync(batch)).ToArray();
 
 					if (requests.Length > 0)
@@ -429,6 +436,15 @@ namespace DotnetSpider
 							while (bucket.ShouldThrottle(1, out var waitTimeMillis))
 							{
 								await Task.Delay(waitTimeMillis, default);
+							}
+
+							// If the speed is changed, the bucket needs to be recreated
+							// Since the maximum speed is 500, the smallest division is 0.002, so the comparison is accurate to 0.001
+							if (Math.Abs(speed - Options.Speed) > 0.001)
+							{
+								speed = Options.Speed;
+
+								bucket = CreateBucket(speed);
 							}
 
 							if (!await PublishRequestMessagesAsync(request))
