@@ -75,8 +75,7 @@ namespace DotnetSpider.Http
 
 		public string ReadAsString()
 		{
-			// todo: 推测编码
-			return Encoding.UTF8.GetString(Content.Bytes);
+			return Content.GetEncoding().GetString(Content.Bytes);
 		}
 
 		protected virtual void Dispose(bool disposing)
