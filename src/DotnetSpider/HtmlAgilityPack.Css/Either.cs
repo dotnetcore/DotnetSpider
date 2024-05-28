@@ -24,107 +24,105 @@
 using System;
 using System.Collections.Generic;
 
-namespace DotnetSpider.HtmlAgilityPack.Css
+namespace DotnetSpider.HtmlAgilityPack.Css;
+// Adapted from Mono Rocks
+
+internal abstract class Either<TA, TB>
+    : IEquatable<Either<TA, TB>>
 {
-    // Adapted from Mono Rocks
+    private Either() { }
 
-    internal abstract class Either<TA, TB>
-            : IEquatable<Either<TA, TB>>
+    public static Either<TA, TB> A(TA value)
     {
-        private Either() { }
+        if (value == null) throw new ArgumentNullException("value");
+        return new AImpl(value);
+    }
 
-        public static Either<TA, TB> A(TA value)
+    public static Either<TA, TB> B(TB value)
+    {
+        if (value == null) throw new ArgumentNullException("value");
+        return new BImpl(value);
+    }
+
+    public abstract override bool Equals(object obj);
+    public abstract bool Equals(Either<TA, TB> obj);
+    public abstract override int GetHashCode();
+    public abstract override string ToString();
+    public abstract TResult Fold<TResult>(Func<TA, TResult> a, Func<TB, TResult> b);
+
+    private sealed class AImpl : Either<TA, TB>
+    {
+        private readonly TA _value;
+
+        public AImpl(TA value)
         {
-            if (value == null) throw new ArgumentNullException("value");
-            return new AImpl(value);
+            _value = value;
         }
 
-        public static Either<TA, TB> B(TB value)
+        public override int GetHashCode()
         {
-            if (value == null) throw new ArgumentNullException("value");
-            return new BImpl(value);
+            return _value.GetHashCode();
         }
 
-        public abstract override bool Equals(object obj);
-        public abstract bool Equals(Either<TA, TB> obj);
-        public abstract override int GetHashCode();
-        public abstract override string ToString();
-        public abstract TResult Fold<TResult>(Func<TA, TResult> a, Func<TB, TResult> b);
-
-        private sealed class AImpl : Either<TA, TB>
+        public override bool Equals(object obj)
         {
-            private readonly TA _value;
-
-            public AImpl(TA value)
-            {
-                _value = value;
-            }
-
-            public override int GetHashCode()
-            {
-                return _value.GetHashCode();
-            }
-
-            public override bool Equals(object obj)
-            {
-                return Equals(obj as AImpl);
-            }
-
-            public override bool Equals(Either<TA, TB> obj)
-            {
-	            return obj is AImpl a
-	                   && EqualityComparer<TA>.Default.Equals(_value, a._value);
-            }
-
-            public override TResult Fold<TResult>(Func<TA, TResult> a, Func<TB, TResult> b)
-            {
-                if (a == null) throw new ArgumentNullException("a");
-                if (b == null) throw new ArgumentNullException("b");
-                return a(_value);
-            }
-
-            public override string ToString()
-            {
-                return _value.ToString();
-            }
+            return Equals(obj as AImpl);
         }
 
-        private sealed class BImpl : Either<TA, TB>
+        public override bool Equals(Either<TA, TB> obj)
         {
-            private readonly TB _value;
+            return obj is AImpl a
+                   && EqualityComparer<TA>.Default.Equals(_value, a._value);
+        }
 
-            public BImpl(TB value)
-            {
-                _value = value;
-            }
+        public override TResult Fold<TResult>(Func<TA, TResult> a, Func<TB, TResult> b)
+        {
+            if (a == null) throw new ArgumentNullException("a");
+            if (b == null) throw new ArgumentNullException("b");
+            return a(_value);
+        }
 
-            public override int GetHashCode()
-            {
-                return _value.GetHashCode();
-            }
+        public override string ToString()
+        {
+            return _value.ToString();
+        }
+    }
 
-            public override bool Equals(object obj)
-            {
-                return Equals(obj as BImpl);
-            }
+    private sealed class BImpl : Either<TA, TB>
+    {
+        private readonly TB _value;
 
-            public override bool Equals(Either<TA, TB> obj)
-            {
-	            return obj is BImpl b
-	                   && EqualityComparer<TB>.Default.Equals(_value, b._value);
-            }
+        public BImpl(TB value)
+        {
+            _value = value;
+        }
 
-            public override TResult Fold<TResult>(Func<TA, TResult> a, Func<TB, TResult> b)
-            {
-                if (a == null) throw new ArgumentNullException("a");
-                if (b == null) throw new ArgumentNullException("b");
-                return b(_value);
-            }
+        public override int GetHashCode()
+        {
+            return _value.GetHashCode();
+        }
 
-            public override string ToString()
-            {
-                return _value.ToString();
-            }
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as BImpl);
+        }
+
+        public override bool Equals(Either<TA, TB> obj)
+        {
+            return obj is BImpl b
+                   && EqualityComparer<TB>.Default.Equals(_value, b._value);
+        }
+
+        public override TResult Fold<TResult>(Func<TA, TResult> a, Func<TB, TResult> b)
+        {
+            if (a == null) throw new ArgumentNullException("a");
+            if (b == null) throw new ArgumentNullException("b");
+            return b(_value);
+        }
+
+        public override string ToString()
+        {
+            return _value.ToString();
         }
     }
 }

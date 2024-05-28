@@ -1,11 +1,5 @@
 using System;
 
-namespace DotnetSpider
-{
-    public class SpiderException : Exception
-    {
-        public SpiderException(string msg) : base(msg)
-        {
-        }
-    }
-}
+namespace DotnetSpider;
+
+public class SpiderException(string msg) : Exception(msg);

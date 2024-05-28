@@ -1,9 +1,8 @@
 using System;
 
-namespace DotnetSpider.Http
+namespace DotnetSpider.Http;
+
+public interface IHttpContent : IDisposable, ICloneable
 {
-	public interface IHttpContent : IDisposable, ICloneable
-	{
-		ContentHeaders Headers { get; }
-	}
+    ContentHeaders Headers { get; }
 }

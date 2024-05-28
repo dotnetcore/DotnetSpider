@@ -1,33 +1,32 @@
-﻿namespace DotnetSpider.Selector
+﻿namespace DotnetSpider.Selector;
+
+/// <summary>
+/// 查询器类型
+/// </summary>
+public enum SelectorType
 {
     /// <summary>
-    /// 查询器类型
+    /// XPath
     /// </summary>
-    public enum SelectorType
-    {
-        /// <summary>
-        /// XPath
-        /// </summary>
-        XPath,
+    XPath,
 
-        /// <summary>
-        /// Regex
-        /// </summary>
-        Regex,
+    /// <summary>
+    /// Regex
+    /// </summary>
+    Regex,
 
-        /// <summary>
-        /// Css
-        /// </summary>
-        Css,
+    /// <summary>
+    /// Css
+    /// </summary>
+    Css,
 
-        /// <summary>
-        /// JsonPath
-        /// </summary>
-        JsonPath,
+    /// <summary>
+    /// JsonPath
+    /// </summary>
+    JsonPath,
 
-        /// <summary>
-        /// Environment
-        /// </summary>
-        Environment
-    }
+    /// <summary>
+    /// Environment
+    /// </summary>
+    Environment
 }

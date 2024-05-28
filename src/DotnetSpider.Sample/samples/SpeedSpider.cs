@@ -11,66 +11,65 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
 
-namespace DotnetSpider.Sample.samples
+namespace DotnetSpider.Sample.samples;
+
+public class SpeedSpider : Spider
 {
-	public class SpeedSpider : Spider
-	{
-		public static async Task RunAsync()
-		{
-			var builder = Builder.CreateDefaultBuilder<SpeedSpider>(options =>
-			{
-				options.Speed = 100;
-			});
-			builder.UseSerilog();
-			builder.UseDownloader<EmptyDownloader>();
-			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
-			await builder.Build().RunAsync();
-		}
+    public static async Task RunAsync()
+    {
+        var builder = Builder.CreateDefaultBuilder<SpeedSpider>(options =>
+        {
+            options.Speed = 100;
+        });
+        builder.UseSerilog();
+        // builder.UseDownloader<EmptyDownloader>();
+        builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
+        await builder.Build().RunAsync();
+    }
 
-		public SpeedSpider(IOptions<SpiderOptions> options,
-			DependenceServices services,
-			ILogger<Spider> logger) : base(
-			options, services, logger)
-		{
-		}
+    public SpeedSpider(IOptions<SpiderOptions> options,
+        DependenceServices services,
+        ILogger<Spider> logger) : base(
+        options, services, logger)
+    {
+    }
 
-		protected override async Task InitializeAsync(CancellationToken stoppingToken = default)
-		{
-			for (var i = 0; i < 100000; ++i)
-			{
-				await AddRequestsAsync(new Request("https://news.cnblogs.com/n/page/" + i)
-				{
-					Downloader = Downloaders.Empty
-				});
-			}
+    protected override async Task InitializeAsync(CancellationToken stoppingToken = default)
+    {
+        for (var i = 0; i < 100000; ++i)
+        {
+            await AddRequestsAsync(new Request("https://news.cnblogs.com/n/page/" + i)
+            {
+                Downloader = nameof(EmptyDownloader)
+            });
+        }
 
-			AddDataFlow(new MyDataFlow());
-		}
+        AddDataFlow<MyDataFlow>();
+    }
 
-		protected override SpiderId GenerateSpiderId()
-		{
-			return new(ObjectId.CreateId().ToString(), "speed");
-		}
+    protected override SpiderId GenerateSpiderId()
+    {
+        return new(ObjectId.CreateId().ToString(), "speed");
+    }
 
-		protected class MyDataFlow : DataFlowBase
-		{
-			private int _downloadCount;
+    protected class MyDataFlow : DataFlowBase
+    {
+        private int _downloadCount;
 
-			public override Task InitializeAsync()
-			{
-				return Task.CompletedTask;
-			}
+        public override Task InitializeAsync()
+        {
+            return Task.CompletedTask;
+        }
 
-			public override Task HandleAsync(DataFlowContext context)
-			{
-				Interlocked.Increment(ref _downloadCount);
-				if ((_downloadCount % 100) == 0)
-				{
-					Logger.LogInformation($"Complete {_downloadCount}");
-				}
+        public override async Task HandleAsync(DataFlowContext context, ResponseDelegate next)
+        {
+            Interlocked.Increment(ref _downloadCount);
+            if ((_downloadCount % 100) == 0)
+            {
+                Logger.LogInformation($"Complete {_downloadCount}");
+            }
 
-				return Task.CompletedTask;
-			}
-		}
-	}
+            await next(context);
+        }
+    }
 }

@@ -1,20 +1,14 @@
 using System.Security.Cryptography;
 using Murmur;
 
-namespace DotnetSpider.Infrastructure
+namespace DotnetSpider.Infrastructure;
+
+public class MurmurHashAlgorithmService : HashAlgorithmService
 {
-	public class MurmurHashAlgorithmService : HashAlgorithmService
-	{
-		private readonly HashAlgorithm _hashAlgorithm;
+    private readonly HashAlgorithm _hashAlgorithm = MurmurHash.Create32();
 
-		public MurmurHashAlgorithmService()
-		{
-			_hashAlgorithm = MurmurHash.Create32();
-		}
-
-		protected override HashAlgorithm GetHashAlgorithm()
-		{
-			return _hashAlgorithm;
-		}
-	}
+    protected override HashAlgorithm GetHashAlgorithm()
+    {
+        return _hashAlgorithm;
+    }
 }

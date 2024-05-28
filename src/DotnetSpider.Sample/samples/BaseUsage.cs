@@ -13,56 +13,53 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
 
-namespace DotnetSpider.Sample.samples
+namespace DotnetSpider.Sample.samples;
+
+public class BaseUsageSpider(
+    IOptions<SpiderOptions> options,
+    DependenceServices services,
+    ILogger<Spider> logger)
+    : Spider(options, services, logger)
 {
-	public class BaseUsageSpider : Spider
-	{
-		public static async Task RunAsync()
-		{
-			var builder = Builder.CreateDefaultBuilder<BaseUsageSpider>(x =>
-			{
-				x.Speed = 5;
-			});
-			builder.UseSerilog();
-			builder.UseDownloader<HttpClientDownloader>();
-			builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
-			await builder.Build().RunAsync();
-		}
+    public static async Task RunAsync()
+    {
+        var builder = Builder.CreateDefaultBuilder<BaseUsageSpider>(x =>
+        {
+            x.Speed = 5;
+        });
+        builder.UseSerilog();
+        // builder.UseDownloader<HttpClientDownloader>();
+        builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
+        await builder.Build().RunAsync();
+    }
 
-		class MyDataParser : DataParser
-		{
-			protected override Task ParseAsync(DataFlowContext context)
-			{
-				context.AddData("URL", context.Request.RequestUri);
-				context.AddData("Title", context.Selectable.XPath(".//title")?.Value);
-				return Task.CompletedTask;
-			}
+    class MyDataParser : DataParser
+    {
+        protected override Task ParseAsync(DataFlowContext context)
+        {
+            context.AddData("URL", context.Request.RequestUri);
+            context.AddData("Title", context.Selectable.XPath(".//title")?.Value);
+            return Task.CompletedTask;
+        }
 
-			public override Task InitializeAsync()
-			{
-				AddRequiredValidator("cnblogs\\.com");
-				AddFollowRequestQuerier(Selectors.XPath("."));
+        public override Task InitializeAsync()
+        {
+            AddRequiredValidator("cnblogs\\.com");
+            AddFollowRequestQuerier(Selectors.XPath("."));
 
-				return Task.CompletedTask;
-			}
-		}
+            return Task.CompletedTask;
+        }
+    }
 
-		public BaseUsageSpider(IOptions<SpiderOptions> options, DependenceServices services,
-			ILogger<Spider> logger) : base(
-			options, services, logger)
-		{
-		}
+    protected override async Task InitializeAsync(CancellationToken stoppingToken = default)
+    {
+        await AddRequestsAsync(new Request("http://www.cnblogs.com/"));
+        AddDataFlow<MyDataParser>();
+        AddDataFlow<ConsoleStorage>();
+    }
 
-		protected override async Task InitializeAsync(CancellationToken stoppingToken)
-		{
-			await AddRequestsAsync(new Request("http://www.cnblogs.com/"));
-			AddDataFlow(new MyDataParser());
-			AddDataFlow(new ConsoleStorage());
-		}
-
-		protected override SpiderId GenerateSpiderId()
-		{
-			return new(ObjectId.CreateId().ToString(), "博客园");
-		}
-	}
+    protected override SpiderId GenerateSpiderId()
+    {
+        return new(ObjectId.CreateId().ToString(), "博客园");
+    }
 }

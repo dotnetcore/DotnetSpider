@@ -1,43 +1,33 @@
 using System;
 using DotnetSpider.Scheduler;
-using DotnetSpider.Statistics;
+using DotnetSpider.Statistic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using IMessageQueue = DotnetSpider.MessageQueue.IMessageQueue;
 
-namespace DotnetSpider
+namespace DotnetSpider;
+
+public class DependenceServices(
+    IServiceProvider serviceProvider,
+    IScheduler scheduler,
+    IMessageQueue messageQueue,
+    IStatisticService statisticService,
+    IHostApplicationLifetime applicationLifetime,
+    IConfiguration configuration,
+    HostBuilderContext builderContext)
+    : IDisposable
 {
-	public class DependenceServices : IDisposable
-	{
-		public IServiceProvider ServiceProvider { get; }
-		public IScheduler Scheduler { get; }
-		public IMessageQueue MessageQueue { get; }
-		public IStatisticsClient StatisticsClient { get; }
-		public IHostApplicationLifetime ApplicationLifetime { get; }
-		public HostBuilderContext HostBuilderContext { get; }
-		public IConfiguration Configuration { get; }
+    public IServiceProvider ServiceProvider { get; } = serviceProvider;
+    public IScheduler Scheduler { get; } = scheduler;
+    public IMessageQueue MessageQueue { get; } = messageQueue;
+    public IStatisticService StatisticService { get; } = statisticService;
+    public IHostApplicationLifetime ApplicationLifetime { get; } = applicationLifetime;
+    public HostBuilderContext HostBuilderContext { get; } = builderContext;
+    public IConfiguration Configuration { get; } = configuration;
 
-		public DependenceServices(IServiceProvider serviceProvider,
-			IScheduler scheduler,
-			IMessageQueue messageQueue,
-			IStatisticsClient statisticsClient,
-			IHostApplicationLifetime applicationLifetime,
-			IConfiguration configuration,
-			HostBuilderContext builderContext)
-		{
-			ServiceProvider = serviceProvider;
-			Scheduler = scheduler;
-			MessageQueue = messageQueue;
-			StatisticsClient = statisticsClient;
-			ApplicationLifetime = applicationLifetime;
-			HostBuilderContext = builderContext;
-			Configuration = configuration;
-		}
-
-		public void Dispose()
-		{
-			MessageQueue.Dispose();
-			Scheduler.Dispose();
-		}
-	}
+    public void Dispose()
+    {
+        MessageQueue.Dispose();
+        Scheduler.Dispose();
+    }
 }

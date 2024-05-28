@@ -1,8 +1,7 @@
-namespace DotnetSpider.Scheduler.Component
+namespace DotnetSpider.Scheduler.Component;
+
+public class BloomFilterOptions
 {
-    public class BloomFilterOptions
-    {
-        public double FalsePositiveProbability { get; set; }
-        public int ExpectedInsertions { get; set; }
-    }
+    public double FalsePositiveProbability { get; set; }
+    public int ExpectedInsertions { get; set; }
 }

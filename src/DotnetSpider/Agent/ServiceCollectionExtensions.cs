@@ -4,25 +4,28 @@ using DotnetSpider.Proxy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace DotnetSpider.Agent
+namespace DotnetSpider.Agent;
+
+public static class ServiceCollectionExtensions
 {
-	public static class ServiceCollectionExtensions
-	{
-		public static IServiceCollection AddAgent<TDownloader>(this IServiceCollection services,
-			Action<AgentOptions> configure = null)
-			where TDownloader : class, IDownloader
-		{
-			services.AddHttpClient();
+    public static IServiceCollection AddAgentHostService(this IServiceCollection services,
+        Action<AgentOptions> configure = null)
+    {
+        services.AddHttpClient();
 
-			if (configure != null)
-			{
-				services.Configure(configure);
-			}
+        if (configure != null)
+        {
+            services.Configure(configure);
+        }
 
-			services.TryAddSingleton<IProxyService, EmptyProxyService>();
-			services.AddSingleton<IDownloader, TDownloader>();
-			services.AddHostedService<AgentService>();
-			return services;
-		}
-	}
+        // 注册下载器
+        services.AddDownloader<HttpClientDownloader>();
+        services.AddDownloader<FileDownloader>();
+        services.AddDownloader<EmptyDownloader>();
+        services.AddDownloader<FakeHttpClientDownloader>();
+        services.AddDownloader<PPPoEHttpClientDownloader>();
+        services.TryAddSingleton<IProxyService, EmptyProxyService>();
+        services.AddHostedService<AgentHostService>();
+        return services;
+    }
 }

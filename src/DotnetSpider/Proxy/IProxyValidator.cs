@@ -1,10 +1,9 @@
 using System;
 using System.Threading.Tasks;
 
-namespace DotnetSpider.Proxy
+namespace DotnetSpider.Proxy;
+
+public interface IProxyValidator
 {
-    public interface IProxyValidator
-    {
-        Task<bool> IsAvailable(Uri proxy);
-    }
+    Task<bool> IsAvailable(Uri proxy);
 }

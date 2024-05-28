@@ -5,36 +5,27 @@ using System.Threading.Tasks;
 using DotnetSpider.Http;
 using Microsoft.Extensions.Logging;
 
-namespace DotnetSpider.Downloader
+namespace DotnetSpider.Downloader;
+
+public class EmptyDownloader(ILogger<EmptyDownloader> logger) : IDownloader
 {
-	public class EmptyDownloader : IDownloader
-	{
-		private int _downloadCount;
+    private int _downloadCount;
 
-		protected ILogger Logger { get; }
+    public Task<Response> DownloadAsync(Request request)
+    {
+        Interlocked.Increment(ref _downloadCount);
+        if ((_downloadCount % 100) == 0)
+        {
+            logger.LogInformation($"download {_downloadCount} already");
+        }
 
-		public EmptyDownloader(ILogger<EmptyDownloader> logger)
-		{
-			Logger = logger;
-		}
+        var response = new Response
+        {
+            RequestHash = request.Hash,
+            StatusCode = HttpStatusCode.OK,
+            Content = new ByteArrayContent(Encoding.UTF8.GetBytes(""))
+        };
+        return Task.FromResult(response);
+    }
 
-		public Task<Response> DownloadAsync(Request request)
-		{
-			Interlocked.Increment(ref _downloadCount);
-			if ((_downloadCount % 100) == 0)
-			{
-				Logger.LogInformation($"download {_downloadCount} already");
-			}
-
-			var response = new Response
-			{
-				RequestHash = request.Hash,
-				StatusCode = HttpStatusCode.OK,
-				Content = new ByteArrayContent(Encoding.UTF8.GetBytes(""))
-			};
-			return Task.FromResult(response);
-		}
-
-		public string Name => Downloaders.Empty;
-	}
 }

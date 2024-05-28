@@ -1,13 +1,12 @@
 using System;
 using System.Threading.Tasks;
 
-namespace DotnetSpider.Proxy
+namespace DotnetSpider.Proxy;
+
+public class FakeProxyValidator : IProxyValidator
 {
-	public class FakeProxyValidator : IProxyValidator
-	{
-		public Task<bool> IsAvailable(Uri proxy)
-		{
-			return Task.FromResult(true);
-		}
-	}
+    public Task<bool> IsAvailable(Uri proxy)
+    {
+        return Task.FromResult(true);
+    }
 }

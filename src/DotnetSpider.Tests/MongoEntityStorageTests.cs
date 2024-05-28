@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
-using DotnetSpider.DataFlow.Storage;
+using DotnetSpider.DataFlow.Storage.Entity;
 using DotnetSpider.Mongo;
 using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Bson;
@@ -10,41 +10,41 @@ using MongoDB.Driver;
 using Moq;
 using Xunit;
 
-namespace DotnetSpider.Tests
+namespace DotnetSpider.Tests;
+
+public class MongoEntityStorageTests
 {
-    public class MongoEntityStorageTests
+    [Schema("test", "CreateTableEntity1")]
+    public class CreateTableEntity1 : EntityBase<CreateTableEntity1>
     {
-        [Schema("test", "CreateTableEntity1")]
-        public class CreateTableEntity1 : EntityBase<CreateTableEntity1>
-        {
-            public string Str1 { get; set; } = "xxx";
+        public string Str1 { get; set; } = "xxx";
 
-            public string Str2 { get; set; } = "yyy";
+        public string Str2 { get; set; } = "yyy";
 
-            public int Required1 { get; set; } = 655;
+        public int Required1 { get; set; } = 655;
 
-            public decimal Decimal1 { get; set; }
+        public decimal Decimal1 { get; set; }
 
-            public long Long1 { get; set; } = 600;
+        public long Long1 { get; set; } = 600;
 
-            public double Double1 { get; set; } = 400;
+        public double Double1 { get; set; } = 400;
 
-            public DateTimeOffset DateTime1 { get; set; } = DateTimeOffset.Now;
+        public DateTimeOffset DateTime1 { get; set; } = DateTimeOffset.Now;
 
-            public DateTimeOffset DateTimeOffset1 { get; set; } = DateTimeOffset.Now;
+        public DateTimeOffset DateTimeOffset1 { get; set; } = DateTimeOffset.Now;
 
-            public float Float1 { get; set; } = 200.0F;
-        }
+        public float Float1 { get; set; } = 200.0F;
+    }
 
-        /// <summary>
-        /// 测试芒果数据库存储数据成功
-        /// 1. 数据库名是否正确
-        /// 2. Collection 是否正确
-        /// 3. 数据存储是否正确
-        /// </summary>
-        [Fact]
-        public async Task Store_Should_Success()
-        {
+    /// <summary>
+    /// 测试芒果数据库存储数据成功
+    /// 1. 数据库名是否正确
+    /// 2. Collection 是否正确
+    /// 3. 数据存储是否正确
+    /// </summary>
+    [Fact]
+    public async Task Store_Should_Success()
+    {
             var mongoCollection = new Mock<IMongoCollection<BsonDocument>>();
 
             var mongoDatabase = new Mock<IMongoDatabase>();
@@ -67,19 +67,18 @@ namespace DotnetSpider.Tests
                 entity
             };
             dfc.AddData(typeName, items);
-            await mongoEntityStorage.HandleAsync(dfc);
+            await mongoEntityStorage.HandleAsync(dfc, _ => Task.CompletedTask);
         }
 
 
-        [Fact]
-        public async Task Store_Empty_Should_Success()
-        {
+    [Fact]
+    public async Task Store_Empty_Should_Success()
+    {
             var mongoClient = new Mock<IMongoClient>();
             var mongoEntityStorage = new MongoEntityStorage(mongoClient.Object);
 
             var dfc = new DataFlowContext(null, null, null, null);
             mongoEntityStorage.SetLogger(NullLogger.Instance);
-            await mongoEntityStorage.HandleAsync(dfc);
+            await mongoEntityStorage.HandleAsync(dfc, _ => Task.CompletedTask);
         }
-    }
 }

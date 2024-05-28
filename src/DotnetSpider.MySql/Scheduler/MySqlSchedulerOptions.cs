@@ -1,7 +1,6 @@
-namespace DotnetSpider.MySql.Scheduler
+namespace DotnetSpider.MySql.Scheduler;
+
+public class MySqlSchedulerOptions
 {
-	public class MySqlSchedulerOptions
-	{
-		public string ConnectionString { get; set; }
-	}
+    public string ConnectionString { get; set; }
 }

@@ -1,17 +1,16 @@
-namespace DotnetSpider.RabbitMQ
+namespace DotnetSpider.RabbitMQ;
+
+public class RabbitMQOptions
 {
-	public class RabbitMQOptions
-	{
-		public string Exchange { get; set; } = "DotnetSpider";
+    public string Exchange { get; set; } = "DotnetSpider";
 
-		public string HostName { get; set; }
+    public string HostName { get; set; }
 
-		public int Port { get; set; }
+    public int Port { get; set; }
 
-		public string UserName { get; set; }
+    public string UserName { get; set; }
 
-		public string Password { get; set; }
+    public string Password { get; set; }
 
-		public int RetryCount { get; set; } = 5;
-	}
+    public int RetryCount { get; set; } = 5;
 }

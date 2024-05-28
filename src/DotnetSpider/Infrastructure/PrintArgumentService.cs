@@ -1,17 +1,20 @@
+using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using static System.String;
 
-namespace DotnetSpider.Infrastructure
+namespace DotnetSpider.Infrastructure;
+
+public class PrintArgumentService(IOptions<SpiderOptions> options, ILogger<PrintArgumentService> logger)
+    : IHostedService
 {
-	public class PrintArgumentService : IHostedService
-	{
-		private readonly SpiderOptions _options;
-		private readonly ILogger<PrintArgumentService> _logger;
+    private readonly SpiderOptions _options = options.Value;
 
-		private static readonly string _logo = @"
+    private const string Info = @"
 
   _____        _              _    _____       _     _
  |  __ \      | |            | |  / ____|     (_)   | |
@@ -23,29 +26,25 @@ namespace DotnetSpider.Infrastructure
                                         |_|
 ";
 
-		public PrintArgumentService(IOptions<SpiderOptions> options, ILogger<PrintArgumentService> logger)
-		{
-			_logger = logger;
-			_options = options.Value;
-		}
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        var properties = typeof(SpiderOptions).GetProperties();
+        var version = GetType().Assembly.GetName().Version;
+        if (version == null)
+        {
+            throw new ArgumentException("Assembly version is null");
+        }
 
-		public Task StartAsync(CancellationToken cancellationToken)
-		{
-			var properties = typeof(SpiderOptions).GetProperties();
-			var version = GetType().Assembly.GetName().Version;
-			var versionDescription = version.MinorRevision == 0 ? version.ToString() : $"{version}-beta";
-			_logger.LogInformation(string.Format(_logo, versionDescription));
-			foreach (var property in properties)
-			{
-				_logger.LogInformation($"{property.Name}: {property.GetValue(_options)}");
-			}
+        var versionDescription = version.MinorRevision == 0 ? version.ToString() : $"{version}-beta";
+        logger.LogInformation(Format(Info, versionDescription));
+        var config = string.Join(", ", properties.Select(x => $"{x.Name}: {x.GetValue(_options)}"));
+        logger.LogInformation(config);
 
-			return Task.CompletedTask;
-		}
+        return Task.CompletedTask;
+    }
 
-		public Task StopAsync(CancellationToken cancellationToken)
-		{
-			return Task.CompletedTask;
-		}
-	}
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
 }

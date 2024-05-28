@@ -1,9 +1,8 @@
-namespace DotnetSpider.Selector
+namespace DotnetSpider.Selector;
+
+public enum SelectableType
 {
-    public enum SelectableType
-    {
-        Text,
-        Html,
-        Json
-    }
+    Text,
+    Html,
+    Json
 }

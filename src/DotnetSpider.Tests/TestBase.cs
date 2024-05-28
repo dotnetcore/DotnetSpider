@@ -1,6 +1,5 @@
-namespace DotnetSpider.Tests
+namespace DotnetSpider.Tests;
+
+public abstract class TestBase
 {
-    public abstract class TestBase
-    {
-    }
 }

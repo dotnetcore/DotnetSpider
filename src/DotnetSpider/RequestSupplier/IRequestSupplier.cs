@@ -3,16 +3,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Http;
 
-namespace DotnetSpider.RequestSupplier
+namespace DotnetSpider.RequestSupplier;
+
+/// <summary>
+/// 请求供应接口
+/// </summary>
+public interface IRequestSupplier
 {
     /// <summary>
-    /// 请求供应接口
+    /// 运行请求供应
     /// </summary>
-    public interface IRequestSupplier
-    {
-        /// <summary>
-        /// 运行请求供应
-        /// </summary>
-        Task<IEnumerable<Request>> GetAllListAsync(CancellationToken cancellationToken);
-    }
+    Task<IEnumerable<Request>> GetAllListAsync(CancellationToken cancellationToken);
 }

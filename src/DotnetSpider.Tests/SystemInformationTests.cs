@@ -4,37 +4,37 @@ using DotnetSpider.Infrastructure;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace DotnetSpider.Tests
+namespace DotnetSpider.Tests;
+
+public class SystemInformationTests
 {
-	public class SystemInformationTests
-	{
-		private readonly ITestOutputHelper _testOutput;
+    private readonly ITestOutputHelper _testOutput;
 
-		public SystemInformationTests(ITestOutputHelper testOutput)
-		{
-			_testOutput = testOutput;
-		}
+    public SystemInformationTests(ITestOutputHelper testOutput)
+    {
+        _testOutput = testOutput;
+    }
 
-		[Fact()]
-		public void GetSystemInformation()
-		{
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-			{
-				_testOutput.WriteLine(File.ReadAllText("/proc/meminfo"));
-			}
+    [Fact()]
+    public void GetSystemInformation()
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            _testOutput.WriteLine(File.ReadAllText("/proc/meminfo"));
+        }
 
-			var memoryStatus = MachineInfo.Current;
+        var memoryStatus = MachineInfo.Current;
 
-			_testOutput.WriteLine(
-				$"Free: {memoryStatus.AvailableMemory}, Total: {memoryStatus.Memory}");
-			Assert.True(memoryStatus.AvailableMemory > 0);
-			Assert.True(memoryStatus.Memory > 0);
-		}
+        _testOutput.WriteLine(
+            $"Free: {memoryStatus.AvailableMemory}, Total: {memoryStatus.Memory}");
+        Assert.True(memoryStatus.AvailableMemory > 0);
+        Assert.True(memoryStatus.Memory > 0);
+    }
 
-		[Fact]
-		public void LinuxParser()
-		{
-			var msg = @"MemTotal:        7733016 kB
+    [Fact]
+    public void LinuxParser()
+    {
+        var msg = @"MemTotal:        7733016 kB
 MemFree:          179152 kB
 MemAvailable:    3635216 kB
 Buffers:         1141108 kB
@@ -82,10 +82,9 @@ DirectMap4k:      123576 kB
 DirectMap2M:     3790848 kB
 DirectMap1G:     4194304 kB";
 
-			var total = MachineInfo.Linux.GetTotalMemory(msg);
-			var free = MachineInfo.Linux.GetFreeMemory(msg);
-			Assert.Equal(7551, total);
-			Assert.Equal(3550, free);
-		}
-	}
+        var total = MachineInfo.Linux.GetTotalMemory(msg);
+        var free = MachineInfo.Linux.GetFreeMemory(msg);
+        Assert.Equal(7551, total);
+        Assert.Equal(3550, free);
+    }
 }

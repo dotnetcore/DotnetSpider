@@ -3,7 +3,7 @@
   <Import Project="../../package.props" />
   <PropertyGroup>
     <PackageId>DotnetSpider.RabbitMQ</PackageId>
-    <TargetFrameworks>netstandard2.1;netstandard2.0</TargetFrameworks>
+    <TargetFramework>net8</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="RabbitMQ.Client" Version="6.6.0" />
-    <PackageReference Include="Polly" Version="8.1.0" />
+    <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
+    <PackageReference Include="Polly" Version="8.4.0" />
   </ItemGroup>
 </Project>

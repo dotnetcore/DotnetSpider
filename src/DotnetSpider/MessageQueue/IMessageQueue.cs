@@ -1,17 +1,15 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
-namespace DotnetSpider.MessageQueue
+namespace DotnetSpider.MessageQueue;
+
+public interface IMessageQueue : IDisposable
 {
-	public interface IMessageQueue : IDisposable
-	{
-		Task PublishAsync(string queue, byte[] message);
+    Task PublishAsync(string queue, byte[] message);
 
-		Task ConsumeAsync(AsyncMessageConsumer<byte[]> consumer, CancellationToken cancellationToken);
+    Task ConsumeAsync(AsyncMessageConsumer<byte[]> consumer);
 
-		void CloseQueue(string queue);
+    void CloseQueue(string queue);
 
-		bool IsDistributed { get; }
-	}
+    bool IsDistributed { get; }
 }

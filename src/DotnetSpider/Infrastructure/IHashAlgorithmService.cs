@@ -1,7 +1,6 @@
-namespace DotnetSpider.Infrastructure
+namespace DotnetSpider.Infrastructure;
+
+public interface IHashAlgorithmService
 {
-	public interface IHashAlgorithmService
-	{
-		byte[] ComputeHash(byte[] bytes);
-	}
+    byte[] ComputeHash(byte[] bytes);
 }

@@ -1,15 +1,14 @@
-namespace DotnetSpider.Infrastructure
-{
-    public enum MySqlFileType
-    {
-        /// <summary>
-        /// LOAD
-        /// </summary>
-        LoadFile,
+namespace DotnetSpider.Infrastructure;
 
-        /// <summary>
-        /// INSERT SQL语句
-        /// </summary>
-        InsertSql
-    }
+public enum MySqlFileType
+{
+    /// <summary>
+    /// LOAD
+    /// </summary>
+    LoadFile,
+
+    /// <summary>
+    /// INSERT SQL语句
+    /// </summary>
+    InsertSql
 }
