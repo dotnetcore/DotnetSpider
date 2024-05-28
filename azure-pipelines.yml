@@ -39,7 +39,7 @@ steps:
 
   - task: DotNetCoreInstaller@0
     inputs:
-      version: '7.0.203'
+      version: '8.0.100'
 
   - script: sh build.sh
     displayName: 'BuildSolution'
