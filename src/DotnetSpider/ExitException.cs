@@ -1,8 +1,3 @@
 namespace DotnetSpider;
 
-public sealed class ExitException : SpiderException
-{
-    public ExitException(string msg) : base(msg)
-    {
-    }
-}
+public sealed class ExitException(string msg) : SpiderException(msg);

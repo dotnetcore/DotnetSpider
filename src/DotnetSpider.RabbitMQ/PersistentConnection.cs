@@ -9,22 +9,19 @@ using RabbitMQ.Client.Exceptions;
 
 namespace DotnetSpider.RabbitMQ;
 
-public class PersistentConnection : IDisposable
+public class PersistentConnection(
+    IConnectionFactory connectionFactory,
+    ILogger<PersistentConnection> logger,
+    int retryCount = 5)
+    : IDisposable
 {
-    private readonly IConnectionFactory _connectionFactory;
-    private readonly ILogger<PersistentConnection> _logger;
-    private readonly int _retryCount;
-    private	IConnection _connection;
-    private	bool _disposed;
-    private readonly object _syncLocker = new();
+    private readonly IConnectionFactory _connectionFactory =
+        connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
 
-    public PersistentConnection(IConnectionFactory connectionFactory,
-        ILogger<PersistentConnection> logger, int retryCount = 5)
-    {
-        _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _retryCount = retryCount;
-    }
+    private readonly ILogger<PersistentConnection> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private IConnection _connection;
+    private bool _disposed;
+    private readonly object _syncLocker = new();
 
     public bool IsConnected => _connection != null && _connection.IsOpen && !_disposed;
 
@@ -36,12 +33,12 @@ public class PersistentConnection : IDisposable
         {
             var policy = Policy.Handle<SocketException>()
                 .Or<BrokerUnreachableException>()
-                .WaitAndRetry(_retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                .WaitAndRetry(retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
                     (ex, time) =>
                     {
                         _logger.LogWarning(ex,
-                            "RabbitMQ Client could not connect after {TimeOut}s ({ExceptionMessage})",
-                            $"{time.TotalSeconds:n1}", ex.Message);
+                            "RabbitMQ Client could not connect after {TimeOut}s",
+                            $"{time.TotalSeconds:n1}");
                     }
                 );
 
@@ -97,7 +94,7 @@ public class PersistentConnection : IDisposable
         }
         catch (IOException ex)
         {
-            _logger.LogCritical(ex.ToString());
+            _logger.LogCritical(ex, "RabbitMQ 连接释放异常");
         }
     }
 

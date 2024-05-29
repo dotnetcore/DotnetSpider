@@ -16,7 +16,7 @@ public class RequestedQueue : IDisposable
     private readonly HashedWheelTimer _timer = new(TimeSpan.FromSeconds(1)
         , 100000);
 
-    private readonly ConcurrentBag<Request> _queue = new();
+    private readonly ConcurrentBag<Request> _queue = [];
 
     public int Count => _dict.Count;
 

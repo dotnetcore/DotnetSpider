@@ -9,8 +9,8 @@ namespace DotnetSpider.DataFlow;
 
 public class FlowBuilder
 {
-    private readonly List<Func<ResponseDelegate, ResponseDelegate>> _components = new();
-    private readonly List<Func<IDataFlow>> _flowFactories = new();
+    private readonly List<Func<ResponseDelegate, ResponseDelegate>> _components = [];
+    private readonly List<Func<IDataFlow>> _flowFactories = [];
 
     public async Task<(string, ResponseDelegate)> BuildAsync()
     {

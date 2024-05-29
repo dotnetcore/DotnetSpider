@@ -91,7 +91,7 @@ public class LruCache<TInput, TResult> : IDisposable
     private class IndexedLinkedList<T>
     {
 
-        private LinkedList<T> _data = new();
+        private LinkedList<T> _data = [];
         private Dictionary<T, LinkedListNode<T>> _index = new();
 
         public void Add(T value)

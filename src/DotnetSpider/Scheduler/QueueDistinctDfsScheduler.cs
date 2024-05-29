@@ -13,7 +13,7 @@ namespace DotnetSpider.Scheduler;
 public class QueueDistinctDfsScheduler(IDuplicateRemover duplicateRemover, IRequestHasher requestHasher)
     : SchedulerBase(duplicateRemover, requestHasher)
 {
-    private readonly List<Request> _requests = new();
+    private readonly List<Request> _requests = [];
 
     public override void Dispose()
     {

@@ -6,12 +6,9 @@ using System.Threading.Tasks;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Parser.Formatters;
 using DotnetSpider.DataFlow.Storage.Entity;
-using DotnetSpider.Downloader;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
 using DotnetSpider.Proxy;
-using DotnetSpider.Scheduler;
-using DotnetSpider.Scheduler.Component;
 using DotnetSpider.Selector;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -20,7 +17,11 @@ using Serilog;
 
 namespace DotnetSpider.Sample.samples;
 
-public class ProxySpider : Spider
+public class ProxySpider(
+    IOptions<SpiderOptions> options,
+    DependenceServices services,
+    ILogger<Spider> logger)
+    : Spider(options, services, logger)
 {
     public static async Task RunAsync()
     {
@@ -36,14 +37,7 @@ public class ProxySpider : Spider
                 x.ProxyTestUrl = "http://localhost:8866";
             });
             builder.IgnoreServerCertificateError();
-            builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
             await builder.Build().RunAsync();
-        }
-
-    public ProxySpider(IOptions<SpiderOptions> options, DependenceServices services,
-        ILogger<Spider> logger) : base(
-        options, services, logger)
-    {
         }
 
     protected override async Task InitializeAsync(CancellationToken stoppingToken = default)
@@ -64,7 +58,7 @@ public class ProxySpider : Spider
     [EntitySelector(Expression = ".//div[@class='news_block']", Type = SelectorType.XPath)]
     [GlobalValueSelector(Expression = ".//a[@class='current']", Name = "类别", Type = SelectorType.XPath)]
     [GlobalValueSelector(Expression = "//title", Name = "Title", Type = SelectorType.XPath)]
-    [FollowRequestSelector(Expressions = new[] { "//div[@class='pager']" })]
+    [FollowRequestSelector(Expressions = ["//div[@class='pager']"])]
     class CnblogsEntry : EntityBase<CnblogsEntry>
     {
         protected override void Configure()

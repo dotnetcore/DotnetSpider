@@ -11,19 +11,14 @@ namespace DotnetSpider.Proxy;
 
 public class ProxyService : IProxyService
 {
-    private class ProxyEntry
+    private class ProxyEntry(Uri uri)
     {
-        public Uri Uri { get; private set; }
+        public Uri Uri { get; private set; } = uri;
 
         /// <summary>
         /// 使用此代理下载数据的失败次数
         /// </summary>
         public int FailedNum { get; set; }
-
-        public ProxyEntry(Uri uri)
-        {
-            Uri = uri;
-        }
     }
 
     private readonly ConcurrentQueue<ProxyEntry> _queue;
@@ -87,7 +82,7 @@ public class ProxyService : IProxyService
         {
             if (await _proxyValidator.IsAvailable(proxy) && _dict.TryAdd(proxy, new ProxyEntry(proxy)))
             {
-                _logger.LogInformation($"proxy {proxy} is available");
+                _logger.LogInformation("Proxy {Proxy} is available",proxy);
                 _queue.Enqueue(_dict[proxy]);
                 cnt++;
             }
@@ -126,20 +121,11 @@ public class ProxyService : IProxyService
         }
     }
 
-    private class ReturnProxyTask : ITimerTask
+    private class ReturnProxyTask(IProxyService pool, Uri proxy) : ITimerTask
     {
-        private readonly Uri _proxy;
-        private readonly IProxyService _pool;
-
-        public ReturnProxyTask(IProxyService pool, Uri proxy)
-        {
-            _pool = pool;
-            _proxy = proxy;
-        }
-
         public async Task RunAsync(ITimeout timeout)
         {
-            await _pool.ReturnAsync(_proxy, HttpStatusCode.OK);
+            await pool.ReturnAsync(proxy, HttpStatusCode.OK);
         }
     }
 }

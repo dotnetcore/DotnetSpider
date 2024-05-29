@@ -58,7 +58,7 @@ public class JsonPathSelector : ISelector
 
         if (!(JsonConvert.DeserializeObject(text) is JToken token))
         {
-            return Enumerable.Empty<ISelectable>();
+            return [];
         }
 
         return token.SelectTokens(_jsonPath)

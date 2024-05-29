@@ -13,21 +13,14 @@ using MySqlConnector;
 
 namespace DotnetSpider.MySql;
 
-public class MySqlFileOptions
+public class MySqlFileOptions(IConfiguration configuration)
 {
-    private readonly IConfiguration _configuration;
-
-    public MySqlFileOptions(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
-
-    public MySqlFileType Type => string.IsNullOrWhiteSpace(_configuration["MySqlFile:Type"])
+    public MySqlFileType Type => string.IsNullOrWhiteSpace(configuration["MySqlFile:Type"])
         ? MySqlFileType.LoadFile
-        : (MySqlFileType)Enum.Parse(typeof(MySqlFileType), _configuration["MySqlFile:Type"]);
+        : (MySqlFileType)Enum.Parse(typeof(MySqlFileType), configuration["MySqlFile:Type"]);
 
-    public bool IgnoreCase => string.IsNullOrWhiteSpace(_configuration["MySqlFile:IgnoreCase"]) ||
-                              bool.Parse(_configuration["MySqlFile:IgnoreCase"]);
+    public bool IgnoreCase => string.IsNullOrWhiteSpace(configuration["MySqlFile:IgnoreCase"]) ||
+                              bool.Parse(configuration["MySqlFile:IgnoreCase"]);
 }
 
 /// <summary>

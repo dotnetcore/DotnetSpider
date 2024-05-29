@@ -6,14 +6,9 @@ using Microsoft.Extensions.Options;
 
 namespace DotnetSpider.Proxy;
 
-public class FiddlerProxySupplier : IProxySupplier
+public class FiddlerProxySupplier(IOptions<ProxyOptions> options) : IProxySupplier
 {
-    private Uri[] _proxies;
-
-    public FiddlerProxySupplier(IOptions<ProxyOptions> options)
-    {
-        _proxies = new Uri[] {new(options.Value.ProxyTestUrl)};
-    }
+    private Uri[] _proxies = [new(options.Value.ProxyTestUrl)];
 
     public Task<IEnumerable<Uri>> GetProxiesAsync()
     {
@@ -23,7 +18,7 @@ public class FiddlerProxySupplier : IProxySupplier
         }
 
         var result = _proxies.Clone() as IEnumerable<Uri>;
-        _proxies = new Uri[0];
+        _proxies = [];
         return Task.FromResult(result);
     }
 }

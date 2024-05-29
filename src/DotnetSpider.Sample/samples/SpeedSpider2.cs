@@ -2,11 +2,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
-using DotnetSpider.Downloader;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
-using DotnetSpider.Scheduler;
-using DotnetSpider.Scheduler.Component;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -17,7 +14,11 @@ namespace DotnetSpider.Sample.samples;
 /// <summary>
 /// https://localhost:5001/WeatherForecast
 /// </summary>
-public class SpeedSpider2 : Spider
+public class SpeedSpider2(
+    IOptions<SpiderOptions> options,
+    DependenceServices services,
+    ILogger<Spider> logger)
+    : Spider(options, services, logger)
 {
     public static async Task RunAsync()
     {
@@ -27,15 +28,7 @@ public class SpeedSpider2 : Spider
         });
         builder.UseSerilog();
         builder.IgnoreServerCertificateError();
-        builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
         await builder.Build().RunAsync();
-    }
-
-    public SpeedSpider2(IOptions<SpiderOptions> options,
-        DependenceServices services,
-        ILogger<Spider> logger) : base(
-        options, services, logger)
-    {
     }
 
     protected override async Task InitializeAsync(CancellationToken stoppingToken = default)

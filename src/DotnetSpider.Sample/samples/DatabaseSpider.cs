@@ -2,10 +2,7 @@
 using System.Threading.Tasks;
 using Dapper;
 using DotnetSpider.DataFlow;
-using DotnetSpider.Downloader;
 using DotnetSpider.Http;
-using DotnetSpider.Scheduler;
-using DotnetSpider.Scheduler.Component;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -14,21 +11,17 @@ using Serilog;
 
 namespace DotnetSpider.Sample.samples;
 
-public class DatabaseSpider : CnBlogsSpider
+public class DatabaseSpider(
+    IOptions<SpiderOptions> options,
+    DependenceServices services,
+    ILogger<Spider> logger)
+    : CnBlogsSpider(options, services, logger)
 {
     public static new async Task RunAsync()
     {
         var builder = Builder.CreateDefaultBuilder<DatabaseSpider>();
         builder.UseSerilog();
-        // builder.UseDownloader<HttpClientDownloader>();
-        builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
         await builder.Build().RunAsync();
-    }
-
-    public DatabaseSpider(IOptions<SpiderOptions> options, DependenceServices services,
-        ILogger<Spider> logger) : base(
-        options, services, logger)
-    {
     }
 
     protected override async Task InitializeAsync(CancellationToken stoppingToken = default)

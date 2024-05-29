@@ -5,11 +5,8 @@ using System.Threading.Tasks;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Parser.Formatters;
 using DotnetSpider.DataFlow.Storage.Entity;
-using DotnetSpider.Downloader;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
-using DotnetSpider.Scheduler;
-using DotnetSpider.Scheduler.Component;
 using DotnetSpider.Selector;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -18,7 +15,12 @@ using Serilog;
 
 namespace DotnetSpider.Sample.samples;
 
-public class TestSpider2 : Spider
+public class TestSpider2(
+    IOptions<SpiderOptions> options,
+    DependenceServices services,
+    ILogger<Spider> logger)
+    : Spider(options,
+        services, logger)
 {
     public static async Task RunAsync()
     {
@@ -27,17 +29,7 @@ public class TestSpider2 : Spider
                 options.Speed = 1;
             });
             builder.UseSerilog();
-            builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
             await builder.Build().RunAsync();
-        }
-
-    public TestSpider2(
-        IOptions<SpiderOptions> options,
-        DependenceServices services,
-        ILogger<Spider> logger) : base(
-        options,
-        services, logger)
-    {
         }
 
     protected override async Task InitializeAsync(CancellationToken stoppingToken)
@@ -56,8 +48,8 @@ public class TestSpider2 : Spider
     [Schema("cnblogs", "news")]
     [EntitySelector(Expression = ".//div[@class='news_block']", Type = SelectorType.XPath)]
     [GlobalValueSelector(Expression = ".//a[@class='current']", Name = "类别", Type = SelectorType.XPath)]
-    [FollowRequestSelector(Expressions = new[] { "//div[@class='pager']" },
-        Patterns = new[] { "news\\.cnblogs\\.com/n/page" })]
+    [FollowRequestSelector(Expressions = ["//div[@class='pager']"],
+        Patterns = ["news\\.cnblogs\\.com/n/page"])]
     public class CnblogsEntity : EntityBase<CnblogsEntity>
     {
         protected override void Configure()

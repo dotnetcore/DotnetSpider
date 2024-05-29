@@ -28,7 +28,7 @@ public static class ServiceCollectionExtensions
                 services.Configure(configureDelegate);
             }
 
-            services.TryAddSingleton<IMessageQueue, RabbitMQMessageQueue>();
+            services.AddSingleton<IMessageQueue, RabbitMQMessageQueue>();
         });
         return builder;
     }

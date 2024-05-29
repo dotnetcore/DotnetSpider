@@ -1,8 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using DotnetSpider.RabbitMQ;
-using DotnetSpider.Scheduler;
-using DotnetSpider.Scheduler.Component;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
@@ -38,10 +36,9 @@ class Program
                 return;
             }
 
-            var builder = Builder.CreateBuilder(type);
+            var builder = Builder.CreateDefaultBuilder(type);
             builder.UseSerilog();
             builder.UseRabbitMQ();
-            builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
             await builder.Build().RunAsync();
         }
 

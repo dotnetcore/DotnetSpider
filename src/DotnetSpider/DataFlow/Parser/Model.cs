@@ -94,8 +94,8 @@ public class Model<T> where T : EntityBase<T>, new()
 
         Selector = selector;
         ValueSelectors = valueSelectors;
-        FollowRequestSelectors = new HashSet<FollowRequestSelector>(followRequestSelectors);
-        GlobalValueSelectors = new HashSet<GlobalValueSelector>(sharedValueSelectors);
+        FollowRequestSelectors = [..followRequestSelectors];
+        GlobalValueSelectors = [..sharedValueSelectors];
         foreach (var valueSelector in GlobalValueSelectors)
         {
             if (string.IsNullOrWhiteSpace(valueSelector.Name))

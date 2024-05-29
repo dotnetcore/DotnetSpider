@@ -19,6 +19,7 @@ public class RequestHasher(IHashAlgorithmService hashAlgorithmService) : IReques
             request.RequestedTimes,
             request.Content
         }.Serialize();
-        request.Hash = Convert.ToBase64String(hashAlgorithmService.ComputeHash(bytes)).TrimEnd('=');
+        var hash64 = BitConverter.ToUInt64(hashAlgorithmService.ComputeHash(bytes), 0);
+        request.Hash = $"{hash64:X}";
     }
 }

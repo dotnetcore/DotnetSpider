@@ -17,7 +17,7 @@ namespace DotnetSpider.Http;
 [Serializable]
 public class Request : IDisposable
 {
-    private static HashSet<string> _hashBodyMethods = new() { "DELETE", "POST", "PATCH", "PUT" };
+    private static HashSet<string> _hashBodyMethods = ["DELETE", "POST", "PATCH", "PUT"];
 
     private string _method;
     private Uri _requestUri;

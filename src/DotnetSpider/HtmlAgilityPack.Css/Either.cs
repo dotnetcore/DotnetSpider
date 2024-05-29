@@ -50,14 +50,9 @@ internal abstract class Either<TA, TB>
     public abstract override string ToString();
     public abstract TResult Fold<TResult>(Func<TA, TResult> a, Func<TB, TResult> b);
 
-    private sealed class AImpl : Either<TA, TB>
+    private sealed class AImpl(TA value) : Either<TA, TB>
     {
-        private readonly TA _value;
-
-        public AImpl(TA value)
-        {
-            _value = value;
-        }
+        private readonly TA _value = value;
 
         public override int GetHashCode()
         {
@@ -88,14 +83,9 @@ internal abstract class Either<TA, TB>
         }
     }
 
-    private sealed class BImpl : Either<TA, TB>
+    private sealed class BImpl(TB value) : Either<TA, TB>
     {
-        private readonly TB _value;
-
-        public BImpl(TB value)
-        {
-            _value = value;
-        }
+        private readonly TB _value = value;
 
         public override int GetHashCode()
         {

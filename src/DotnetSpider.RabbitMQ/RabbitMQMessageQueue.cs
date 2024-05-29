@@ -80,8 +80,8 @@ public class RabbitMQMessageQueue : IMessageQueue
                 (ex, time) =>
                 {
                     _logger.LogWarning(ex,
-                        "Could not publish data after {Timeout}s ({ExceptionMessage})",
-                        $"{time.TotalSeconds:n1}", ex.Message);
+                        "Could not publish data after {Timeout}s",
+                        $"{time.TotalSeconds:n1}");
                 });
 
         _logger.LogTrace("Declaring RabbitMQ exchange to publish event");

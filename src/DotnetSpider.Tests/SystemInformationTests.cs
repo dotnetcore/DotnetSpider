@@ -6,26 +6,19 @@ using Xunit.Abstractions;
 
 namespace DotnetSpider.Tests;
 
-public class SystemInformationTests
+public class SystemInformationTests(ITestOutputHelper testOutput)
 {
-    private readonly ITestOutputHelper _testOutput;
-
-    public SystemInformationTests(ITestOutputHelper testOutput)
-    {
-        _testOutput = testOutput;
-    }
-
     [Fact()]
     public void GetSystemInformation()
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            _testOutput.WriteLine(File.ReadAllText("/proc/meminfo"));
+            testOutput.WriteLine(File.ReadAllText("/proc/meminfo"));
         }
 
         var memoryStatus = MachineInfo.Current;
 
-        _testOutput.WriteLine(
+        testOutput.WriteLine(
             $"Free: {memoryStatus.AvailableMemory}, Total: {memoryStatus.Memory}");
         Assert.True(memoryStatus.AvailableMemory > 0);
         Assert.True(memoryStatus.Memory > 0);

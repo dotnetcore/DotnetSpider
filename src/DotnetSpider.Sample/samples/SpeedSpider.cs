@@ -4,8 +4,6 @@ using DotnetSpider.DataFlow;
 using DotnetSpider.Downloader;
 using DotnetSpider.Http;
 using DotnetSpider.Infrastructure;
-using DotnetSpider.Scheduler;
-using DotnetSpider.Scheduler.Component;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -13,7 +11,11 @@ using Serilog;
 
 namespace DotnetSpider.Sample.samples;
 
-public class SpeedSpider : Spider
+public class SpeedSpider(
+    IOptions<SpiderOptions> options,
+    DependenceServices services,
+    ILogger<Spider> logger)
+    : Spider(options, services, logger)
 {
     public static async Task RunAsync()
     {
@@ -22,16 +24,7 @@ public class SpeedSpider : Spider
             options.Speed = 100;
         });
         builder.UseSerilog();
-        // builder.UseDownloader<EmptyDownloader>();
-        builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
         await builder.Build().RunAsync();
-    }
-
-    public SpeedSpider(IOptions<SpiderOptions> options,
-        DependenceServices services,
-        ILogger<Spider> logger) : base(
-        options, services, logger)
-    {
     }
 
     protected override async Task InitializeAsync(CancellationToken stoppingToken = default)

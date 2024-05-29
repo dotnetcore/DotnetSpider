@@ -1,8 +1,5 @@
-using DotnetSpider.Agent;
-using DotnetSpider.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Http;
 
 namespace DotnetSpider.Downloader;
 

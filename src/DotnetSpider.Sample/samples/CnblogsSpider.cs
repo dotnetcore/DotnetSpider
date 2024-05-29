@@ -1,13 +1,10 @@
 using System;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
-using DotnetSpider.Downloader;
 using DotnetSpider.Http;
-using DotnetSpider.Infrastructure;
-using DotnetSpider.Scheduler;
-using DotnetSpider.Scheduler.Component;
 using DotnetSpider.Selector;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -16,6 +13,7 @@ using Serilog;
 
 namespace DotnetSpider.Sample.samples;
 
+[DisplayName("博客园爬虫")]
 public class CnBlogsSpider(
     IOptions<SpiderOptions> options,
     DependenceServices services,
@@ -29,7 +27,6 @@ public class CnBlogsSpider(
             x.Speed = 2;
         });
         builder.UseSerilog();
-        builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
         await builder.Build().RunAsync();
     }
 
@@ -37,14 +34,10 @@ public class CnBlogsSpider(
     {
         AddDataFlow<ListNewsParser>();
         AddDataFlow<NewsParser>();
-        var request = new Request("https://news.cnblogs.com/n/page/1") { };
+        // AddDataFlow(GetDefaultStorage);
+        var request = new Request("https://news.cnblogs.com/n/page/1");
         request.Headers.UserAgent = "";
         await AddRequestsAsync(request);
-    }
-
-    protected override SpiderId GenerateSpiderId()
-    {
-        return new(ObjectId.CreateId().ToString(), "博客园");
     }
 
     protected class ListNewsParser : DataParser

@@ -5,7 +5,7 @@ namespace DotnetSpider.Infrastructure;
 
 public class MurmurHashAlgorithmService : HashAlgorithmService
 {
-    private readonly HashAlgorithm _hashAlgorithm = MurmurHash.Create32();
+    private readonly HashAlgorithm _hashAlgorithm = MurmurHash.Create128();
 
     protected override HashAlgorithm GetHashAlgorithm()
     {

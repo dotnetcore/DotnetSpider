@@ -1,5 +1,5 @@
 using DotnetSpider.Scheduler.Component;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace DotnetSpider.Scheduler;
@@ -10,14 +10,14 @@ public static class ServiceCollectionExtensions
     {
         builder.ConfigureServices(x =>
         {
-            x.TryAddSingleton<IScheduler, QueueDfsScheduler>();
+            x.AddSingleton<IScheduler, QueueDfsScheduler>();
         });
         return builder;
     }
 
     public static Builder UseQueueBfsScheduler(this Builder builder)
     {
-        builder.ConfigureServices(x => { x.TryAddSingleton<IScheduler, QueueBfsScheduler>(); });
+        builder.ConfigureServices(x => { x.AddSingleton<IScheduler, QueueBfsScheduler>(); });
         return builder;
     }
 
@@ -26,8 +26,8 @@ public static class ServiceCollectionExtensions
     {
         builder.ConfigureServices(x =>
         {
-            x.TryAddSingleton<IDuplicateRemover, TDuplicateRemover>();
-            x.TryAddSingleton<IScheduler, QueueDistinctBfsScheduler>();
+            x.AddSingleton<IDuplicateRemover, TDuplicateRemover>();
+            x.AddSingleton<IScheduler, QueueDistinctBfsScheduler>();
         });
         return builder;
     }

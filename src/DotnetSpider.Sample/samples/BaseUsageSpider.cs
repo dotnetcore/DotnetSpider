@@ -1,12 +1,9 @@
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
-using DotnetSpider.Downloader;
 using DotnetSpider.Http;
-using DotnetSpider.Infrastructure;
-using DotnetSpider.Scheduler;
-using DotnetSpider.Scheduler.Component;
 using DotnetSpider.Selector;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -15,6 +12,7 @@ using Serilog;
 
 namespace DotnetSpider.Sample.samples;
 
+[DisplayName(displayName: "博客园")]
 public class BaseUsageSpider(
     IOptions<SpiderOptions> options,
     DependenceServices services,
@@ -28,8 +26,6 @@ public class BaseUsageSpider(
             x.Speed = 5;
         });
         builder.UseSerilog();
-        // builder.UseDownloader<HttpClientDownloader>();
-        builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
         await builder.Build().RunAsync();
     }
 
@@ -56,10 +52,5 @@ public class BaseUsageSpider(
         await AddRequestsAsync(new Request("http://www.cnblogs.com/"));
         AddDataFlow<MyDataParser>();
         AddDataFlow<ConsoleStorage>();
-    }
-
-    protected override SpiderId GenerateSpiderId()
-    {
-        return new(ObjectId.CreateId().ToString(), "博客园");
     }
 }

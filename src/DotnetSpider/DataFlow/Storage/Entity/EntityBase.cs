@@ -68,7 +68,7 @@ public abstract class EntityBase<T> : IEntity where T : class, new()
             var primary = properties.FirstOrDefault(x => x.Name.ToLower() == "id");
             if (primary != null)
             {
-                _tableMetadata.Value.Primary = new HashSet<string> { primary.Name };
+                _tableMetadata.Value.Primary = [primary.Name];
             }
         }
 
@@ -84,7 +84,7 @@ public abstract class EntityBase<T> : IEntity where T : class, new()
                 columns.Remove(primary);
             }
 
-            _tableMetadata.Value.Updates = new HashSet<string>(columns);
+            _tableMetadata.Value.Updates = [..columns];
         }
 
         return _tableMetadata.Value;
@@ -103,7 +103,7 @@ public abstract class EntityBase<T> : IEntity where T : class, new()
             throw new SpiderException("主键不能为空");
         }
 
-        _tableMetadata.Value.Primary = new HashSet<string>(columns);
+        _tableMetadata.Value.Primary = [..columns];
         return this as T;
     }
 

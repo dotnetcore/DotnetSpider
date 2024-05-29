@@ -16,15 +16,8 @@ using Xunit.Abstractions;
 
 namespace DotnetSpider.Tests;
 
-public class MySqlEntityStorageTests : TestBase
+public class MySqlEntityStorageTests(ITestOutputHelper testOutputHelper) : TestBase
 {
-    private readonly ITestOutputHelper _testOutputHelper;
-
-    public MySqlEntityStorageTests(ITestOutputHelper testOutputHelper)
-    {
-            _testOutputHelper = testOutputHelper;
-        }
-
     protected virtual string Escape => "`";
 
     private class IndexInfo
@@ -192,7 +185,7 @@ public class MySqlEntityStorageTests : TestBase
             var primaries = (await conn.QueryAsync<PrimaryInfo>(
                     $"SELECT t.CONSTRAINT_TYPE, c.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS t, INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c WHERE t.TABLE_NAME = c.TABLE_NAME AND t.TABLE_SCHEMA = 'test' AND t.CONSTRAINT_TYPE = 'PRIMARY KEY' AND t.TABLE_NAME='createtablemultiprimay';")
                 ).ToList();
-            _testOutputHelper.WriteLine(JsonConvert.SerializeObject(primaries));
+            testOutputHelper.WriteLine(JsonConvert.SerializeObject(primaries));
             var columnNames = primaries.Select(x => x.COLUMN_NAME).ToList();
             Assert.Equal(2, primaries.Count);
             Assert.Contains("str2", columnNames);

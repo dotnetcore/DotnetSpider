@@ -131,8 +131,8 @@ public partial class DataParserTests
     }
 
     [EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-    [FollowRequestSelector(Expressions = new[] { ".//div[@class='page clearfix']" },
-        Patterns = new[] { "list\\.html" })]
+    [FollowRequestSelector(Expressions = [".//div[@class='page clearfix']"],
+        Patterns = ["list\\.html"])]
     [GlobalValueSelector(Name = "Title", Expression = ".//div[@class='s-title']", Type = SelectorType.XPath)]
     [GlobalValueSelector(Name = "Title2", Expression = ".//div[@class='s-title']", Type = SelectorType.XPath)]
     private class Product : EntityBase<Product>

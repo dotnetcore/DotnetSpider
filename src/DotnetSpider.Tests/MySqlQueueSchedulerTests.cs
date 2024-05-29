@@ -11,7 +11,7 @@ using Xunit.Abstractions;
 
 namespace DotnetSpider.Tests;
 
-public class MySqlQueueSchedulerTests
+public class MySqlQueueSchedulerTests(ITestOutputHelper testOutputHelper)
 {
     class Opt : IOptions<MySqlSchedulerOptions>
     {
@@ -32,13 +32,6 @@ public class MySqlQueueSchedulerTests
         }
     }
 
-    private readonly ITestOutputHelper _testOutputHelper;
-
-    public MySqlQueueSchedulerTests(ITestOutputHelper testOutputHelper)
-    {
-        _testOutputHelper = testOutputHelper;
-    }
-
     private static readonly RequestHasher _hashAlgorithm = new(new MurmurHashAlgorithmService());
 
     [Fact]
@@ -57,10 +50,10 @@ public class MySqlQueueSchedulerTests
             var cnt = await scheduler.EnqueueAsync(
                 new[] {new Request($"http://www.{i.ToString()}.com") {Owner = ownerId}});
 
-            _testOutputHelper.WriteLine($"Enqueue {i}: {cnt}");
+            testOutputHelper.WriteLine($"Enqueue {i}: {cnt}");
         });
 
-        _testOutputHelper.WriteLine($"End");
+        testOutputHelper.WriteLine($"End");
         ParallelUtilities.For(0, 1000, new ExecutionDataflowBlockOptions {MaxDegreeOfParallelism = 20},
             async _ => { await scheduler.DequeueAsync(); });
 

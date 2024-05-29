@@ -23,46 +23,39 @@ public enum SqlServerVersion
     V2017
 }
 
-public class SqlServerOptions
+public class SqlServerOptions(IConfiguration configuration)
 {
-    private readonly IConfiguration _configuration;
-
-    public SqlServerOptions(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
-
-    public StorageMode Mode => string.IsNullOrWhiteSpace(_configuration["SqlServer:Mode"])
+    public StorageMode Mode => string.IsNullOrWhiteSpace(configuration["SqlServer:Mode"])
         ? StorageMode.Insert
-        : (StorageMode)Enum.Parse(typeof(StorageMode), _configuration["SqlServer:Mode"]);
+        : (StorageMode)Enum.Parse(typeof(StorageMode), configuration["SqlServer:Mode"]);
 
-    public SqlServerVersion ServerVersion => string.IsNullOrWhiteSpace(_configuration["SqlServer:Version"])
+    public SqlServerVersion ServerVersion => string.IsNullOrWhiteSpace(configuration["SqlServer:Version"])
         ? SqlServerVersion.V2008
-        : (SqlServerVersion)Enum.Parse(typeof(SqlServerVersion), _configuration["SqlServer:Version"]);
+        : (SqlServerVersion)Enum.Parse(typeof(SqlServerVersion), configuration["SqlServer:Version"]);
 
     /// <summary>
     /// 连接字符串
     /// </summary>
-    public string ConnectionString => _configuration["SqlServer:ConnectionString"];
+    public string ConnectionString => configuration["SqlServer:ConnectionString"];
 
     /// <summary>
     /// 数据库操作重试次数
     /// </summary>
-    public int RetryTimes => string.IsNullOrWhiteSpace(_configuration["SqlServer:RetryTimes"])
+    public int RetryTimes => string.IsNullOrWhiteSpace(configuration["SqlServer:RetryTimes"])
         ? 600
-        : int.Parse(_configuration["SqlServer:RetryTimes"]);
+        : int.Parse(configuration["SqlServer:RetryTimes"]);
 
     /// <summary>
     /// 是否使用事务操作。默认不使用。
     /// </summary>
-    public bool UseTransaction => !string.IsNullOrWhiteSpace(_configuration["SqlServer:UseTransaction"]) &&
-                                  bool.Parse(_configuration["SqlServer:UseTransaction"]);
+    public bool UseTransaction => !string.IsNullOrWhiteSpace(configuration["SqlServer:UseTransaction"]) &&
+                                  bool.Parse(configuration["SqlServer:UseTransaction"]);
 
     /// <summary>
     /// 数据库忽略大小写
     /// </summary>
-    public bool IgnoreCase => !string.IsNullOrWhiteSpace(_configuration["SqlServer:IgnoreCase"]) &&
-                              bool.Parse(_configuration["SqlServer:IgnoreCase"]);
+    public bool IgnoreCase => !string.IsNullOrWhiteSpace(configuration["SqlServer:IgnoreCase"]) &&
+                              bool.Parse(configuration["SqlServer:IgnoreCase"]);
 }
 
 /// <summary>

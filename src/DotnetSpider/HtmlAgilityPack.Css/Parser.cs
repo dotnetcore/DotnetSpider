@@ -610,7 +610,7 @@ public sealed class Parser
         CustomSelectors.Add(name,new DelegateInfo
         {
             Method=selector,
-            ParameterTypes=new List<Type>()
+            ParameterTypes= []
         }  );
     }
     public static void RegisterCustomSelector<TNode, T1>(string name, Func<T1, Selector<TNode>> selector)
@@ -618,7 +618,7 @@ public sealed class Parser
         CustomSelectors.Add(name, new DelegateInfo
         {
             Method=selector,
-            ParameterTypes=new List<Type> { typeof(T1)}
+            ParameterTypes= [typeof(T1)]
         }  );
     }
     public static void RegisterCustomSelector<TNode, T1, T2>(string name, Func<T1, T2, Selector<TNode>> selector)
@@ -626,7 +626,7 @@ public sealed class Parser
         CustomSelectors.Add(name, new DelegateInfo
         {
             Method=selector,
-            ParameterTypes=new List<Type> { typeof(T1),typeof(T2)}
+            ParameterTypes= [typeof(T1), typeof(T2)]
         } );
     }
     public static void RegisterCustomSelector<TNode, T1, T2, T3>(string name, Func<T1, T2, T3, Selector<TNode>> selector)
@@ -634,7 +634,7 @@ public sealed class Parser
         CustomSelectors.Add(name, new DelegateInfo
         {
             Method=selector,
-            ParameterTypes=new List<Type> { typeof(T1),typeof(T2),typeof(T3)}
+            ParameterTypes= [typeof(T1), typeof(T2), typeof(T3)]
         });
     }
 

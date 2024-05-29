@@ -58,7 +58,7 @@ public class DataFlowContext : IDisposable
         Response = response;
         Options = options;
         ServiceProvider = serviceProvider;
-        FollowRequests = new List<Request>();
+        FollowRequests = [];
     }
 
     public void AddFollowRequests(params Request[] requests)

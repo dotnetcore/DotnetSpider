@@ -5,8 +5,6 @@ using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Storage.Entity;
 using DotnetSpider.Downloader;
 using DotnetSpider.Http;
-using DotnetSpider.Scheduler;
-using DotnetSpider.Scheduler.Component;
 using DotnetSpider.Selector;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -15,20 +13,14 @@ using Serilog;
 
 namespace DotnetSpider.Sample.samples;
 
-public class JsonEntitySpider : Spider
+public class JsonEntitySpider(IOptions<SpiderOptions> options, DependenceServices services, ILogger<Spider> logger)
+    : Spider(options, services, logger)
 {
     public static async Task RunAsync()
     {
         var builder = Builder.CreateDefaultBuilder<JsonEntitySpider>();
         builder.UseSerilog();
-        // builder.UseDownloader<HttpClientDownloader>();
-        builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
         await builder.Build().RunAsync();
-    }
-
-    public JsonEntitySpider(IOptions<SpiderOptions> options, DependenceServices services, ILogger<Spider> logger) :
-        base(options, services, logger)
-    {
     }
 
     protected override async Task InitializeAsync(CancellationToken stoppingToken = default)

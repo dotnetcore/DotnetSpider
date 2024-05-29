@@ -18,8 +18,8 @@ namespace DotnetSpider.DataFlow.Parser;
 /// </summary>
 public abstract class DataParser : DataFlowBase
 {
-    private readonly List<Func<DataFlowContext, IEnumerable<Request>>> _followRequestQueriers = new();
-    private readonly List<Func<Request, bool>> _requiredValidator = new();
+    private readonly List<Func<DataFlowContext, IEnumerable<Request>>> _followRequestQueriers = [];
+    private readonly List<Func<Request, bool>> _requiredValidator = [];
 
     /// <summary>
     /// 选择器的生成方法
@@ -33,6 +33,10 @@ public abstract class DataParser : DataFlowBase
     /// <returns></returns>
     protected abstract Task ParseAsync(DataFlowContext context);
 
+    /// <summary>
+    /// 解析响应结果，获取新的需要采集的请求
+    /// </summary>
+    /// <param name="selector"></param>
     public virtual void AddFollowRequestQuerier(ISelector selector)
     {
         _followRequestQueriers.Add(context =>
@@ -50,11 +54,21 @@ public abstract class DataParser : DataFlowBase
         });
     }
 
+    /// <summary>
+    /// 添加是否需要被解析的验证器
+    /// 若验证不通过，则响应结果不会进入此解析器
+    /// </summary>
+    /// <param name="requiredValidator"></param>
     public virtual void AddRequiredValidator(Func<Request, bool> requiredValidator)
     {
         _requiredValidator.Add(requiredValidator);
     }
 
+    /// <summary>
+    /// 添加是否需要被解析的验证器
+    /// 若验证不通过，则响应结果不会进入此解析器
+    /// </summary>
+    /// <param name="pattern"></param>
     public virtual void AddRequiredValidator(string pattern)
     {
         _requiredValidator.Add(request => Regex.IsMatch(request.RequestUri.ToString(), pattern));

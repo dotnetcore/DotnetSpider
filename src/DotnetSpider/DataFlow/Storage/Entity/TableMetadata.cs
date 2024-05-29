@@ -70,9 +70,9 @@ public class TableMetadata
     /// </summary>
     public TableMetadata()
     {
-        Indexes = new HashSet<IndexMetadata>();
+        Indexes = [];
         Columns = new Dictionary<string, Column>();
-        Primary = new HashSet<string>();
-        Updates = new HashSet<string>();
+        Primary = [];
+        Updates = [];
     }
 }

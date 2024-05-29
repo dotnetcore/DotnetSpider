@@ -23,10 +23,10 @@ namespace DotnetSpider.MySql.Scheduler;
 /// 2. 查询出需要的请求
 /// 3. 删除请求
 /// </summary>
-public abstract class MySqlQueueScheduler : IScheduler
+public abstract class MySqlQueueScheduler(IRequestHasher requestHasher, IOptions<MySqlSchedulerOptions> options)
+    : IScheduler
 {
-    private readonly MySqlSchedulerOptions _options;
-    private readonly IRequestHasher _requestHasher;
+    private readonly MySqlSchedulerOptions _options = options.Value;
     private string _spiderId;
     private string _insertSetSql;
     private string _totalSql;
@@ -36,13 +36,6 @@ public abstract class MySqlQueueScheduler : IScheduler
     private string _insertQueueSql;
 
     protected abstract string DequeueSql { get; }
-
-    public MySqlQueueScheduler(
-        IRequestHasher requestHasher, IOptions<MySqlSchedulerOptions> options)
-    {
-        _options = options.Value;
-        _requestHasher = requestHasher;
-    }
 
     public async Task InitializeAsync(string spiderId)
     {
@@ -99,7 +92,7 @@ CREATE TABLE IF NOT EXISTS `{spiderId}_queue`
             if (rows.Count == 0)
             {
                 await transaction.DisposeAsync();
-                return Enumerable.Empty<Request>();
+                return [];
             }
 
             var ids = string.Join(",", rows.Select(x => $"'{x["id"]}'"));
@@ -144,7 +137,7 @@ CREATE TABLE IF NOT EXISTS `{spiderId}_queue`
             var total = 0;
             foreach (var request in requests)
             {
-                _requestHasher.ComputeHash(request);
+                requestHasher.ComputeHash(request);
 
                 var data = new {request.Hash, Request = request.Serialize()};
                 var cnt = await conn.ExecuteAsync(_insertSetSql, data, transaction);

@@ -8,14 +8,9 @@ using MySqlConnector;
 
 namespace DotnetSpider.MySql.AgentCenter;
 
-public class MySqlAgentStore : IAgentStore
+public class MySqlAgentStore(IOptions<AgentCenterOptions> options) : IAgentStore
 {
-    private readonly AgentCenterOptions _options;
-
-    public MySqlAgentStore(IOptions<AgentCenterOptions> options)
-    {
-        _options = options.Value;
-    }
+    private readonly AgentCenterOptions _options = options.Value;
 
     public async Task EnsureDatabaseAndTableCreatedAsync()
     {

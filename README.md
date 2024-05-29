@@ -143,7 +143,6 @@ public class EntitySpider : Spider
     {
         var builder = Builder.CreateDefaultBuilder<EntitySpider>();
         builder.UseSerilog();
-        builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
         await builder.Build()
             .RunAsync();
     }

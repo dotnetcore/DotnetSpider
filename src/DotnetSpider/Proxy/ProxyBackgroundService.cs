@@ -7,22 +7,18 @@ using Microsoft.Extensions.Options;
 
 namespace DotnetSpider.Proxy;
 
-public class ProxyBackgroundService : BackgroundService
+public class ProxyBackgroundService(
+    IProxyService pool,
+    ILogger<ProxyService> logger,
+    IServiceProvider serviceProvider,
+    IOptions<SpiderOptions> options)
+    : BackgroundService
 {
-    private readonly IProxySupplier _proxySupplier;
-    private readonly IProxyService _pool;
-    private readonly ILogger _logger;
-    private readonly SpiderOptions _options;
+    private readonly IProxySupplier _proxySupplier =
+        serviceProvider.GetService(typeof(IProxySupplier)) as IProxySupplier;
 
-    public ProxyBackgroundService(
-        IProxyService pool, ILogger<ProxyService> logger, IServiceProvider serviceProvider,
-        IOptions<SpiderOptions> options)
-    {
-        _proxySupplier = serviceProvider.GetService(typeof(IProxySupplier)) as IProxySupplier;
-        _pool = pool;
-        _logger = logger;
-        _options = options.Value;
-    }
+    private readonly ILogger _logger = logger;
+    private readonly SpiderOptions _options = options.Value;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -40,17 +36,17 @@ public class ProxyBackgroundService : BackgroundService
                 try
                 {
                     var proxies = await _proxySupplier.GetProxiesAsync();
-                    var cnt = await _pool.AddAsync(proxies);
+                    var cnt = await pool.AddAsync(proxies);
                     if (cnt > 0)
                     {
-                        _logger.LogInformation($"Find new {cnt} proxies");
+                        _logger.LogInformation("Find new {ProxyCount} proxies", cnt);
                     }
 
                     await Task.Delay(interval, default);
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError($"Get proxies failed: {e}");
+                    _logger.LogError(e, "Get proxies failed");
                     failedNum++;
                     if (failedNum > 5)
                     {

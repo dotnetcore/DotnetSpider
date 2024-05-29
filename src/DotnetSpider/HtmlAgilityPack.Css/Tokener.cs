@@ -247,19 +247,13 @@ public static class Tokener
         return IsNmStart(ch) || ch == '-' || ch >= '0' && ch <= '9';
     }
 
-    private sealed class Reader
+    private sealed class Reader(string input)
     {
-        private readonly string _input;
         private int _index = -1;
         private int _start = -1;
 
-        public Reader(string input)
-        {
-            _input = input;
-        }
-
-        private bool Ready => _index >= 0 && _index < _input.Length;
-        public char? Value => Ready ? _input[_index] : (char?)null;
+        private bool Ready => _index >= 0 && _index < input.Length;
+        public char? Value => Ready ? input[_index] : (char?)null;
         public int Position => _index + 1;
 
         public void Mark()
@@ -285,15 +279,15 @@ public static class Tokener
         private string Marked(int trim)
         {
             var start = _start;
-            var count = Math.Min(_input.Length, _index + trim) - start;
+            var count = Math.Min(input.Length, _index + trim) - start;
             return count > 0
-                ? _input.Substring(start, count)
+                ? input.Substring(start, count)
                 : string.Empty;
         }
 
         public char? Read()
         {
-            _index = Position >= _input.Length ? _input.Length : _index + 1;
+            _index = Position >= input.Length ? input.Length : _index + 1;
             return Value;
         }
 

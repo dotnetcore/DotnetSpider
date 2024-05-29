@@ -22,14 +22,14 @@ public class HtmlNodeOps : IElementOps<HtmlNode>
     public virtual Selector<HtmlNode> Type(NamespacePrefix prefix, string type)
     {
         return prefix.IsSpecific
-            ? (Selector<HtmlNode>)(nodes => Enumerable.Empty<HtmlNode>())
+            ? (Selector<HtmlNode>)(nodes => [])
             : nodes => nodes.Elements().Where(n => n.Name == type);
     }
 
     public virtual Selector<HtmlNode> Universal(NamespacePrefix prefix)
     {
         return prefix.IsSpecific
-            ? (Selector<HtmlNode>)(nodes => Enumerable.Empty<HtmlNode>())
+            ? (Selector<HtmlNode>)(nodes => [])
             : nodes => nodes.Elements();
     }
 
@@ -52,7 +52,7 @@ public class HtmlNodeOps : IElementOps<HtmlNode>
     public virtual Selector<HtmlNode> AttributeExists(NamespacePrefix prefix, string name)
     {
         return prefix.IsSpecific
-            ? (Selector<HtmlNode>)(nodes => Enumerable.Empty<HtmlNode>())
+            ? (Selector<HtmlNode>)(nodes => [])
             : nodes => nodes.Elements().Where(n => n.Attributes[name] != null);
     }
 
@@ -61,7 +61,7 @@ public class HtmlNodeOps : IElementOps<HtmlNode>
         var withoutAttribute = string.IsNullOrEmpty(value);
 
         return prefix.IsSpecific
-            ? (Selector<HtmlNode>)(nodes => Enumerable.Empty<HtmlNode>())
+            ? (Selector<HtmlNode>)(nodes => [])
             : nodes => from n in nodes.Elements()
                 let a = n.Attributes[name]
                 where withoutAttribute ? a == null || string.IsNullOrEmpty(a.Value) : a != null && a.Value == value
@@ -71,7 +71,7 @@ public class HtmlNodeOps : IElementOps<HtmlNode>
     public virtual Selector<HtmlNode> AttributeNotEqual(NamespacePrefix prefix, string name, string value)
     {
         return prefix.IsSpecific
-            ? (Selector<HtmlNode>)(nodes => Enumerable.Empty<HtmlNode>())
+            ? (Selector<HtmlNode>)(nodes => [])
             : nodes => from n in nodes.Elements()
                 let a = n.Attributes[name]
                 where a == null || a.Value != value
@@ -81,7 +81,7 @@ public class HtmlNodeOps : IElementOps<HtmlNode>
     public virtual Selector<HtmlNode> AttributeIncludes(NamespacePrefix prefix, string name, string value)
     {
         return prefix.IsSpecific
-            ? (Selector<HtmlNode>)(nodes => Enumerable.Empty<HtmlNode>())
+            ? (Selector<HtmlNode>)(nodes => [])
             : nodes => from n in nodes.Elements()
                 let a = n.Attributes[name]
                 where a != null && a.Value.Split(' ').Contains(value)
@@ -93,7 +93,7 @@ public class HtmlNodeOps : IElementOps<HtmlNode>
         var regex = CreateRegex(value);
 
         return prefix.IsSpecific
-            ? (Selector<HtmlNode>)(nodes => Enumerable.Empty<HtmlNode>())
+            ? (Selector<HtmlNode>)(nodes => [])
             : nodes => from n in nodes.Elements()
                 let a = n.GetAttributeValue(name, string.Empty)
                 where regex.IsMatch(a)
@@ -103,7 +103,7 @@ public class HtmlNodeOps : IElementOps<HtmlNode>
     public virtual Selector<HtmlNode> AttributeDashMatch(NamespacePrefix prefix, string name, string value)
     {
         return prefix.IsSpecific || string.IsNullOrEmpty(value)
-            ? (Selector<HtmlNode>)(nodes => Enumerable.Empty<HtmlNode>())
+            ? (Selector<HtmlNode>)(nodes => [])
             : nodes => from n in nodes.Elements()
                 let a = n.Attributes[name]
                 where a != null && a.Value.Split('-').Contains(value)
@@ -113,7 +113,7 @@ public class HtmlNodeOps : IElementOps<HtmlNode>
     public Selector<HtmlNode> AttributePrefixMatch(NamespacePrefix prefix, string name, string value)
     {
         return prefix.IsSpecific || string.IsNullOrEmpty(value)
-            ? (Selector<HtmlNode>)(nodes => Enumerable.Empty<HtmlNode>())
+            ? (Selector<HtmlNode>)(nodes => [])
             : nodes => from n in nodes.Elements()
                 let a = n.Attributes[name]
                 where a != null && a.Value.StartsWith(value)
@@ -123,7 +123,7 @@ public class HtmlNodeOps : IElementOps<HtmlNode>
     public Selector<HtmlNode> AttributeSuffixMatch(NamespacePrefix prefix, string name, string value)
     {
         return prefix.IsSpecific || string.IsNullOrEmpty(value)
-            ? (Selector<HtmlNode>)(nodes => Enumerable.Empty<HtmlNode>())
+            ? (Selector<HtmlNode>)(nodes => [])
             : nodes => from n in nodes.Elements()
                 let a = n.Attributes[name]
                 where a != null && a.Value.EndsWith(value)
@@ -133,7 +133,7 @@ public class HtmlNodeOps : IElementOps<HtmlNode>
     public Selector<HtmlNode> AttributeSubstring(NamespacePrefix prefix, string name, string value)
     {
         return prefix.IsSpecific || string.IsNullOrEmpty(value)
-            ? (Selector<HtmlNode>)(nodes => Enumerable.Empty<HtmlNode>())
+            ? (Selector<HtmlNode>)(nodes => [])
             : nodes => from n in nodes.Elements()
                 let a = n.Attributes[name]
                 where a != null && a.Value.Contains(value)

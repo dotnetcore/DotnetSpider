@@ -16,7 +16,7 @@ public class EmptyDownloader(ILogger<EmptyDownloader> logger) : IDownloader
         Interlocked.Increment(ref _downloadCount);
         if ((_downloadCount % 100) == 0)
         {
-            logger.LogInformation($"download {_downloadCount} already");
+            logger.LogInformation("Download {DownloadCount} already", _downloadCount);
         }
 
         var response = new Response
@@ -27,5 +27,4 @@ public class EmptyDownloader(ILogger<EmptyDownloader> logger) : IDownloader
         };
         return Task.FromResult(response);
     }
-
 }

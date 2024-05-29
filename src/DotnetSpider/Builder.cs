@@ -2,18 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using DotnetSpider.Agent;
+using DotnetSpider.AgentCenter;
+using DotnetSpider.AgentCenter.Store;
 using DotnetSpider.Infrastructure;
 using DotnetSpider.MessageQueue;
+using DotnetSpider.Scheduler;
+using DotnetSpider.Scheduler.Component;
 using DotnetSpider.Statistic;
 using DotnetSpider.Statistic.Store;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.EventLog;
 
 namespace DotnetSpider;
 
@@ -26,7 +27,39 @@ public class Builder : HostBuilder
     {
     }
 
-    public IConfiguration Configuration { get; private set; }
+    public static Builder CreateDefaultBuilder<T>(Action<SpiderOptions> configureDelegate = null)
+        where T : Spider
+    {
+        return CreateDefaultBuilder<T>([], configureDelegate);
+    }
+
+    public static Builder CreateDefaultBuilder<T>(string[] args, Action<SpiderOptions> configureDelegate = null)
+        where T : Spider
+    {
+        return CreateDefaultBuilder(typeof(T), args, configureDelegate);
+    }
+
+    public static Builder CreateDefaultBuilder(Type type, string[] args = null,
+        Action<SpiderOptions> configure = null)
+    {
+        var builder = new Builder();
+        ConfigureBuilder(builder, type, args, configure);
+        builder.ConfigureServices(services =>
+        {
+            services.AddStatisticHostService<InMemoryStatisticStore>();
+            services.AddAgentHostService();
+            services.AddAgentCenterHostService<InMemoryAgentStore>();
+        });
+        return builder;
+    }
+
+    public static Builder CreateBuilder(Type type,
+        string[] args = null, Action<SpiderOptions> configureDelegate = null)
+    {
+        var builder = new Builder();
+        ConfigureBuilder(builder, type, args, configureDelegate);
+        return builder;
+    }
 
     /// <summary>
     /// Create a spider builder only contains spider background service
@@ -38,12 +71,6 @@ public class Builder : HostBuilder
         where T : Spider
     {
         return CreateBuilder<T>(null, configureDelegate);
-    }
-
-    public static Builder CreateDefaultBuilder<T>(Action<SpiderOptions> configureDelegate = null)
-        where T : Spider
-    {
-        return CreateDefaultBuilder<T>(null, configureDelegate);
     }
 
     /// <summary>
@@ -59,42 +86,14 @@ public class Builder : HostBuilder
         return CreateBuilder(typeof(T), args, configureDelegate);
     }
 
-    public static Builder CreateDefaultBuilder<T>(string[] args, Action<SpiderOptions> configureDelegate = null)
-        where T : Spider
-    {
-        return CreateDefaultBuilder(typeof(T), args, configureDelegate);
-    }
-
-    public static Builder CreateBuilder(Type type,
-        string[] args = null, Action<SpiderOptions> configureDelegate = null)
-    {
-        var builder = new Builder();
-        ConfigureBuilder(builder, args, configureDelegate);
-        builder.ConfigureServices((x, services) =>
-        {
-            builder.Configuration = x.Configuration;
-            services.AddSingleton(typeof(IHostedService), type);
-        });
-        return builder;
-    }
-
-    public static Builder CreateDefaultBuilder(Type type, string[] args = null,
-        Action<SpiderOptions> configure = null)
-    {
-        var builder = CreateBuilder(type, args, configure);
-        builder.ConfigureServices((x, services) =>
-        {
-            builder.Configuration = x.Configuration;
-            services.AddLocalMQ();
-            services.AddStatisticHostService<InMemoryStatisticStore>();
-            // services.AddAgentCenter<DefaultAgentStore>();
-        });
-        return builder;
-    }
-
-    public static void ConfigureBuilder(HostBuilder builder, string[] args = null,
+    private static void ConfigureBuilder(Builder builder, Type type, string[] args = null,
         Action<SpiderOptions> configureDelegate = null)
     {
+        if (!type.IsAssignableTo(typeof(Spider)))
+        {
+            throw new ArgumentException($"Type {type.FullName} is not a spider");
+        }
+
         builder.UseContentRoot(Directory.GetCurrentDirectory());
         builder.ConfigureHostConfiguration(config =>
         {
@@ -127,11 +126,7 @@ public class Builder : HostBuilder
                 }
 
                 config.AddCommandLine(list.ToArray());
-            }).ConfigureLogging((hostingContext, logging) =>
-        {
-            logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
-            logging.AddConsole();
-        }).ConfigureServices((context, services) =>
+            }).ConfigureServices((context, services) =>
         {
             var configuration = context.Configuration;
             services.Configure<SpiderOptions>(configuration);
@@ -143,16 +138,18 @@ public class Builder : HostBuilder
 
             services.AddHttpClient();
             services.AddHostedService<PrintArgumentService>();
-            services.AddAgentHostService();
+            services.AddLocalMQ();
             services.TryAddSingleton<IStatisticService, StatisticService>();
             services.TryAddSingleton<DependenceServices>();
             services.TryAddSingleton<IRequestHasher, RequestHasher>();
             services.TryAddSingleton<IHashAlgorithmService, MurmurHashAlgorithmService>();
+            services.AddSingleton(typeof(IHostedService), type);
         }).UseDefaultServiceProvider((context, options) =>
         {
             var flag = context.HostingEnvironment.IsDevelopment();
             options.ValidateScopes = flag;
             options.ValidateOnBuild = flag;
         });
+        builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
     }
 }

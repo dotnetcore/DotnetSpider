@@ -48,7 +48,7 @@ public class DefaultProxyValidator : IProxyValidator
         }
         catch
         {
-            _logger.LogWarning($"proxy {proxy} is not available");
+            _logger.LogWarning("Proxy {Proxy} is not available", proxy);
             return false;
         }
     }

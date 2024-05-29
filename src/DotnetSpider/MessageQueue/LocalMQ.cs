@@ -84,7 +84,7 @@ public class LocalMQ : IMessageQueue
         {
             // 创建一个有界的 Channel
             // 新的消息将会等待， 直到有空间可用
-            var options = new BoundedChannelOptions(1000) { FullMode = BoundedChannelFullMode.Wait };
+            var options = new BoundedChannelOptions(5000) { FullMode = BoundedChannelFullMode.Wait };
             return Channel.CreateBounded<byte[]>(options);
         });
     }

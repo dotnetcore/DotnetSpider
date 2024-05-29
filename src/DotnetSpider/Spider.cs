@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -102,6 +104,15 @@ public abstract class Spider :
         var id = Environment.GetEnvironmentVariable("DOTNET_SPIDER_ID");
         id = string.IsNullOrWhiteSpace(id) ? ObjectId.CreateId().ToString() : id;
         var name = Environment.GetEnvironmentVariable("DOTNET_SPIDER_NAME");
+        if (string.IsNullOrEmpty(name))
+        {
+            var displayName = GetType().GetCustomAttribute<DisplayNameAttribute>();
+            if (displayName != null)
+            {
+                name = displayName.DisplayName;
+            }
+        }
+
         return new SpiderId(id, name);
     }
 
@@ -159,6 +170,11 @@ public abstract class Spider :
         return await AddRequestsAsync(requests.Select(x => new Request(x)));
     }
 
+    /// <summary>
+    /// 添加采集请求到队列中
+    /// </summary>
+    /// <param name="requests"></param>
+    /// <returns></returns>
     protected async Task<int> AddRequestsAsync(params Request[] requests)
     {
         if (requests == null || requests.Length == 0)

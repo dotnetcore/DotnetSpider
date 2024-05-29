@@ -24,7 +24,7 @@ public class KuaidailiProxySupplier : IProxySupplier
     {
         var client = _httpClientFactory.CreateClient("kuaidaili");
         var text = await client.GetStringAsync(_options.ProxySupplierUrl);
-        var proxies = text.Split(new[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries);
+        var proxies = text.Split(["\r\n"], StringSplitOptions.RemoveEmptyEntries);
         return proxies.Select(x => new Uri($"http://{x}"));
     }
 }

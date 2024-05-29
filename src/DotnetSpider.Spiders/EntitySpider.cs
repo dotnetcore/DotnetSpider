@@ -31,7 +31,7 @@ public class EntitySpider(
     [Schema("cnblogs", "news")]
     [EntitySelector(Expression = ".//div[@class='news_block']", Type = SelectorType.XPath)]
     [GlobalValueSelector(Expression = ".//a[@class='current']", Name = "类别", Type = SelectorType.XPath)]
-    [FollowRequestSelector(Expressions = new[] { "//div[@class='pager']" })]
+    [FollowRequestSelector(Expressions = ["//div[@class='pager']"])]
     public class CnblogsEntry : EntityBase<CnblogsEntry>
     {
         protected override void Configure()

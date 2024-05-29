@@ -11,15 +11,8 @@ using Xunit.Abstractions;
 
 namespace DotnetSpider.Tests;
 
-public class RabbitMQTests
+public class RabbitMQTests(ITestOutputHelper testOutputHelper)
 {
-    private readonly ITestOutputHelper _testOutputHelper;
-
-    public RabbitMQTests(ITestOutputHelper testOutputHelper)
-    {
-        _testOutputHelper = testOutputHelper;
-    }
-
     public class MyOptions : IOptions<RabbitMQOptions>
     {
         public RabbitMQOptions Value => new()
@@ -79,7 +72,7 @@ public class RabbitMQTests
             var consumer = new AsyncMessageConsumer<byte[]>("test");
             consumer.Received += bytes =>
             {
-                _testOutputHelper.WriteLine("hi");
+                testOutputHelper.WriteLine("hi");
                 return Task.CompletedTask;
             };
             await messageQueue.ConsumeAsync(consumer);

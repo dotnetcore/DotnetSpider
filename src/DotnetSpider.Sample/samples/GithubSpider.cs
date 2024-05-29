@@ -9,13 +9,9 @@ using Microsoft.Extensions.Options;
 
 namespace DotnetSpider.Sample.samples;
 
-public class GithubSpider : Spider
+public class GithubSpider(IOptions<SpiderOptions> options, DependenceServices services, ILogger<Spider> logger)
+    : Spider(options, services, logger)
 {
-    public GithubSpider(IOptions<SpiderOptions> options, DependenceServices services, ILogger<Spider> logger) :
-        base(options, services, logger)
-    {
-    }
-
     protected override async Task InitializeAsync(CancellationToken stoppingToken)
     {
         // 添加自定义解析

@@ -30,7 +30,7 @@ internal static class StorageUtilities
             throw new SpiderException($"Storage {type} didn't implement method CreateFromOptions");
         }
 
-        var storage = method.Invoke(null, new object[] { configuration });
+        var storage = method.Invoke(null, [configuration]);
         if (storage == null)
         {
             throw new SpiderException("Create default storage failed");

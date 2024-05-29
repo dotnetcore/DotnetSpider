@@ -10,16 +10,9 @@ using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.HBase;
 
-public class HBaseOptions
+public class HBaseOptions(IConfiguration configuration)
 {
-    private readonly IConfiguration _configuration;
-
-    public HBaseOptions(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
-
-    public string HBaseRestServer => _configuration["HBase:RestServer"];
+    public string HBaseRestServer => configuration["HBase:RestServer"];
 }
 
 /// <summary>

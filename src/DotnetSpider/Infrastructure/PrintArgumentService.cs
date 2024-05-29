@@ -37,7 +37,7 @@ public class PrintArgumentService(IOptions<SpiderOptions> options, ILogger<Print
 
         var versionDescription = version.MinorRevision == 0 ? version.ToString() : $"{version}-beta";
         logger.LogInformation(Format(Info, versionDescription));
-        var config = string.Join(", ", properties.Select(x => $"{x.Name}: {x.GetValue(_options)}"));
+        var config = Join(", ", properties.Select(x => $"{x.Name}: {x.GetValue(_options)}"));
         logger.LogInformation(config);
 
         return Task.CompletedTask;

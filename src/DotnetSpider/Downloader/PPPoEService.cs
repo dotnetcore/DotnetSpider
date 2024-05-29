@@ -9,14 +9,9 @@ using Microsoft.Extensions.Options;
 
 namespace DotnetSpider.Downloader;
 
-public class PPPoEService
+public class PPPoEService(IOptions<PPPoEOptions> options)
 {
-    private readonly PPPoEOptions _options;
-
-    public PPPoEService(IOptions<PPPoEOptions> options)
-    {
-        _options = options.Value;
-    }
+    private readonly PPPoEOptions _options = options.Value;
 
     public bool IsActive => !string.IsNullOrWhiteSpace(_options.Account) &&
                             !string.IsNullOrWhiteSpace(_options.Password) &&

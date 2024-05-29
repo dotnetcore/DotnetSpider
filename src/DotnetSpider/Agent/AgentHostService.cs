@@ -18,7 +18,7 @@ namespace DotnetSpider.Agent;
 
 public class AgentHostService : BackgroundService
 {
-    private readonly List<AsyncMessageConsumer<byte[]>> _consumers = new();
+    private readonly List<AsyncMessageConsumer<byte[]>> _consumers = [];
     private readonly IOptions<AgentOptions> _options;
     private readonly ILogger _logger;
     private readonly IMessageQueue _messageQueue;
@@ -44,7 +44,7 @@ public class AgentHostService : BackgroundService
     {
         if (_messageQueue.IsDistributed)
         {
-            _logger.LogDebug("Agent {AgentId}, {AgentName} is starting", _options.Value.AgentId,
+            _logger.LogDebug("Agent {AgentId} - {AgentName} is starting", _options.Value.AgentId,
                 _options.Value.AgentName);
         }
         else
@@ -88,7 +88,7 @@ public class AgentHostService : BackgroundService
 
         if (_messageQueue.IsDistributed)
         {
-            _logger.LogDebug("Agent {AgentId}, {AgentName} started", _options.Value.AgentId,
+            _logger.LogDebug("Agent {AgentId} - {AgentName} started", _options.Value.AgentId,
                 _options.Value.AgentName);
         }
         else
@@ -174,7 +174,7 @@ public class AgentHostService : BackgroundService
 
     private async Task HeartbeatAsync()
     {
-        _logger.LogDebug("I am alive {AgentId}, {AgentName}", _options.Value.AgentId, _options.Value.AgentName);
+        _logger.LogDebug("I am alive {AgentId} - {AgentName}", _options.Value.AgentId, _options.Value.AgentName);
 
         await _messageQueue.PublishAsBytesAsync(Topics.AgentCenter,
             new Messages.Agent.Heartbeat
@@ -190,7 +190,8 @@ public class AgentHostService : BackgroundService
     {
         if (_messageQueue.IsDistributed)
         {
-            _logger.LogInformation("Agent {AgentId} is stopping", _options.Value.AgentId);
+            _logger.LogInformation("Agent {AgentId} - {AgentName} is stopping", _options.Value.AgentId,
+                _options.Value.AgentName);
         }
         else
         {
@@ -206,7 +207,8 @@ public class AgentHostService : BackgroundService
 
         if (_messageQueue.IsDistributed)
         {
-            _logger.LogInformation("Agent {AgentId} stopped", _options.Value.AgentId);
+            _logger.LogInformation("Agent {AgentId} - {AgentName} stopped", _options.Value.AgentId,
+                _options.Value.AgentName);
         }
         else
         {
