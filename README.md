@@ -75,6 +75,7 @@ https://github.com/dotnetcore/DotnetSpider/wiki
 [View complete Codes](https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Sample/samples/EntitySpider.cs)
 
 ````csharp
+[DisplayName("博客园爬虫")]
 public class EntitySpider(
     IOptions<SpiderOptions> options,
     DependenceServices services,
@@ -92,21 +93,6 @@ public class EntitySpider(
         await builder.Build().RunAsync();
     }
 
-    public static async Task RunMySqlQueueAsync()
-    {
-        var builder = Builder.CreateDefaultBuilder<EntitySpider>(options =>
-        {
-            options.Speed = 1;
-        });
-        builder.UseSerilog();
-        builder.IgnoreServerCertificateError();
-        builder.UseMySqlQueueBfsScheduler((context, options) =>
-        {
-            options.ConnectionString = context.Configuration["SchedulerConnectionString"];
-        });
-        await builder.Build().RunAsync();
-    }
-
     protected override async Task InitializeAsync(CancellationToken stoppingToken = default)
     {
         AddDataFlow<DataParser<CnblogsEntry>>();
@@ -114,11 +100,6 @@ public class EntitySpider(
         await AddRequestsAsync(
             new Request(
                 "https://news.cnblogs.com/n/page/1", new Dictionary<string, object> { { "网站", "博客园" } }));
-    }
-
-    protected override SpiderId GenerateSpiderId()
-    {
-        return new(ObjectId.CreateId().ToString(), "博客园");
     }
 
     [Schema("cnblogs", "news")]
@@ -169,7 +150,6 @@ public class EntitySpider(
         public DateTime CreationTime { get; set; }
     }
 }
-
 
 ````
 
