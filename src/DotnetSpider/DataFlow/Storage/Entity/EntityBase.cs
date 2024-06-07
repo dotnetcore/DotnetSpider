@@ -19,7 +19,7 @@ public abstract class EntityBase<T> : IEntity where T : class, new()
     /// 获取实体的表元数据
     /// </summary>
     /// <returns></returns>
-    TableMetadata IEntity.GetTableMetadata()
+    public TableMetadata GetTableMetadata()
     {
         Configure();
 

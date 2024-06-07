@@ -111,7 +111,7 @@ public abstract class RDEntityStorageBase : EntityStorageBase
         foreach (var kv in entities)
         {
             var list = kv.Value;
-            var firstItem = list.ElementAtOrDefault(0);
+            var firstItem = list.ElementAtOrDefault(0) as IEntity;
             if (firstItem == null)
             {
                 continue;
