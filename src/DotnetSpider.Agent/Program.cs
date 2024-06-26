@@ -2,7 +2,9 @@
 using System.Threading.Tasks;
 using DotnetSpider.Downloader;
 using DotnetSpider.RabbitMQ;
+using DotnetSpider.Statistic;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
@@ -35,7 +37,7 @@ class Program
                     builder.UseSerilog();
                     builder.ConfigureServices((context, services) =>
                     {
-                        services.AddKeyedSingleton<IDownloader>(nameof(HttpClientDownloader));
+                        services.TryAddSingleton<IStatisticService, StatisticService>();
                         services.AddAgentHostService(o =>
                         {
                             o.AgentId = "agent" + id;
