@@ -10,7 +10,7 @@ public static class ServiceCollectionExtensions
     public static Builder UseProxy<TProxySupplier>(this Builder builder, Action<ProxyOptions> configure)
         where TProxySupplier : class, IProxySupplier
     {
-        builder.Properties["UserProxy"] = "true";
+        builder.Properties["UseProxy"] = "true";
         builder.ConfigureServices(x =>
         {
             x.AddProxy<TProxySupplier>(configure);
@@ -23,7 +23,7 @@ public static class ServiceCollectionExtensions
         where TProxySupplier : class, IProxySupplier
         where TProxyValidator : class, IProxyValidator
     {
-        builder.Properties["UserProxy"] = "true";
+        builder.Properties["UseProxy"] = "true";
         builder.ConfigureServices(x =>
         {
             x.AddProxy<TProxySupplier, TProxyValidator>(configure);
@@ -37,7 +37,7 @@ public static class ServiceCollectionExtensions
         where TProxyValidator : class, IProxyValidator
         where THttpMessageHandlerBuilder : HttpMessageHandlerBuilder
     {
-        builder.Properties["UserProxy"] = "true";
+        builder.Properties["UseProxy"] = "true";
         builder.ConfigureServices(x =>
         {
             x.AddProxy<TProxySupplier, TProxyValidator, THttpMessageHandlerBuilder>(configure);

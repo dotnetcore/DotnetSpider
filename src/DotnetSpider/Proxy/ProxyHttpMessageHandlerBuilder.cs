@@ -29,15 +29,14 @@ public class ProxyHttpMessageHandlerBuilder : HttpMessageHandlerBuilder
 
     public override HttpMessageHandler Build()
     {
-        if (PrimaryHandler != null)
+        if (Name == null)
         {
             return CreateHandlerPipeline(PrimaryHandler, AdditionalHandlers);
         }
 
         if (!Name.StartsWith(Const.ProxyPrefix))
         {
-            throw new SpiderException(
-                "you are using proxy http client builder, but looks like your http client name is incorrect");
+            return CreateHandlerPipeline(PrimaryHandler, AdditionalHandlers);
         }
 
         var uri = Name.Replace(Const.ProxyPrefix, string.Empty);
