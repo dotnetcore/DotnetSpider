@@ -68,11 +68,11 @@ https://github.com/dotnetcore/DotnetSpider/wiki
 
 ### BASE USAGE
 
-[Base usage Codes](https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Sample/samples/BaseUsage.cs)
+[Base usage Codes](https://github.com/dotnetcore/DotnetSpider/blob/master/src/DotnetSpider.Sample/samples/BaseUsageSpider.cs)
 
 ### ADDITIONAL USAGE: Configurable Entity Spider
 
-[View complete Codes](https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Sample/samples/EntitySpider.cs)
+[View complete Codes](https://github.com/dotnetcore/DotnetSpider/blob/master/src/DotnetSpider.Sample/samples/EntitySpider.cs)
 
 ````csharp
 [DisplayName("博客园爬虫")]
