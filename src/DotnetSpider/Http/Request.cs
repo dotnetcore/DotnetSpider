@@ -216,7 +216,7 @@ public class Request : IDisposable
             {
                 foreach (var header in requestContent.Headers)
                 {
-                    httpRequestMessage.Content.Headers.TryAddWithoutValidation(header.Key, header.Value);
+                    httpContent.Headers.TryAddWithoutValidation(header.Key, header.Value);
                 }
             }
 
