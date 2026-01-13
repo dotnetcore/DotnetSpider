@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -90,5 +91,73 @@ public class RequestedQueueTests
             var request = queue.Dequeue(hash);
             Assert.NotNull(request);
         });
+    }
+
+    /// <summary>
+    /// CRITICAL BUG TEST: When a request is dequeued (response received) and then
+    /// a NEW request with the SAME hash is enqueued, the old timer should NOT
+    /// affect the new request.
+    ///
+    /// Scenario:
+    /// 1. Request A (hash X) enqueued - timer starts for 2s
+    /// 2. Response for A received at T=1s - A dequeued successfully
+    /// 3. Request B (same hash X) enqueued - new entry in dict
+    /// 4. Timer for A fires at T=2s - should NOT remove B from dict!
+    /// </summary>
+    [Fact]
+    public void SameHashReuse_OldTimerShouldNotAffectNewRequest()
+    {
+        var queue = new RequestedQueue();
+        var requestHasher = new RequestHasher(new MurmurHashAlgorithmService());
+
+        // Create the request A with 2s timeout
+        var requestA = new Request("http://www.example.com/page")
+        {
+            Timeout = 2000,
+            Timestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds()
+        };
+        requestHasher.ComputeHash(requestA);
+
+        // T=0: Enqueue request A
+        queue.Enqueue(requestA);
+        Assert.Equal(1, queue.Count);
+
+        // T=1s: Response for A arrives - dequeue A
+        Thread.Sleep(1000);
+        var dequeuedA = queue.Dequeue(requestA.Hash);
+        Assert.NotNull(dequeuedA);
+        Assert.Equal(0, queue.Count);
+
+        // Immediately enqueue request B with the SAME hash
+        // (In the real scenario, this could be a retry or same URL requested again)
+        var requestB = new Request("http://www.example.com/page")
+        {
+            Timeout = 2000,
+            Timestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds()
+        };
+        requestHasher.ComputeHash(requestB);
+
+        queue.Enqueue(requestB);
+        Assert.Equal(1, queue.Count);
+
+        // T=2s: Timer for request A fires (1s after A was enqueued + 1s wait)
+        // Wait for A's timer to fire (it was set for 2s from T=0, so 1s more)
+        Thread.Sleep(1100);
+
+        // EXPECTED CORRECT BEHAVIOR:
+        // Request B should still be in the queue - A's timer should NOT affect it
+        // B was only enqueued ~1s ago, so its timer shouldn't fire until ~3s from the start
+
+        // Try to dequeue B - it should still be there
+        var dequeuedB = queue.Dequeue(requestB.Hash);
+
+        // With the bug: dequeuedB is null because A's timer removed B
+        // After fix: dequeuedB is not null, B is still in the queue
+        Assert.NotNull(dequeuedB);
+
+        // Also, verify nothing is in a timeout list for B
+        // (A completed successfully, B was just dequeued successfully)
+        var timeoutList = queue.GetAllTimeoutList();
+        Assert.Empty(timeoutList);
     }
 }
