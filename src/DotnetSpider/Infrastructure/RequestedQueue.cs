@@ -32,7 +32,7 @@ public class RequestedQueue : IDisposable
             return false;
         }
 
-        _timer.NewTimeout(new TimeoutTask(this, request.Hash),
+        _timer.NewTimeout(new TimeoutTask(this, request.Hash, request.Timestamp),
             TimeSpan.FromMilliseconds(request.Timeout));
         return true;
     }
@@ -50,19 +50,28 @@ public class RequestedQueue : IDisposable
         return data;
     }
 
-    private void Timeout(string hash)
+    private void Timeout(string hash, long timestamp)
     {
-        if (_dict.TryRemove(hash, out var request))
+        // Only remove the request if it's the same instance that was enqueued
+        // when this timer was created (identified by matching timestamp).
+        // This prevents a stale timer from removing a different request that
+        // reused the same hash after the original was dequeued.
+        if (!_dict.TryGetValue(hash, out var request) || request.Timestamp != timestamp)
         {
-            _queue.Add(request);
+            return;
+        }
+
+        if (_dict.TryRemove(hash, out var removedRequest))
+        {
+            _queue.Add(removedRequest);
         }
     }
 
-    private class TimeoutTask(RequestedQueue requestedQueue, string hash) : ITimerTask
+    private class TimeoutTask(RequestedQueue requestedQueue, string hash, long timestamp) : ITimerTask
     {
         public Task RunAsync(ITimeout timeout)
         {
-            requestedQueue.Timeout(hash);
+            requestedQueue.Timeout(hash, timestamp);
             return Task.CompletedTask;
         }
     }
